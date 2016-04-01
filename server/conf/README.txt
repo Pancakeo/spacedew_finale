@@ -1,0 +1,1 @@
+Please copy "reasonable_defaults.db" to "settings.db" after checkout.
