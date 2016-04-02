@@ -1,6 +1,5 @@
 "use strict";
 var server_settings = require('./managers/server_settings');
-var path = require('path');
 
 global.shared_root = require('path').join(__dirname, '..', 'shared');
 

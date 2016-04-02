@@ -1,6 +1,5 @@
 "use strict";
 var sessions = {};
-var toolio = require('../util/toolio');
 var event_bus = require(global.shared_root + '/event_bus');
 
 exports.broadcast = function(type, sub_type, data, options) {
