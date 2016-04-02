@@ -3,9 +3,7 @@ var persistic = require('./persistic');
 
 var settings = {
     http_port: 1991,
-    chat_port: 2001,
-    motd: 'Hey everybody!',
-    lobby_room: 'Lobby'
+    chat_port: 2001
 };
 
 var loaded = false;

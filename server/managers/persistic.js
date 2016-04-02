@@ -39,7 +39,7 @@ exports.each_param_sql = function(sql, params) {
 /*
  Use for insert, and probably update.
  */
-exports.run_param_sql = function(sql, params, callback) {
+exports.run_param_sql = function(sql, params) {
     return new Promise(function(resolve, reject) {
         var db = new sqlite3.Database(db_path);
 

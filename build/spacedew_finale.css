@@ -1,3 +1,27 @@
-h1 {
-  color: red;
+
+
+#login {
+  margin-left: auto;
+  margin-right: auto;
+  width: 190px;
+  margin-top: 20px;
+  border: 1px #ccc solid;
+  padding: 10px;
+}
+#login .heading {
+  font-weight: bold;
+}
+#login label {
+  width: 150px;
+  display: inline-block;
+}
+#login div.field_container {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+#login #status {
+  visibility: hidden;
+}
+#login #create_account {
+  display: none;
 }

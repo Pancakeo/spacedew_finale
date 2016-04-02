@@ -58,7 +58,7 @@ exports.connect = function(connection_id, ws) {
 
             }
 
-            return wup;
+            return JSON.stringify(wup);
         }
     };
 
