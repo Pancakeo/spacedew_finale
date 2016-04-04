@@ -12,23 +12,23 @@ require("fs").readdirSync(normalized_path).forEach(function(file) {
         throw 'message handler for ' + key + ' is already defined. Duplicate file?';
     }
 
-    handlers[key] = handler.handle_message;
+    handlers[key] = handler;
 });
 
 exports.handle = function(session, json_message) {
     var parsed_message = JSON.parse(json_message);
     var type = parsed_message.type;
 
-    if (typeof(handlers[type]) == "function") {
+    if (typeof(handlers[type]) == "object") {
         var handler = handlers[type];
 
-        if (handler.requires_auth === true) {
+        if (handler.requires_auth !== false) {
             if (session.authenticated) {
-                handler(session, parsed_message);
+                handler.handle_message(session, parsed_message);
             }
         }
         else {
-            handler(session, parsed_message);
+            handler.handle_message(session, parsed_message);
         }
 
     }

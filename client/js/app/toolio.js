@@ -5,7 +5,8 @@ module.exports = (function() {
     toolio.alert = function(title, message) {
         w2popup.open({
             title: title,
-            body: '<div class="w2ui-centered">' + message + '</div>'
+            body: '<div class="w2ui-centered">' + message + '</div>',
+            modal: true
         });
     };
 

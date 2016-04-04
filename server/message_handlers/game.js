@@ -1,16 +1,13 @@
 "use strict";
 
-exports.requires_auth = false;
 exports.handle_message = function handle_message(session, message) {
     var sub_type = message.sub_type;
     var data = message.data;
 
-    switch (sub_type) {
-        case 'heartbeat':
+    var handle = {};
 
-            break;
-
-        default:
-            break;
+    if (handle[sub_type] != null) {
+        handle[sub_type]();
     }
+
 };

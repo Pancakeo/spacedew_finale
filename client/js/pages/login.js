@@ -1,27 +1,45 @@
 module.exports = function() {
+    var event_bus = require('../../../shared/event_bus');
     var ws = require('../app/wupsocket');
 
     get_page('login', function(page) {
         var $parent = $('body');
-        $parent.append(page.container);
+        $parent.append(page.$container);
 
         page.$('button').prop('disabled', true);
         page.$("#status").text('Connecting...').css({visibility: 'visible'});
 
         ws.connect();
 
-        page.listen('ws.connect', function() {
+        event_bus.on('ws.connect', function() {
             page.$("#status").text('Connected!');
             page.$('button').prop('disabled', false);
+
+            if (localStorage.auth_key != null) {
+                page.$("#status").text('Logging in (auth_key)...');
+                page.$('button').prop('disabled', true);
+                page.send('login_with_auth_key', {username: localStorage.username, auth_key: localStorage.auth_key});
+            }
         });
 
-        page.listen('login.login', function(data) {
+        page.listen('login', function(data) {
+            console.log(data);
+
             if (data.success !== true) {
-                page.alert('Uh oh', "Well that didn't work.");
+                if (data.auto_login !== true) {
+                    page.alert('Uh oh', "Well that didn't work.");
+                    page.$("#status").text('Whoops, try again.');
+                }
+                else {
+                    page.$("#status").text('Auto-login failed.');
+                }
+
                 page.$('button').prop('disabled', false);
                 return;
             }
 
+            localStorage.auth_key = data.auth_key;
+            localStorage.username = data.username;
             require('../pages/tom_clancy')();
         });
 
@@ -39,7 +57,7 @@ module.exports = function() {
             }
 
             page.$("#status").text('Logging in...');
-            ws.send('login', 'login', params);
+            page.send('login', params);
         };
 
         page.$('#username, #password').on('keypress', function(e) {
@@ -55,8 +73,10 @@ module.exports = function() {
         });
 
         page.$("#sign_up").on('click', function() {
+            page.$container.hide();
             require('./create_account')();
         });
 
+        page.$("#username").val(localStorage.username);
     });
 };

@@ -37,12 +37,16 @@ exports.connect = function(connection_id, ws) {
             ws.send(JSON.stringify(message));
         },
 
-        login: function(params) {
+        login: function(username) {
             session.logged_in = true;
+            session.profile.username = username;
+            console.log(username + " logged in.");
+            session.authenticated = true;
             event_bus.emit('login', session.profile);
         },
         logout: function() {
             session.logged_in = false;
+            console.log(session.profile.username + " logged out.");
             session.authenticated = false;
             event_bus.emit('logout', session.profile);
         },
@@ -61,7 +65,7 @@ exports.connect = function(connection_id, ws) {
         }
     };
 
-    console.log("Connected.", session.get_debug_info());
+    // console.log("Connected.", session.get_debug_info());
     session.send('connection', 'connection_info', {fancy: true});
     session.send('connection', 'heartbeat', {ping_sent_at: Date.now()});
 
@@ -77,7 +81,8 @@ exports.disconnect = function(connection_id) {
             session.logout();
         }
 
-        console.log('Disconnected.', session.get_debug_info());
+
+        // console.log('Disconnected.', session.get_debug_info());
         delete sessions[connection_id];
     }
 };

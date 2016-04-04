@@ -5,15 +5,15 @@ module.exports = function(page_name, callback) {
 
     $.get('html/pages/' + page_name + '.html', function(res) {
         var page = {
-            container: $(res),
+            $container: $(res),
             $: function(selector) {
-                return jQuery(selector, this.container);
+                return jQuery(selector, this.$container);
             },
-            listen: function(event_key, listener) {
-                event_bus.on(event_key, listener);
+            listen: function(event_type, listener) {
+                event_bus.on(page_name + '.' + event_type, listener);
             },
-            send: function(type, sub_type, data) {
-                ws.send(type, sub_type, data);
+            send: function(sub_type, data) {
+                ws.send(page_name, sub_type, data);
             },
             alert: function(title, message) {
                 toolio.alert(title, message);

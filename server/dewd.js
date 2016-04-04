@@ -9,7 +9,6 @@ server_settings.load().then(function(settings) {
     var uuid = require('node-uuid');
 
     require('./servers/http_server');
-    require('./managers/load_observers');
     var sessionator = require('./managers/sessionator');
 
     console.log("Listening for WebSocket requests (chat) on port " + chat_port);
