@@ -1,6 +1,24 @@
 #users {
+  height: 100%;
+  position: relative;
+
   #users_list {
-    min-height: 20px;
-    border: 1px #ccc solid;
+    height: ~"calc(100% - 50px)";
+
+    .user {
+      padding: 5px;
+      font-size: 1.25em;
+      border-bottom: 1px #ccc solid;
+    }
+  }
+
+  #footer {
+    position: absolute;
+    bottom: 5px;
+    font-size: 0;
+
+    img {
+      cursor: pointer;
+    }
   }
 }

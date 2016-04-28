@@ -7,12 +7,12 @@ module.exports = function($parent) {
 
             console.log(data.users);
             data.users.map(function(user) {
-                var $user = $('<div>' + user.username + '</div>');
+                var $user = $('<div class="user">' + user.username + '</div>');
                 $users.append($user);
             });
             page.$("#users_list").append($users);
         });
-        
+
         page.send('users_list', {});
     });
 };
