@@ -1,12 +1,22 @@
 #tom_clancy {
 
   #layout_layout_panel_top .w2ui-panel-content {
-    background: #ccc;
+    background: lightblue;
   }
 
   #footer {
     width: 100%;
     background: #ccc;
+  }
+
+  #rooms {
+    padding-top: 4px;
+    background: transparent;
+
+    .w2ui-tb-caption {
+      font-size: 1.25em;
+      font-weight: 700;
+    }
   }
 
   #top {
@@ -22,6 +32,7 @@
     #button_jar {
       position: absolute;
       right: 5px;
+      top: 0;
     }
 
     #logout {
@@ -34,10 +45,12 @@
   img[menu_item] {
     vertical-align: middle;
     cursor: pointer;
+    padding-left: 2px;
+    padding-right: 2px;
   }
 
-  #top .heading {
-    font-size: 1.25em;
+  img[menu_item].active {
+    background: orange;
   }
 
   #left_pane,

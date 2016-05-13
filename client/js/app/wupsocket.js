@@ -109,7 +109,7 @@ module.exports = (function() {
         death_socket.postMessage({
             action: 'connect',
             params: {
-                server_ip: spacedew_fin.settings.server
+                server_ip: app.settings.server
             }
         });
     };

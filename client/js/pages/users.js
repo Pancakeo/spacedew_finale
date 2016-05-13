@@ -15,4 +15,6 @@ module.exports = function($parent) {
 
         page.send('users_list', {});
     });
+    
+    return {};
 };

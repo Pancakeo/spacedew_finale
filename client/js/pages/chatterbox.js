@@ -5,7 +5,7 @@ module.exports = function($parent) {
 
         page.listen('chat', function(data) {
             console.log(data);
-            var $message = $('<div class="message">' + data.username + ': ' + data.message + '</div>');
+            var $message = $('<div class="message"><span class="timestamp">[' + moment().format("h:mm:ss A") + ']</span><span class="username">' + data.username + ':</span>' + data.message + '</div>');
             $chat.append($message);
 
             $message[0].scrollIntoView();
@@ -23,4 +23,6 @@ module.exports = function($parent) {
             }
         })
     });
+
+    return {};
 };

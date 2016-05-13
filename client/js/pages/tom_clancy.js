@@ -1,5 +1,4 @@
 module.exports = function() {
-    var tom_clancy = {};
 
     get_page('tom_clancy', function(page) {
         $('div').not('#tom_clancy').remove();
@@ -26,12 +25,28 @@ module.exports = function() {
             ]
         });
 
-        tom_clancy.chatterbox = require('./chatterbox')(page.$('#left_pane'));
-        tom_clancy.users = require('./users')(page.$('#right_pane'));
+        require('./chatterbox')(page.$('#left_pane'));
+        require('./users')(page.$('#right_pane'));
 
-        page.$("img[menu_item='logout']").on('click', function() {
-            delete localStorage.auth_key;
-            window.location = '/';
+        var top_menu_handlers = {
+            logout: function() {
+                delete localStorage.auth_key;
+                window.location = '/';
+            },
+            timestamps: function() {
+                $(this).toggleClass('active');
+                page.$("#chat").toggleClass('show_timestamps');
+            }
+        };
+
+        page.$("#button_jar").on('click', 'img[menu_item]', function() {
+            var menu_item = $(this).attr('menu_item');
+
+            if (top_menu_handlers[menu_item] != null) {
+                top_menu_handlers[menu_item].call(this);
+            }
+
         });
+
     });
 };

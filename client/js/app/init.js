@@ -1,11 +1,11 @@
 module.exports = (function() {
-    window.spacedew_fin = {};
+    window.app = {};
 
     var server_settings = {
         server: 'ws://localhost:2001'
     };
 
-    window.spacedew_fin.settings = server_settings;
+    app.settings = server_settings;
 
     for (var server in server_settings) {
         if (server_settings[server].match('ws://localhost') !== null) {
