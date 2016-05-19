@@ -12,6 +12,9 @@ module.exports = function(page_name, callback) {
             listen: function(event_type, listener) {
                 event_bus.on(page_name + '.' + event_type, listener);
             },
+            emit: function(event_type, params) {
+                event_bus.emit(page_name + '.' + event_type, params);
+            },
             send: function(sub_type, data) {
                 ws.send(page_name, sub_type, data);
             },

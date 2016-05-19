@@ -45,6 +45,7 @@ event_bus.on('login', function(params) {
 
 event_bus.on('logout', function(params) {
     var username = params.username;
+    
     for (var i = 0; i < users.length; i++) {
         var user = users[i];
         if (user.username.toLowerCase() === username.toLowerCase()) {
@@ -53,5 +54,5 @@ event_bus.on('logout', function(params) {
         }
     }
 
-    sessionator.broadcast('chatterbox', 'users', {users: users});
+    sessionator.broadcast('users', 'users_list', {users: users});
 });
