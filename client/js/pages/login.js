@@ -23,7 +23,6 @@ module.exports = function() {
         });
 
         page.listen('login', function(data) {
-            console.log(data);
 
             if (data.success !== true) {
                 if (data.auto_login !== true) {

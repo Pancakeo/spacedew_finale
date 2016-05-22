@@ -5,17 +5,43 @@ module.exports = function($parent) {
         $parent.append(page.$container);
         var $chat = page.$("#chat");
 
+        // TODO - check if page is focused. Hide after x seconds. Return to window.
+        var show_notification = function(message) {
+
+            if (app.settings.notify === true && app.hidden) {
+                var n = new Notification(message);
+
+                n.onclick = function() {
+                    window.focus();
+                    n.close();
+                };
+
+                setTimeout(function() {
+                    n.close();
+                }, 2500);
+            }
+        };
+
         var append_system = function(message, class_name) {
             var $message = $('<div class="message"><span class="timestamp">[' + moment().format("h:mm:ss A") + ']</span>' + message + '</div>');
             $message.addClass(class_name);
             $chat.append($message);
-            $message[0].scrollIntoView();
+
+            show_notification(message);
+
+            if (app.settings.scroll_lock !== true) {
+                $message[0].scrollIntoView();
+            }
         };
 
         var append_chat = function(data) {
             var $message = $('<div class="message"><span class="timestamp">[' + moment().format("h:mm:ss A") + ']</span><span class="username">' + data.username + ':</span>' + data.message + '</div>');
             $chat.append($message);
-            $message[0].scrollIntoView();
+            show_notification(data.message);
+
+            if (app.settings.scroll_lock !== true) {
+                $message[0].scrollIntoView();
+            }
         };
 
         event_bus.on('users.roams_the_earth', function(user) {

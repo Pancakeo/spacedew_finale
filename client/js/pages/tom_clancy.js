@@ -36,8 +36,52 @@ module.exports = function() {
             timestamps: function() {
                 $(this).toggleClass('active');
                 page.$("#chat").toggleClass('show_timestamps');
+            },
+            notify: function() {
+                var active = $(this).hasClass('active');
+                $(this).removeClass('active');
+                localStorage.auto_notify = false;
+                app.settings.notify = false;
+
+                var _this = this;
+
+                if (!active) {
+                    Notification.requestPermission(function(permission) {
+                        app.settings.notify = (permission == "granted");
+
+                        if (app.settings.notify) {
+                            localStorage.auto_notify = true;
+                            $(_this).addClass('active');
+                            page.alert("Notifications", "Notifications are now turned on.");
+                        }
+                        else {
+                            page.alert("Notifications", "Desolee. Failed to activate Notifications. May have been disabled for this domain previously.");
+                        }
+                    });
+                }
+                else {
+                    page.alert("Notifications", "Notifications are now turned off.");
+                }
+            },
+            scroll_lock: function() {
+                $(this).toggleClass('active');
+                app.settings.scroll_lock = $(this).hasClass('active');
+            },
+            dress_up: function() {
+                require('./dress_up')();
             }
+
         };
+
+        // Turn on Notifications if already set.
+        if (Boolean(localStorage.auto_notify) == true) {
+            Notification.requestPermission(function(permission) {
+                app.settings.notify = (permission == "granted");
+                if (app.settings.notify) {
+                    page.$("#button_jar img[menu_item='notify']").addClass('active');
+                }
+            });
+        }
 
         page.$("#button_jar").on('click', 'img[menu_item]', function() {
             var menu_item = $(this).attr('menu_item');
@@ -45,7 +89,6 @@ module.exports = function() {
             if (top_menu_handlers[menu_item] != null) {
                 top_menu_handlers[menu_item].call(this);
             }
-
         });
 
     });
