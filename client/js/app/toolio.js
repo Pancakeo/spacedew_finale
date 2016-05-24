@@ -3,9 +3,8 @@ module.exports = (function() {
     var toolio = {};
 
     toolio.alert = function(title, message) {
-        w2popup.open({
+        $('<div>' + message + '</div>').dialog({
             title: title,
-            body: '<div class="w2ui-centered">' + message + '</div>',
             modal: true
         });
     };

@@ -14,17 +14,7 @@ module.exports = function() {
         });
 
         do_resize();
-
-        var pstyle = 'border: 1px solid #dfdfdf;';
-        $('#content').w2layout({
-            name: 'layout',
-            panels: [
-                {type: 'top', size: 35, style: pstyle, content: page.$("#top"), resizable: false},
-                {type: 'left', size: '88%', style: pstyle, content: page.$("#left_pane"), resizable: true},
-                {type: 'main', style: pstyle, content: page.$("#right_pane"), resizable: true}
-            ]
-        });
-
+        
         require('./chatterbox')(page.$('#left_pane'));
         require('./users')(page.$('#right_pane'));
 

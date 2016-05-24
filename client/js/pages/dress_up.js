@@ -1,11 +1,26 @@
 module.exports = function() {
 
     get_page('dress_up', function(page) {
-        w2popup.open({
-            title: 'eh',
-            body: '<div class="w2ui-centered">' + 'eh' + '</div>',
-            modal: true
+
+        page.$container.dialog({
+            title: 'Dress Up',
+            width: 'auto',
+            resizeable: false,
+            modal: true,
+            buttons: {
+                'Save': function() {
+                    $(this).dialog('close');
+                },
+                'Reset': function() {
+                    $(this).dialog('close');
+                },
+                'Cancel': function() {
+                    $(this).dialog('close');
+                }
+
+            }
         });
+
     });
 
     return {};
