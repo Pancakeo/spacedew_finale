@@ -17,7 +17,10 @@ module.exports = function() {
                 'Cancel': function() {
                     $(this).dialog('close');
                 }
-
+            },
+            open: function() {
+                $(this).find('#font_name').selectmenu();
+                $(this).find('#font_size').selectmenu();
             }
         });
 
