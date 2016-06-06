@@ -16,6 +16,7 @@ module.exports = (function() {
 
     for (var server in server_settings) {
         if (server_settings[server].match('ws://localhost') !== null) {
+            debugger;
             server_settings[server] = server_settings[server].replace('localhost', window.location.hostname);
         }
     }
