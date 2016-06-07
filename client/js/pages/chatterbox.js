@@ -28,6 +28,7 @@ module.exports = function($parent) {
                     app.new_message_alert = true;
 
                     $(window).one('focus', function() {
+                        app.new_message_alert = false;
                         $('#favicon').attr('href', '/images/favicon-normal.png');
                     });
                 }
