@@ -90,6 +90,28 @@ module.exports = function($parent) {
             append_system(user.username + " has gone to a better place.", 'sad')
         });
 
+        event_bus.on('ws.disconnect', function() {
+            if (app.disconnected === true) {
+                return;
+            }
+
+            app.disconnected = true;
+
+            $("<div>Disconnected from server</div>").dialog({
+                title: "Oh shit",
+                modal: true,
+                buttons: {
+                    'Ok': function() {
+                        $(this).dialog('close');
+                    }
+                },
+                close: function() {
+                    app.disconnected = false;
+                    window.location = '/';
+                }
+            });
+        });
+
         page.listen('chat', function(data) {
             append_chat(data);
         });
