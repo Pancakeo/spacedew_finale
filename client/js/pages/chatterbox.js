@@ -8,18 +8,31 @@ module.exports = function($parent) {
         // TODO - check if page is focused. Hide after x seconds. Return to window.
         var show_notification = function(message) {
 
-            if (app.settings.notify === true && app.hidden) {
-                var n = new Notification(message);
+            if (app.hidden) {
+                if (app.settings.notify === true) {
+                    var n = new Notification(message);
 
-                n.onclick = function() {
-                    window.focus();
-                    n.close();
-                };
+                    n.onclick = function() {
+                        window.focus();
+                        n.close();
+                    };
 
-                setTimeout(function() {
-                    n.close();
-                }, 2500);
+                    setTimeout(function() {
+                        n.close();
+                    }, 2500);
+                }
+
+                // Do the favicon thing.
+                if (app.new_message_alert !== true) {
+                    $('#favicon').attr('href', '/images/favicon-alert.png');
+                    app.new_message_alert = true;
+
+                    $(window).one('focus', function() {
+                        $('#favicon').attr('href', '/images/favicon-normal.png');
+                    });
+                }
             }
+
         };
 
         var append_system = function(message, class_name) {
@@ -35,9 +48,33 @@ module.exports = function($parent) {
         };
 
         var append_chat = function(data) {
-            var $message = $('<div class="message"><span class="timestamp">[' + moment().format("h:mm:ss A") + ']</span><span class="username">' + data.username + ':</span>' + data.message + '</div>');
+
+            var message = data.message;
+            var link_replacement = '<a target="_blank" href="\$1">\$1</a>';
+
+            var lines = message.split('<br/>');
+            message = '';
+
+            lines.forEach(function(line) {
+                var parts = line.split(/\s/);
+
+                // Consider a more robust link parser.
+                for (var i = 0; i < parts.length; i++) {
+                    parts[i] = parts[i].replace(/(http.*)/, link_replacement);
+                }
+
+                if (message == '') {
+                    message = parts.join(' ');
+                }
+                else {
+                    message += '<br/>' + parts.join(' ');
+                }
+
+            });
+
+            var $message = $('<div class="message"><span class="timestamp">[' + moment().format("h:mm:ss A") + ']</span><span class="username">' + data.username + ':</span>' + message + '</div>');
             $chat.append($message);
-            show_notification(data.message);
+            show_notification(data.username + ": " + data.message);
 
             if (app.settings.scroll_lock !== true) {
                 $message[0].scrollIntoView();
