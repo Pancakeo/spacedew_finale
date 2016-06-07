@@ -20,9 +20,20 @@ exports.handle_message = function handle_message(session, message) {
     var handle = {
         login: function() {
             crepto.get_hashed_password(data.username, data.password).then(function(result) {
-                do_login({user_id: result.user_id});
+
+                storage_thing.each_param_sql("SELECT user_id from user WHERE username = lower(?) AND password = ?", [data.username, result.hashed_password]).then(function(db_result) {
+                    if (db_result.rows.length > 0) {
+                        do_login({user_id: result.user_id});
+                    }
+                    else {
+                        session.send('login', 'login', {success: false, reason: "Fuck you (bad login)."});
+                    }
+
+                }, function() {
+                    session.send('login', 'login', {success: false, reason: "Fuck you (DB error)."});
+                });
             }).catch(function(error) {
-                session.send('login', 'login', {success: false, reason: "Fuck you"});
+                session.send('login', 'login', {success: false, reason: "Fuck you (bad login)."});
                 console.log(error);
             })
         },
@@ -46,7 +57,7 @@ exports.handle_message = function handle_message(session, message) {
                 return;
             }
 
-                var alpha_numeric_regex = /^[A-Za-z0-9_]+$/i;
+            var alpha_numeric_regex = /^[A-Za-z0-9_]+$/i;
 
             if (alpha_numeric_regex.test(data.username) !== true || alpha_numeric_regex.test(data.password) !== true) {
                 session.send('login', 'create_account', {success: false, reason: "Username and password must be alphanumeric."});
