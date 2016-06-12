@@ -36,8 +36,16 @@ exports.connect = function(connection_id, ws) {
 
             ws.send(JSON.stringify(message));
         },
-
+        logout_existing: function(username) {
+            for (var key in sessions) {
+                var s = sessions[key];
+                if (s.profile.username && s.profile.username.toLowerCase() == username.toLowerCase()) {
+                    s.logout();
+                }
+            }
+        },
         login: function(username) {
+            session.logout_existing(username);
             session.logged_in = true;
             session.profile.username = username;
             console.log(username + " logged in.");
@@ -49,6 +57,13 @@ exports.connect = function(connection_id, ws) {
             console.log(session.profile.username + " logged out.");
             session.authenticated = false;
             event_bus.emit('logout', session.profile);
+            try {
+                s.ws.close();
+            }
+            catch (e) {
+                console.log('Logout failure', e);
+            }
+
         },
         get_debug_info: function() {
             var wup = {};
@@ -80,7 +95,6 @@ exports.disconnect = function(connection_id) {
         if (session.logged_in === true) {
             session.logout();
         }
-
 
         // console.log('Disconnected.', session.get_debug_info());
         delete sessions[connection_id];

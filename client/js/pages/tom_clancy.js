@@ -14,11 +14,11 @@ module.exports = function() {
         });
 
         do_resize();
-        
+
         require('./chatterbox')(page.$('#left_pane'));
         require('./users')(page.$('#right_pane'));
 
-        var top_menu_handlers = {
+        var menu_handlers = {
             logout: function() {
                 delete localStorage.auth_key;
                 window.location = '/';
@@ -59,8 +59,13 @@ module.exports = function() {
             },
             dress_up: function() {
                 require('./dress_up')();
-            }
+            },
+            blargher: function() {
+                require('./blargher')();
+            },
+            browse: function() {
 
+            }
         };
 
         // Turn on Notifications if already set.
@@ -73,13 +78,24 @@ module.exports = function() {
             });
         }
 
-        page.$("#button_jar").on('click', 'img[menu_item]', function() {
+        page.$container.on('click', 'img[menu_item]', function() {
             var menu_item = $(this).attr('menu_item');
 
-            if (top_menu_handlers[menu_item] != null) {
-                top_menu_handlers[menu_item].call(this);
+            if (menu_handlers[menu_item] != null) {
+                menu_handlers[menu_item].call(this);
             }
         });
+
+        // TODO - wup.
+        $(document).idle({
+            onIdle: function() {
+
+            },
+            onActive: function() {
+
+            },
+            idle: 5000
+        })
 
     });
 };
