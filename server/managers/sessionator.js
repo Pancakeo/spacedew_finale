@@ -58,7 +58,7 @@ exports.connect = function(connection_id, ws) {
             session.authenticated = false;
             event_bus.emit('logout', session.profile);
             try {
-                s.ws.close();
+                session.ws.close();
             }
             catch (e) {
                 console.log('Logout failure', e);
