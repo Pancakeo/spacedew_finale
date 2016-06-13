@@ -1,4 +1,4 @@
-module.exports = function() {
+module.exports = function(options) {
 
     get_page('tom_clancy', function(page) {
         $('div').not('#tom_clancy').remove();
@@ -15,7 +15,7 @@ module.exports = function() {
 
         do_resize();
 
-        require('./chatterbox')(page.$('#left_pane'));
+        require('./chatterbox')(page.$('#left_pane'), options);
         require('./users')(page.$('#right_pane'));
 
         var menu_handlers = {
@@ -86,16 +86,24 @@ module.exports = function() {
             }
         });
 
-        // TODO - wup.
-        $(document).idle({
-            onIdle: function() {
+        page.$("#room_names")
 
-            },
-            onActive: function() {
+        app.add_room_tab = function(room, focus) {
+            var $room_tab = $('<div class="room_tab" room_id="' + room.id + '">' + room.name + '</div>');
+            var $room_box = $('<div class="chat_thing"></div>');
+            $room_tab.prop('room', room);
 
-            },
-            idle: 5000
-        })
+            // May actually not need these:
+            $room_box.prop('room_tab', $room_tab);
+            $room_tab.prop('room_box', $room_box);
+
+            page.$("#room_names").append($room_tab);
+            page.$("#chat_rooms").append($room_box);
+
+            if (focus == true) {
+                $room_tab.click();
+            }
+        };
 
     });
 };

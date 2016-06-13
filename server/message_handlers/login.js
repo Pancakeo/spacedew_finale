@@ -2,6 +2,7 @@
 
 var crepto = require('../util/crepto');
 var storage_thing = require('../managers/storage_thing');
+var wiseau = require('../managers/wiseau');
 var crypto = require('crypto');
 
 exports.requires_auth = false;
@@ -13,7 +14,15 @@ exports.handle_message = function handle_message(session, message) {
         session.login(data.username);
         var auth_key = crypto.randomBytes(16).toString('hex');
         var user_id = user.user_id;
-        session.send('login', 'login', {success: true, username: data.username, auth_key: auth_key});
+
+        session.send('login', 'login', {
+                success: true,
+                username: data.username,
+                auth_key: auth_key,
+                lobby: wiseau.get_lobby()
+            }
+        );
+
         storage_thing.run_param_sql("UPDATE user set auth_key = ? WHERE user_id = ?", [auth_key, user_id]);
     };
 

@@ -39,7 +39,12 @@ module.exports = function() {
 
             localStorage.auth_key = data.auth_key;
             localStorage.username = data.username;
-            require('../pages/tom_clancy')();
+
+            var clancy_stuff = {
+                lobby: data.lobby
+            };
+
+            require('../pages/tom_clancy')(clancy_stuff);
         });
 
         var do_login = function() {

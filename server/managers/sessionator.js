@@ -57,13 +57,13 @@ exports.connect = function(connection_id, ws) {
             console.log(session.profile.username + " logged out.");
             session.authenticated = false;
             event_bus.emit('logout', session.profile);
+
             try {
                 session.ws.close();
             }
             catch (e) {
                 console.log('Logout failure', e);
             }
-
         },
         get_debug_info: function() {
             var wup = {};

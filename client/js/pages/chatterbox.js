@@ -1,11 +1,9 @@
-module.exports = function($parent) {
+module.exports = function($parent, options) {
     get_page('chatterbox', function(page) {
         var event_bus = require('../../../shared/event_bus');
 
         $parent.append(page.$container);
-        var $chat = page.$("#chat");
 
-        // TODO - check if page is focused. Hide after x seconds. Return to window.
         var show_notification = function(message) {
 
             if (app.hidden) {
@@ -37,6 +35,7 @@ module.exports = function($parent) {
         };
 
         var append_system = function(message, class_name) {
+            var $chat = page.$(".chat_thing");  // TODO
             var $message = $('<div class="message"><span class="timestamp">[' + moment().format("h:mm:ss A") + ']</span>' + message + '</div>');
             $message.addClass(class_name);
             $chat.append($message);
@@ -49,7 +48,7 @@ module.exports = function($parent) {
         };
 
         var append_chat = function(data) {
-
+            var $chat = page.$(".chat_thing");  // TODO
             var message = data.message;
             var link_replacement = '<a target="_blank" href="\$1">\$1</a>';
 
@@ -120,13 +119,25 @@ module.exports = function($parent) {
             if (e.which === 13) {
                 var message = $(this).val();
 
-                if (message.length != null) {
+                if (message.length > 0) {
                     page.send('chat', {message: message});
                 }
 
                 $(this).val('');
             }
-        })
+        });
+
+        $(document).idle({
+            onIdle: function() {
+                page.send('idle', {idle: true});
+            },
+            onActive: function() {
+                page.send('idle', {idle: false});
+            },
+            idle: 5000
+        });
+
+        app.add_room_tab(options.lobby);
     });
 
     return {};

@@ -2,20 +2,24 @@
   width: 100%;
   height: 100%;
 
-  #chat.show_timestamps .timestamp {
-    display: inline-block;
-    margin-right: 5px;
+  #chat_rooms {
+    height: ~"calc(100% - 45px)";
   }
 
-  #chat {
+  .chat_thing {
     border-bottom: 1px #ccc solid;
     padding-bottom: 10px;
-    height: ~"calc(100% - 45px)";
+    height: 100%;
     width: 100%;
     overflow-y: scroll;
 
     .timestamp {
       display: none;
+    }
+
+    .show_timestamps .timestamp {
+      display: inline-block;
+      margin-right: 5px;
     }
 
     .username {
