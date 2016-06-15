@@ -115,7 +115,9 @@ module.exports = function(options) {
                 focus: false
             }, add_options);
 
-            var $room_tab = $('<div class="room_tab" room_id="' + room.id + '">' + room.name + '</div>');
+            var nice_title = room.name.replace("\"", "&quot;");
+            var $room_tab = $('<div class="room_tab" room_id="' + room.id + '" title="' + nice_title + '">' + room.name + '</div>');
+
             var $room_box = $('<div class="chat_thing" room_id="' + room.id + '"></div>');
             $room_tab.prop('room', room);
 
