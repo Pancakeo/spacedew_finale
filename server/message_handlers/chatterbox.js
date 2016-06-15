@@ -27,12 +27,10 @@ exports.handle_message = function handle_message(session, message) {
         },
         blargh: function() {
             if (data.message.length > 0) {
-                var room = wiseau.get_room(room_id);
                 sessionator.broadcast('chatterbox', 'blargh', {message: data.message, username: session.profile.username}, {room_id: room.id});
             }
         },
         change_room_name: function() {
-            var room = wiseau.get_room(room_id);
             if (room == null) {
                 return;
             }
