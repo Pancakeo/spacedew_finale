@@ -86,12 +86,42 @@ module.exports = function(options) {
             }
         });
 
-        page.$("#room_names")
+        page.$("#room_names").on('click', '.room_tab', function() {
+            var $active = page.$("#room_names .room_tab.active");
+            if ($active.length == 1 && $active.attr('room_id') != $(this).attr('room_id')) {
+                $active.prop('room_box').hide();
+            }
 
-        app.add_room_tab = function(room, focus) {
+            page.$("#room_names .room_tab").removeClass('active');
+            $(this).addClass('active');
+            $(this).prop('room_box').show();
+        });
+
+        page.$("#room_names").on('dblclick', '.room_tab', function() {
+            var room_id = $(this).prop('room').id;
+
+            page.prompt("Room Name", "Maybe input a room name here:", function(val) {
+                if (val != null) {
+                    val = val.trim();
+                    if (val.length > 0) {
+                        page.emit('change_room_name', {name: val, room_id: room_id});
+                    }
+                }
+            });
+        });
+
+        app.add_room_tab = function(room, add_options) {
+            add_options = $.extend({
+                focus: false
+            }, add_options);
+
             var $room_tab = $('<div class="room_tab" room_id="' + room.id + '">' + room.name + '</div>');
-            var $room_box = $('<div class="chat_thing"></div>');
+            var $room_box = $('<div class="chat_thing" room_id="' + room.id + '"></div>');
             $room_tab.prop('room', room);
+
+            $room_box.on('click', '.blargh .close', function() {
+                $(this).closest('.blargh').remove();
+            });
 
             // May actually not need these:
             $room_box.prop('room_tab', $room_tab);
@@ -100,10 +130,25 @@ module.exports = function(options) {
             page.$("#room_names").append($room_tab);
             page.$("#chat_rooms").append($room_box);
 
-            if (focus == true) {
+            if (add_options.focus == true) {
                 $room_tab.click();
             }
         };
 
+        app.get_active_room = function(just_id) {
+            var $active = page.$("#room_names .room_tab.active");
+
+            // uh oh
+            if ($active.length == 0) {
+                throw 'heh';
+            }
+
+            if (just_id) {
+                return $active.attr('room_id');
+            }
+            else {
+                return $active.prop('room');
+            }
+        };
     });
 };

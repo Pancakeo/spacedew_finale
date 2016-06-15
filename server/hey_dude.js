@@ -2,6 +2,7 @@
 var server_settings = require('./managers/server_settings');
 
 global.shared_root = require('path').join(__dirname, '..', 'shared');
+// global.Promise = require("bluebird");
 
 server_settings.load().then(function(settings) {
     var WebSocketServer = require('ws').Server;

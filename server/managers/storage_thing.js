@@ -1,4 +1,5 @@
 "use strict";
+var Promise = require("bluebird");
 var sqlite3 = require('sqlite3').verbose();
 var fs = require('fs');
 var db_path = "conf/settings.db";

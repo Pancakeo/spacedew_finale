@@ -4,9 +4,12 @@ const DEFAULT_LOBBY_NAME = "Tom Clancy's Rocket Ballz";
 
 var uuid = require('node-uuid');
 var server_settings = require('./server_settings');
+var moment = require('moment');
 
 var rooms = {};
 var lobby_room;
+
+var MAX_MESSAGES = 15;
 
 exports.create_room = function(room_name, room_id) {
     room_id = room_id || uuid.v4();
@@ -16,7 +19,47 @@ exports.create_room = function(room_name, room_id) {
         id: room_id,
         users: [],
         recent_messages: [],
-        bob_ross: []
+        bob_ross: [],
+        add_recent_message: function(message) {
+            if (room.recent_messages.length >= MAX_MESSAGES) {
+                room.recent_messages.shift();
+            }
+
+            room.recent_messages.push({message: message, timestamp: Date.now()});
+        },
+        is_member: function(username) {
+            for (var i = 0; i < room.users.length; i++) {
+                var user = room.users[i];
+
+                if (user.username.toLowerCase() == username.toLowerCase()) {
+                    return true;
+                }
+            }
+
+            return false;
+        },
+        join_room: function(username) {
+            for (var i = 0; i < room.users.length; i++) {
+                var user = room.users[i];
+
+                if (user.username.toLowerCase() == username.toLowerCase()) {
+                    room.users.splice(i, 1);
+                    i--;
+                }
+            }
+
+            room.users.push({username: username, last_activity: Date.now(), idle: false});
+        },
+        leave_room: function(username) {
+            for (var i = 0; i < room.users.length; i++) {
+                var user = room.users[i];
+
+                if (user.username.toLowerCase() == username.toLowerCase()) {
+                    room.users.splice(i, 1);
+                    i--;
+                }
+            }
+        }
     };
 
     rooms[room_id] = room;

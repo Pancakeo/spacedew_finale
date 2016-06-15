@@ -20,6 +20,9 @@ module.exports = function(page_name, callback) {
             },
             alert: function(title, message) {
                 toolio.alert(title, message);
+            },
+            prompt: function(title, message, cb) {
+                toolio.prompt(title, message, cb);
             }
         };
 

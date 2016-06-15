@@ -1,15 +1,32 @@
 "use strict";
 var sessions = {};
 var event_bus = require(global.shared_root + '/event_bus');
+var wiseau = require('./wiseau');
 
 exports.broadcast = function(type, sub_type, data, options) {
-    options = Object.assign({require_logged_in: true}, options);
+    options = Object.assign({
+        require_logged_in: true,
+        room_id: null
+    }, options);
+
+    if (options.room_id != null) {
+        data.room_id = options.room_id;
+        var room = wiseau.get_room(options.room_id);
+    }
 
     for (var key in sessions) {
         var session = sessions[key];
 
         if (options.require_logged_in && session.logged_in) {
-            session.send(type, sub_type, data);
+            if (room != null) {
+
+                if (room.is_member(session.profile.username) >= 0) {
+                    session.send(type, sub_type, data);
+                }
+            }
+            else {
+                session.send(type, sub_type, data);
+            }
         }
         else if (!options.require_logged_in) {
             session.send(type, sub_type, data);

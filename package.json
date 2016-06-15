@@ -29,6 +29,6 @@
     "grunt-refupdate": "^0.1.4"
   },
   "dependencies": {
-    
+    "moment": "^2.13.0"
   }
 }

@@ -15,6 +15,9 @@ exports.handle_message = function handle_message(session, message) {
         var auth_key = crypto.randomBytes(16).toString('hex');
         var user_id = user.user_id;
 
+        var room = wiseau.get_lobby();
+        room.join_room(session.profile.username);
+
         session.send('login', 'login', {
                 success: true,
                 username: data.username,

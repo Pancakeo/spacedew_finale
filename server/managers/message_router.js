@@ -30,7 +30,6 @@ exports.handle = function(session, json_message) {
         else {
             handler.handle_message(session, parsed_message);
         }
-
     }
     else {
         console.error("No parser available for", type, parsed_message);

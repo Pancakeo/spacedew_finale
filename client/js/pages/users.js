@@ -5,15 +5,17 @@ module.exports = function($parent) {
         $parent.append(page.$container);
 
         page.listen('users_list', function(data) {
+            var room_id = data.room_id;
             var $users = page.$("#users_list").empty();
 
+            var logging_in = Object.keys(known_users).length == 0;
             var gone_to_a_better_place = Object.keys(known_users);
 
             data.users.map(function(user) {
                 var nice_username = user.username.toLowerCase();
 
-                if (known_users[nice_username] == null) {
-                    page.emit('roams_the_earth', {username: user.username});
+                if (!logging_in && known_users[nice_username] == null) {
+                    page.emit('roams_the_earth', {username: user.username, room_id: room_id});
                 }
 
                 var idx = gone_to_a_better_place.indexOf(nice_username);
@@ -28,14 +30,24 @@ module.exports = function($parent) {
             });
 
             gone_to_a_better_place.forEach(function(user) {
-                page.emit('has_gone_to_a_better_place', {username: known_users[user]});
+                page.emit('has_gone_to_a_better_place', {username: known_users[user], room_id: room_id});
                 delete known_users[user.toLowerCase()];
             });
 
             page.$("#users_list").append($users);
         });
 
-        page.send('users_list', {});
+        page.send('users_list', {room_id: app.get_active_room(true)});
+
+        $(document).idle({
+            onIdle: function() {
+                page.send('idle', {idle: true});
+            },
+            onActive: function() {
+                page.send('idle', {idle: false});
+            },
+            idle: 5000
+        });
     });
 
     return {};

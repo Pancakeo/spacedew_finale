@@ -1,5 +1,6 @@
 "use strict";
 var storage_thing = require('./storage_thing');
+var Promise = require("bluebird");
 
 var settings = {
     http_port: 1991,
@@ -40,10 +41,17 @@ exports.set = function(key, value) {
 
     settings[key] = value;
 
-    // Write to db. Note: Doesn't check if the key exists.
-    storage_thing.each_param_sql("UPDATE server_settings SET value = ? WHERE key = ?", [value, key]).then(function() {
-        console.log("settings updated.")
-    }).catch(function(error) {
-        console.log("error updating settings", error);
-    })
+    storage_thing.each_param_sql('SELECT key FROM server_settings where key = ?', [key]).then(function(result) {
+        if (result.rows.length == 0) {
+            storage_thing.run_param_sql("INSERT INTO server_settings (key, value) VALUES (?, ?)", [key, value]).then(function(res) {
+                console.log("settings updated.")
+            });
+        }
+        else {
+            storage_thing.each_param_sql("UPDATE server_settings SET value = ? WHERE key = ?", [value, key]).then(function(result) {
+                  console.log("settings updated.")
+            })
+        }
+    });
+
 };

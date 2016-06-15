@@ -4,11 +4,13 @@
   "description": "",
   "main": "dewd.js",
   "dependencies": {
+    "bluebird": "^3.4.0",
     "finalhandler": "^0.4.1",
     "node-uuid": "^1.4.7",
     "serve-static": "^1.10.0",
     "sqlite3": "^3.1.1",
-    "ws": "^1.0.1"
+    "ws": "^1.0.1",
+    "moment": "latest"
   },
   "devDependencies": {},
   "scripts": {

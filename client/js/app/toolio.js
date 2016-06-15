@@ -5,7 +5,48 @@ module.exports = (function() {
     toolio.alert = function(title, message) {
         $('<div>' + message + '</div>').dialog({
             title: title,
-            modal: true
+            modal: true,
+            close: function() {
+                $(this).dialog('destroy');
+            }
+        });
+    };
+
+    toolio.prompt = function(title, message, cb) {
+        var use_input = false;
+
+        var $blargh = $('<div>' + message + '<br/><input id="prompter" style="display: block; margin-top: 5px; min-width: 600px; width: 100%; height: 40px; padding: 5px;"/></div>').dialog({
+            title: title,
+            modal: true,
+            width: 'auto',
+            buttons: {
+                'Ok': function() {
+                    use_input = true;
+                    $(this).dialog('close');
+                },
+                'Cancel': function() {
+                    $(this).dialog('close');
+                }
+            },
+            open: function() {
+                $(this).find("#prompter").off('keydown.blargh').on('keydown.blargh', function(e) {
+                    if (e.which == 13) {
+                        use_input = true;
+                        $blargh.dialog('close');
+                    }
+                });
+            },
+            close: function() {
+                if (use_input) {
+                    var val = $blargh.find('#prompter').val();
+                    cb(val);
+                }
+                else {
+                    cb(null);
+                }
+
+                $(this).dialog('destroy');
+            }
         });
     };
 
