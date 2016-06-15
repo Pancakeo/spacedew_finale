@@ -114,7 +114,6 @@ module.exports = function($parent, options) {
         };
 
         event_bus.on('users.roams_the_earth', function(event) {
-            console.log(event);
             append_system(event.username + " roams the earth.", {class_name: 'happy', room_id: event.room_id})
         });
 
