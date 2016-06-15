@@ -188,6 +188,7 @@ module.exports = function($parent, options) {
 
         var lobby = options.lobby;
         app.add_room_tab(options.lobby, {focus: true});
+        app.ready = true;
 
         if (lobby.recent_messages.length > 0) {
             var $blargh = $('<div class="blargh"/>');

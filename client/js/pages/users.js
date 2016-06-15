@@ -37,8 +37,6 @@ module.exports = function($parent) {
             page.$("#users_list").append($users);
         });
 
-        page.send('users_list', {room_id: app.get_active_room(true)});
-
         $(document).idle({
             onIdle: function() {
                 page.send('idle', {idle: true});
@@ -48,6 +46,13 @@ module.exports = function($parent) {
             },
             idle: 5000
         });
+
+        var wait_for_app = setInterval(function() {
+            if (app.ready) {
+                page.send('users_list', {room_id: app.get_active_room(true)});
+                clearInterval(wait_for_app);
+            }
+        }, 50);
     });
 
     return {};
