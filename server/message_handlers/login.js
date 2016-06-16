@@ -74,7 +74,7 @@ exports.handle_message = function handle_message(session, message) {
                 return;
             }
 
-            var alpha_numeric_regex = /^[A-Za-z0-9_]+$/i;
+            var alpha_numeric_regex = /^[A-Za-z0-9_]+$/;
 
             if (alpha_numeric_regex.test(data.username) !== true || alpha_numeric_regex.test(data.password) !== true) {
                 session.send('login', 'create_account', {success: false, reason: "Username and password must be alphanumeric."});

@@ -25,7 +25,7 @@ module.exports = function(options) {
             },
             timestamps: function() {
                 $(this).toggleClass('active');
-                page.$("#chat").toggleClass('show_timestamps');
+                page.$(".chat_thing").toggleClass('show_timestamps');
             },
             notify: function() {
                 var active = $(this).hasClass('active');

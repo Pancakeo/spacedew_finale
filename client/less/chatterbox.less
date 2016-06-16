@@ -6,21 +6,21 @@
     height: ~"calc(100% - 45px)";
   }
 
+  .chat_thing .timestamp {
+    display: none;
+  }
+
+  .chat_thing.show_timestamps .timestamp {
+    display: inline-block;
+    margin-right: 5px;
+  }
+
   .chat_thing {
     border-bottom: 1px #ccc solid;
     padding-bottom: 10px;
     height: 100%;
     width: 100%;
     overflow-y: scroll;
-
-    .timestamp {
-      display: none;
-    }
-
-    .show_timestamps .timestamp {
-      display: inline-block;
-      margin-right: 5px;
-    }
 
     .username {
       display: inline-block;
