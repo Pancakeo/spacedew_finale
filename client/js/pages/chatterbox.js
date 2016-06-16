@@ -82,7 +82,6 @@ module.exports = function($parent, options) {
 
             var $chat = page.$("div[room_id='" + data.room_id + "']");
             var message = data.message;
-            var link_replacement = '<a target="_blank" href="\$1">\$1</a>';
 
             var lines = message.split('<br/>');
             message = '';
@@ -90,9 +89,11 @@ module.exports = function($parent, options) {
             lines.forEach(function(line) {
                 var parts = line.split(/\s/);
 
-                // Consider a more robust link parser.
+                // Consider a more robust link parser (heh!)
                 for (var i = 0; i < parts.length; i++) {
-                    parts[i] = parts[i].replace(/(http.*)/, link_replacement);
+                    parts[i] = parts[i].replace(/(http.*)/, function(url) {
+                        return '<a target="_blank" href="' + encodeURI(url) + '">' + url + '</a>';
+                    });
                 }
 
                 if (message == '') {
