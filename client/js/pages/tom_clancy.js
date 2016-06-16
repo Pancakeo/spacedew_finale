@@ -111,7 +111,7 @@ module.exports = function(options) {
         });
 
         app.rename_room_tab = function(room_id, room_name) {
-            page.$('#room_names [room_id="' + room_id + '"]').text(room_name).attr('title', room_name);
+            page.$('#room_names [room_id="' + room_id + '"]').html(room_name).attr('title', room_name);
         };
 
         app.add_room_tab = function(room, add_options) {
@@ -120,8 +120,7 @@ module.exports = function(options) {
             }, add_options);
 
             var $room_tab = $('<div class="room_tab" room_id="' + room.id + '"/>');
-            $room_tab.attr('title', room.name);
-            $room_tab.text(room.name);
+            $room_tab.attr('title', room.name).html(room.name);
 
             var $room_box = $('<div class="chat_thing" room_id="' + room.id + '"></div>');
             $room_tab.prop('room', room);

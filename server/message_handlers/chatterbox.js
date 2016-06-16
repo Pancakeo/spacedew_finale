@@ -35,9 +35,13 @@ exports.handle_message = function handle_message(session, message) {
                 return;
             }
 
-            room.name = data.name;
+            var clean_name = data.name;
+            clean_name = clean_name.replace(/</g, '&lt;');
+            clean_name = clean_name.replace(/>/g, '&gt;');
+
+            room.name = clean_name;
             sessionator.broadcast('chatterbox', 'change_room_name', {new_name: room.name, blame: session.profile.username}, {room_id: room.id});
-            server_settings.set('lobby_room_name', data.name);
+            server_settings.set('lobby_room_name', room.name);
         }
     };
 
