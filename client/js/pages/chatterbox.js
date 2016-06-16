@@ -169,7 +169,7 @@ module.exports = function($parent, options) {
 
         page.listen('change_room_name', function(data) {
             append_system(data.blame + ' changed the room name to ' + data.new_name, {room_id: data.room_id, class_name: 'wup'});
-            $('#room_names [room_id="' + data.room_id + '"]').text(data.new_name);
+            app.rename_room_tab(data.room_id, data.new_name);
         });
 
         page.$("#composer").on('keypress', function(e) {

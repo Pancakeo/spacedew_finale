@@ -64,8 +64,13 @@ exports.handle_message = function handle_message(session, message) {
             });
         },
         create_account: function() {
-            if (data.username.length < 4 || data.password.length < 4) {
-                session.send('login', 'create_account', {success: false, reason: "Username and password must be 4+ characters."});
+            if (data.username.length < 3 || data.password.length < 4) {
+                session.send('login', 'create_account', {success: false, reason: "Username is 3-16 characters, password 4-64 characters."});
+                return;
+            }
+
+            if (data.username.length > 16 || data.password.length > 64) {
+                session.send('login', 'create_account', {success: false, reason: "Username is 3-16 characters, password 4-64 characters."});
                 return;
             }
 

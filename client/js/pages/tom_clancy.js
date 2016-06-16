@@ -110,13 +110,18 @@ module.exports = function(options) {
             });
         });
 
+        app.rename_room_tab = function(room_id, room_name) {
+            page.$('#room_names [room_id="' + room_id + '"]').text(room_name).attr('title', room_name);
+        };
+
         app.add_room_tab = function(room, add_options) {
             add_options = $.extend({
                 focus: false
             }, add_options);
 
-            var nice_title = room.name.replace("\"", "&quot;");
-            var $room_tab = $('<div class="room_tab" room_id="' + room.id + '" title="' + nice_title + '">' + room.name + '</div>');
+            var $room_tab = $('<div class="room_tab" room_id="' + room.id + '"/>');
+            $room_tab.attr('title', room.name);
+            $room_tab.text(room.name);
 
             var $room_box = $('<div class="chat_thing" room_id="' + room.id + '"></div>');
             $room_tab.prop('room', room);
