@@ -1,37 +1,50 @@
 <div>
     <div id="dress_up">
-        <div>
-            <label for="username_color">Username</label>
-            <input id="username_color" type="color"/>
-        </div>
 
-        <div>
-            <label for="fg_color">Foreground</label>
-            <input id="fg_color" type="color"/>
-        </div>
+        <div id="dress_tabs">
+            <ul>
+                <li><a href="#chat_style">Chatting</a></li>
+                <li><a href="#user_list_style">User List</a></li>
+            </ul>
 
-        <div>
-            <label for="bg_color">Background</label>
-            <input id="bg_color" type="color"/>
-        </div>
+            <div id="chat_style">
+                <div>
+                    <label for="username_color">Username</label>
+                    <input id="username_color" type="color"/>
+                </div>
 
-        <div>
-            <label for="font_name">Font</label>
-            <select id="font_name">
-                <option>Arial</option>
-            </select>
-        </div>
+                <div>
+                    <label for="fg_color">Foreground</label>
+                    <input id="fg_color" type="color"/>
+                </div>
 
-        <div>
-            <label for="font_size">Size</label>
-            <select id="font_size">
-                <option>14</option>
-            </select>
-        </div>
+                <div>
+                    <label for="bg_color">Background</label>
+                    <input id="bg_color" type="color"/>
+                </div>
 
-        <div id="example_container">
-            <label for="example">Example</label>
-            <input id="example" value="Pancakeo: Heh!" readonly="readonly"/>
+                <div>
+                    <label for="font_family">Font</label>
+                    <select id="font_family"></select>
+                </div>
+
+                <div>
+                    <label for="font_size">Size</label>
+                    <select id="font_size"></select>
+                </div>
+
+                <div id="example_container">
+                    <label>Example</label>
+                    <div id="example_wrapper">
+                        <span id="example_username">Pancakeo:</span>
+                        <span id="example_message">Hey everybody!</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="user_list_style">
+                <p>Maybe something could go here??</p>
+            </div>
         </div>
     </div>
 </div>

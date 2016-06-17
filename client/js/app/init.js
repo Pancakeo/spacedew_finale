@@ -4,6 +4,17 @@ module.exports = (function() {
         settings: {}
     };
 
+    // Dialog stuff.
+    $.widget("yehrye.dialog", $.ui.dialog, {
+        close: function() {
+            var _this = this;
+            setTimeout(function() {
+                _this.uiDialog.remove();
+            }, 0);
+            this._superApply(arguments);
+        }
+    });
+
     var server_settings = {
         server: 'ws://localhost:2001'
     };

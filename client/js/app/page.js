@@ -19,10 +19,10 @@ module.exports = function(page_name, callback) {
                 ws.send(page_name, sub_type, data);
             },
             alert: function(title, message) {
-                toolio.alert(title, message);
+                toolio.alert.apply(this, arguments);
             },
-            prompt: function(title, message, cb) {
-                toolio.prompt(title, message, cb);
+            prompt: function(title, message, existing_value, cb) {
+                toolio.prompt.apply(this, arguments);
             }
         };
 

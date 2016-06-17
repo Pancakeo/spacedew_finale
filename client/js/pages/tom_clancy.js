@@ -100,7 +100,7 @@ module.exports = function(options) {
         page.$("#room_names").on('dblclick', '.room_tab', function() {
             var room_id = $(this).prop('room').id;
 
-            page.prompt("Room Name", "Maybe input a room name here:", function(val) {
+            page.prompt("Room Name", "Maybe input a room name here:", $(this).text(), function(val) {
                 if (val != null) {
                     val = val.trim();
                     if (val.length > 0) {

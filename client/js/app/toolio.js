@@ -5,15 +5,17 @@ module.exports = (function() {
     toolio.alert = function(title, message) {
         $('<div>' + message + '</div>').dialog({
             title: title,
-            modal: true,
-            close: function() {
-                $(this).dialog('destroy');
-            }
+            modal: true
         });
     };
 
-    toolio.prompt = function(title, message, cb) {
+    toolio.prompt = function(title, message, existing_value, cb) {
         var use_input = false;
+
+        if (typeof(existing_value) == "function") {
+            cb = existing_value;
+            existing_value = null;
+        }
 
         var $blargh = $('<div>' + message + '<br/><input id="prompter" style="display: block; margin-top: 5px; min-width: 600px; width: 100%; height: 40px; padding: 5px;"/></div>').dialog({
             title: title,
@@ -29,6 +31,8 @@ module.exports = (function() {
                 }
             },
             open: function() {
+                $(this).find('#prompter').val(existing_value);
+
                 $(this).find("#prompter").off('keydown.blargh').on('keydown.blargh', function(e) {
                     if (e.which == 13) {
                         use_input = true;
@@ -44,8 +48,6 @@ module.exports = (function() {
                 else {
                     cb(null);
                 }
-
-                $(this).dialog('destroy');
             }
         });
     };
