@@ -37,7 +37,7 @@ exports.handle_message = function handle_message(session, message) {
                     crepto.hash_password(data.new_pw).then(function(new_password) {
                         storage_thing.run_param_sql('UPDATE user SET password = ?, salty = ? WHERE user_id = ?', [new_password.hashed_password, new_password.salt, session.profile.user_id]).then(function(heh) {
                             session.send('user_settings', 'change_password', {success: true});
-                            console.log(session.profile.username + " changed her username.");
+                            console.log(session.profile.username + " changed her password.");
                         })
                     });
                 });
