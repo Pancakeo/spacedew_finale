@@ -1,12 +1,49 @@
 "use strict";
 var sessionator = require('../managers/sessionator');
 var storage_thing = require('../managers/storage_thing');
+var crepto = require('../util/crepto');
+var crypto = require('crypto');
 
 exports.handle_message = function handle_message(session, message) {
     var sub_type = message.sub_type;
     var data = message.data;
 
     var handle = {
+        change_password: function() {
+            var alpha_numeric_regex = /^[A-Za-z0-9_]+$/;
+
+            if (data.new_pw != data.confirm_pw) {
+                session.send('user_settings', 'change_password', {success: false, reason: "Passwords don't match."});
+                return;
+            }
+
+            if (data.new_pw.length < 4 || data.new_pw.length > 64) {
+                session.send('user_settings', 'change_password', {success: false, reason: "Password must be 4-64 characters."});
+                return;
+            }
+
+            if (alpha_numeric_regex.test(data.new_pw) !== true) {
+                session.send('user_settings', 'change_password', {success: false, reason: "Shit's gotta be alphanumeric."});
+                return;
+            }
+
+            crepto.get_hashed_password(session.profile.username, data.current_pw).then(function(result) {
+                storage_thing.each_param_sql('SELECT * from user WHERE user_id = ? AND password = ?', [result.user_id, result.hashed_password]).then(function(res) {
+                    if (res.rows.length == 0) {
+                        session.send('user_settings', 'change_password', {success: false, reason: "Current password is incorrect."});
+                        return;
+                    }
+
+                    crepto.hash_password(data.new_pw).then(function(new_password) {
+                        storage_thing.run_param_sql('UPDATE user SET password = ?, salty = ? WHERE user_id = ?', [new_password.hashed_password, new_password.salt, session.profile.user_id]).then(function(heh) {
+                            session.send('user_settings', 'change_password', {success: true});
+                            console.log(session.profile.username + " changed her username.");
+                        })
+                    });
+                });
+            });
+
+        },
         outfit: function() {
             var user_id = session.profile.user_id;
             storage_thing.each_param_sql('SELECT * FROM user_settings WHERE user_id = ?', [user_id]).then(function(result) {

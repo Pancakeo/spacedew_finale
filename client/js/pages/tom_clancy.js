@@ -65,6 +65,15 @@ module.exports = function(options) {
             },
             browse: function() {
 
+            },
+            toggle_user_pane: function() {
+                $(this).toggleClass('active');
+
+                page.$("#left_pane").toggleClass('no_user_pane');
+                page.$("#right_pane").toggleClass('no_user_pane');
+            },
+            change_password: function() {
+                require('./change_password')();
             }
         };
 

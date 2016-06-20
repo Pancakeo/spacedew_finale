@@ -26,6 +26,24 @@ module.exports = function(page_name, callback) {
             }
         };
 
+        Object.defineProperty(page, 'toolio', {
+            get: function() {
+                return toolio;
+            }
+        });
+
+        Object.defineProperty(page, 'ws', {
+            get: function() {
+                return ws;
+            }
+        });
+
+        Object.defineProperty(page, 'event_bus', {
+            get: function() {
+                return event_bus;
+            }
+        });
+
         callback(page);
     });
 };
