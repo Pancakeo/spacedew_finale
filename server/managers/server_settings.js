@@ -20,7 +20,6 @@ exports.load = function() {
                 loaded = true;
                 resolve(settings);
             }, function(error) {
-                console.log('heh');
                 reject(Error('Failed to load server settings from DB'));
             })
     });

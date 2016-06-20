@@ -1,8 +1,7 @@
-// TODO - pass in current settings.
-// TODO - save 2 server.
 module.exports = function() {
 
     var toolio = require('../app/toolio');
+    var ws = require('../app/wupsocket');
 
     var generic_outfit = {
         chat: {
@@ -14,9 +13,9 @@ module.exports = function() {
         }
     };
 
-    var user_outfit = {};
-    user_outfit = $.extend(generic_outfit, user_outfit);
-    var original_colors = toolio.copy_object(user_outfit);
+    var user_outfit = app.world.user_settings[app.profile.username];
+    user_outfit = $.extend(true, {}, generic_outfit, user_outfit.outfit);
+    var original_outfit = toolio.copy_object(user_outfit);
 
     get_page('dress_up', function(page) {
         var $dialog = page.$container.dialog({
@@ -26,7 +25,11 @@ module.exports = function() {
             modal: true,
             buttons: {
                 'Save': function() {
+                    ws.send('user_settings', 'outfit', {outfit: user_outfit});
                     $(this).dialog('close');
+                },
+                'Default': function() {
+                    apply_settings(true, generic_outfit);
                 },
                 'Reset': function() {
                     apply_settings(true);
@@ -62,9 +65,15 @@ module.exports = function() {
             apply_settings(true);
         };
 
-        var apply_settings = function(load) {
+        var apply_settings = function(load, load_from) {
             if (load) {
-                user_outfit = toolio.copy_object(original_colors);
+                if (load_from == null) {
+                    user_outfit = toolio.copy_object(original_outfit);
+                }
+                else {
+                    user_outfit = toolio.copy_object(load_from);
+                }
+
 
                 for (var key in user_outfit.chat) {
                     page.$("#" + key).val(user_outfit.chat[key]);

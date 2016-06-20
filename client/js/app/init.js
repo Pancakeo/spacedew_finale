@@ -1,7 +1,9 @@
 module.exports = (function() {
     window.app = {
         hidden: (document.hidden === true),
-        settings: {}
+        settings: {},
+        profile: {},
+        world: {user_settings: {}} // Users and shit.
     };
 
     // Dialog stuff.

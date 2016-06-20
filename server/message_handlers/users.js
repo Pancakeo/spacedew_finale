@@ -8,13 +8,24 @@ exports.handle_message = function handle_message(session, message) {
     var data = message.data;
 
     var handle = {
-        users_list: function() {
+        sync: function() {
             var room = wiseau.get_room(data.room_id);
             if (room == null) {
                 return;
             }
 
+            var user_settings = {};
+            var sessions = sessionator.get_sessions();
+
+            for (var key in sessions) {
+                var s = sessions[key];
+                if (s.logged_in) {
+                    user_settings[s.profile.username] = s.profile.user_settings;
+                }
+            }
+
             session.send('users', 'users_list', {users: room.users, room_id: room.id});
+            session.send('users', 'user_settings', {user_settings: user_settings});
         }
     };
 

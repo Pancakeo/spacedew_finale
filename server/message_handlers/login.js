@@ -2,6 +2,7 @@
 
 var crepto = require('../util/crepto');
 var storage_thing = require('../managers/storage_thing');
+var sessionator = require('../managers/sessionator');
 var wiseau = require('../managers/wiseau');
 var crypto = require('crypto');
 
@@ -11,22 +12,47 @@ exports.handle_message = function handle_message(session, message) {
     var data = message.data;
 
     var do_login = function(user) {
-        session.login(data.username);
-        var auth_key = crypto.randomBytes(16).toString('hex');
-        var user_id = user.user_id;
+        storage_thing.each_param_sql('SELECT * FROM user_settings WHERE user_id = ?', [user.user_id]).then(function(result) {
+            session.login(data.username, user.user_id);
 
-        var room = wiseau.get_lobby();
-        room.join_room(session.profile.username);
-
-        session.send('login', 'login', {
-                success: true,
-                username: data.username,
-                auth_key: auth_key,
-                lobby: wiseau.get_lobby()
+            if (result.rows.length > 0) {
+                session.profile.user_settings = JSON.parse(result.rows[0].settings_json);
             }
-        );
+            else {
+                session.profile.user_settings = {};
+            }
 
-        storage_thing.run_param_sql("UPDATE user set auth_key = ? WHERE user_id = ?", [auth_key, user_id]);
+            var auth_key = crypto.randomBytes(16).toString('hex');
+            var user_id = user.user_id;
+
+            var room = wiseau.get_lobby();
+            room.join_room(session.profile.username);
+
+            session.send('login', 'login', {
+                    success: true,
+                    username: data.username,
+                    auth_key: auth_key,
+                    lobby: wiseau.get_lobby()
+                }
+            );
+
+            var user_settings = {};
+            var sessions = sessionator.get_sessions();
+
+            for (var key in sessions) {
+                var s = sessions[key];
+                if (s.logged_in) {
+                    user_settings[s.profile.username] = s.profile.user_settings;
+                }
+            }
+
+            sessionator.broadcast('users', 'user_settings', {
+                user_settings: user_settings
+            });
+
+            storage_thing.run_param_sql("UPDATE user set auth_key = ? WHERE user_id = ?", [auth_key, user_id]);
+        });
+
     };
 
     var handle = {

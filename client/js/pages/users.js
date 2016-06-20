@@ -4,6 +4,10 @@ module.exports = function($parent) {
     get_page('users', function(page) {
         $parent.append(page.$container);
 
+        page.listen('user_settings', function(data) {
+            app.world.user_settings = data.user_settings;
+        });
+
         page.listen('users_list', function(data) {
             var room_id = data.room_id;
             var $users = page.$("#users_list").empty();
@@ -49,7 +53,7 @@ module.exports = function($parent) {
 
         var wait_for_app = setInterval(function() {
             if (app.ready) {
-                page.send('users_list', {room_id: app.get_active_room(true)});
+                page.send('sync', {room_id: app.get_active_room(true)});
                 clearInterval(wait_for_app);
             }
         }, 50);

@@ -44,6 +44,7 @@ module.exports = function() {
                 lobby: data.lobby
             };
 
+            app.profile.username = data.username;
             require('../pages/tom_clancy')(clancy_stuff);
         });
 

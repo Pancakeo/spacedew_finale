@@ -3,6 +3,10 @@ var sessions = {};
 var event_bus = require(global.shared_root + '/event_bus');
 var wiseau = require('./wiseau');
 
+exports.get_sessions = function() {
+    return sessions;
+};
+
 exports.broadcast = function(type, sub_type, data, options) {
     options = Object.assign({
         require_logged_in: true,
@@ -61,10 +65,11 @@ exports.connect = function(connection_id, ws) {
                 }
             }
         },
-        login: function(username) {
+        login: function(username, user_id) {
             session.logout_existing(username);
             session.logged_in = true;
             session.profile.username = username;
+            session.profile.user_id = user_id;
             console.log(username + " logged in.");
             session.authenticated = true;
             event_bus.emit('login', session.profile);
