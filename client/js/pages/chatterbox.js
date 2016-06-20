@@ -105,7 +105,25 @@ module.exports = function($parent, options) {
 
             });
 
+            var this_fucking_guy = app.world.user_settings[data.username];
+            this_fucking_guy = $.extend(true, {
+                outfit: {
+                    chat: {
+                        bg_color: 'white',
+                        fg_color: 'black',
+                        font_family: 'Verdana',
+                        font_size: 14,
+                        username_color: 'blue'
+                    }
+                }
+            }, this_fucking_guy);
+
+            var outfit = this_fucking_guy.outfit.chat;
+
             var $message = $('<div class="message"><span class="timestamp">[' + moment().format("h:mm:ss A") + ']</span><span class="username">' + data.username + ': </span>' + message + '</div>');
+            $message.css({background: outfit.bg_color, color: outfit.fg_color, fontFamily: outfit.font_family, fontSize: outfit.font_size + 'px'});
+            $message.find('.username').css({color: outfit.username_color});
+
             $chat.append($message);
             show_notification(data.username + ": " + data.message);
 
