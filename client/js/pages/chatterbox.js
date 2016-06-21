@@ -49,7 +49,7 @@ module.exports = function($parent, options) {
             show_notification("New multi-line message received!");
 
             if (app.settings.scroll_lock !== true) {
-                $blargh[0].scrollIntoView(false);
+                $blargh[0].scrollIntoView();
             }
         };
 
@@ -71,7 +71,7 @@ module.exports = function($parent, options) {
             show_notification(message);
 
             if (app.settings.scroll_lock !== true) {
-                $message[0].scrollIntoView(false);
+                $message[0].scrollIntoView();
             }
         };
 
@@ -129,7 +129,7 @@ module.exports = function($parent, options) {
             show_notification(data.username + ": " + data.message);
 
             if (app.settings.scroll_lock !== true) {
-                $message[0].scrollIntoView(false);
+                $message[0].scrollIntoView();
             }
         };
 
