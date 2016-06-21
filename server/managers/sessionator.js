@@ -3,6 +3,10 @@ var sessions = {};
 var event_bus = require(global.shared_root + '/event_bus');
 var wiseau = require('./wiseau');
 
+setInterval(function() {
+    exports.broadcast('connection', 'heartbeat', {ping_sent_at: Date.now()}, {require_logged_in: false});
+}, 7500);
+
 exports.get_sessions = function() {
     return sessions;
 };
@@ -56,7 +60,13 @@ exports.connect = function(connection_id, ws) {
                 data: data
             };
 
-            ws.send(JSON.stringify(message));
+            try {
+                ws.send(JSON.stringify(message));
+            }
+            catch (e) {
+                console.log('uh oh ' + e);
+            }
+
         },
         logout_existing: function(username) {
             for (var key in sessions) {

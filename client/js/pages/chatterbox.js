@@ -149,7 +149,7 @@ module.exports = function($parent, options) {
         event_bus.on('tom_clancy.change_room_name', function(params) {
             page.send('change_room_name', params);
         });
-
+        
         event_bus.on('ws.disconnect', function() {
             if (app.disconnected === true) {
                 return;

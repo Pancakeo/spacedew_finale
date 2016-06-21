@@ -50,7 +50,6 @@ module.exports = (function() {
 
             case 'message':
                 var message = params.message;
-                // console.log(message);
                 if (typeof(ws_handlers[message.type]) == "function") {
                     ws_handlers[message.type](message);
                 }

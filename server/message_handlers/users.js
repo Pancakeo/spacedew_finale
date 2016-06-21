@@ -29,6 +29,8 @@ var send_users_list = function(room, session) {
 
         if (idx >= 0) {
             nice_users[idx].idle = (s.idle == true);
+            nice_users[idx].ping = s.ping;
+            
             if (s.idle == true && s.idle_start) {
                 nice_users[idx].idle_duration = Date.now() - s.idle_start;
             }

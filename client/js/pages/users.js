@@ -16,7 +16,7 @@ module.exports = function($parent) {
                 };
 
                 var user = $user.prop('user');
-                var extend_from = app.world.user_settings[user.username] && app.world.user_settings[user.username].outfit.user;
+                var extend_from = app.world.user_settings[user.username] && app.world.user_settings[user.username].outfit && app.world.user_settings[user.username].outfit.user;
 
                 $.extend(user_colors, extend_from);
                 $user.css({
@@ -75,6 +75,16 @@ module.exports = function($parent) {
                 }
 
                 var $user = $('<div class="user">' + display_name + '</div>');
+                if (user.ping == null) {
+                    user.ping = '';
+                }
+                else {
+                    user.ping += " ms";
+                }
+
+                var $ping = $('<div class="ping">' + user.ping + '</div>');
+                $user.append($ping);
+
                 $user.prop('user', user);
                 $user.attr('title', user.username);
 
