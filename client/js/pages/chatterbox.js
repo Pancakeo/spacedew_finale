@@ -49,7 +49,7 @@ module.exports = function($parent, options) {
             show_notification("New multi-line message received!");
 
             if (app.settings.scroll_lock !== true) {
-                $blargh[0].scrollIntoView();
+                $blargh[0].scrollIntoView(false);
             }
         };
 
@@ -71,7 +71,7 @@ module.exports = function($parent, options) {
             show_notification(message);
 
             if (app.settings.scroll_lock !== true) {
-                $message[0].scrollIntoView();
+                $message[0].scrollIntoView(false);
             }
         };
 
@@ -129,7 +129,7 @@ module.exports = function($parent, options) {
             show_notification(data.username + ": " + data.message);
 
             if (app.settings.scroll_lock !== true) {
-                $message[0].scrollIntoView();
+                $message[0].scrollIntoView(false);
             }
         };
 
@@ -149,7 +149,7 @@ module.exports = function($parent, options) {
         event_bus.on('tom_clancy.change_room_name', function(params) {
             page.send('change_room_name', params);
         });
-        
+
         event_bus.on('ws.disconnect', function() {
             if (app.disconnected === true) {
                 return;

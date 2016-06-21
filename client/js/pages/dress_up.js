@@ -57,24 +57,44 @@ module.exports = function() {
             $dialog.find('#dress_tabs').tabs();
 
             ['Arial', 'Verdana', 'Tahoma', 'Webdings', 'Comic Sans MS', 'Calibri', 'Georgia', 'Impact', 'Lucida Console', 'Papyrus'].sort().forEach(function(font_family) {
-                page.$("#chat_style #font_family").append('<option>' + font_family + '</option>');
-                page.$("#user_list_style #font_family").append('<option>' + font_family + '</option>');
+                var $choice = $('<option>' + font_family + '</option>').prop('code', font_family);
+                page.$("#chat_style #font_family").append($choice);
+
+                var $choice = $('<option>' + font_family + '</option>').prop('code', font_family);
+                page.$("#user_list_style #font_family").append($choice);
             });
 
             [12, 13, 14, 15, 16, 17, 18].forEach(function(size) {
-                page.$("#chat_style #font_size").append('<option>' + size + '</option>');
-                page.$("#user_list_style #font_size").append('<option>' + size + '</option>');
+                var $choice = $('<option>' + size + '</option>').prop('code', size);
+                page.$("#chat_style #font_size").append($choice);
+
+                var $choice = $('<option>' + size + '</option>').prop('code', size);
+                page.$("#user_list_style #font_size").append($choice);
             });
 
-            page.$("#chat_style").find("input, select").on('change', function() {
+            page.$("#chat_style").find("input").on('change', function() {
                 var key = $(this).attr('id');
                 user_outfit.chat[key] = $(this).val();
                 apply_settings();
             });
 
-            page.$("#user_list_style").find("input, select").on('change', function() {
+            page.$("#chat_style").find("select").on('change', function() {
+                var key = $(this).attr('id');
+                var code = $(this).find(':selected').prop('code');
+                user_outfit.chat[key] = code;
+                apply_settings();
+            });
+
+            page.$("#user_list_style").find("input").on('change', function() {
                 var key = $(this).attr('id');
                 user_outfit.user[key] = $(this).val();
+                apply_settings();
+            });
+
+            page.$("#user_list_style").find("select").on('change', function() {
+                var key = $(this).attr('id');
+                var code = $(this).find(':selected').prop('code');
+                user_outfit.user[key] = code;
                 apply_settings();
             });
 
