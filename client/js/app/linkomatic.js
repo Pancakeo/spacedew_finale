@@ -20,7 +20,6 @@ module.exports = function() {
             }
         });
 
-        if ($link_box.children().length > 0) {
             return $link_box;
         }
         else {
