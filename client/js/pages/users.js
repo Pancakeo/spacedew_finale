@@ -4,8 +4,33 @@ module.exports = function($parent) {
     get_page('users', function(page) {
         $parent.append(page.$container);
 
+        var update_user_list_style = function() {
+            page.$("#users_list .user").each(function() {
+                var $user = $(this);
+
+                var user_colors = {
+                    bg_color: 'white',
+                    fg_color: 'black',
+                    font_family: 'Verdana',
+                    font_size: '1.25em'
+                };
+
+                var user = $user.prop('user');
+                var extend_from = app.world.user_settings[user.username] && app.world.user_settings[user.username].outfit.user;
+
+                $.extend(user_colors, extend_from);
+                $user.css({
+                    background: user_colors.bg_color,
+                    color: user_colors.fg_color,
+                    fontFamily: user_colors.font_family,
+                    fontSize: user_colors.font_size + 'px'
+                })
+            });
+        };
+
         page.listen('user_settings', function(data) {
             app.world.user_settings = data.user_settings;
+            update_user_list_style();
         });
 
         page.listen('users_list', function(data) {
@@ -29,7 +54,34 @@ module.exports = function($parent) {
 
                 known_users[nice_username] = user.username;
 
-                var $user = $('<div class="user">' + user.username + '</div>');
+                var display_name = user.username;
+
+                if (user.idle == true) {
+                    var duration = user.idle_duration / 1000;
+                    var unit = " s";
+
+                    if (duration >= 60) {
+                        duration /= 60;
+                        unit = " m";
+                    }
+
+                    if (duration >= 60) {
+                        duration /= 60;
+                        unit = " h";
+                    }
+
+                    duration = duration.toFixed(0);
+                    display_name += " (Away " + duration + " " + unit + ")";
+                }
+
+                var $user = $('<div class="user">' + display_name + '</div>');
+                $user.prop('user', user);
+                $user.attr('title', user.username);
+
+                if (user.idle) {
+                    $user.addClass('idle');
+                }
+
                 $users.append($user);
             });
 
@@ -38,6 +90,7 @@ module.exports = function($parent) {
                 delete known_users[user.toLowerCase()];
             });
 
+            update_user_list_style();
             page.$("#users_list").append($users);
         });
 
@@ -48,6 +101,7 @@ module.exports = function($parent) {
             onActive: function() {
                 page.send('idle', {idle: false});
             },
+            // idle: 60000 * 5 // 5 minutes
             idle: 5000
         });
 

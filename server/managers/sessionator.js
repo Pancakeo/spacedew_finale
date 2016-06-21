@@ -47,6 +47,7 @@ exports.connect = function(connection_id, ws) {
         logged_in: false,
         authenticated: false,
         profile: {},
+        idle: false,
 
         send: function(type, sub_type, data) {
             var message = {

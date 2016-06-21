@@ -10,6 +10,12 @@ module.exports = function() {
             bg_color: '#FFFFFF',
             font_family: 'Verdana',
             font_size: 14
+        },
+        user: {
+            fg_color: '#000000',
+            bg_color: '#FFFFFF',
+            font_family: 'Verdana',
+            font_size: 14
         }
     };
 
@@ -46,19 +52,29 @@ module.exports = function() {
         });
 
         page.init = function() {
+            $dialog.find('#example_username').text(app.profile.username + ':');
+            $dialog.find('#ul_example').text(app.profile.username);
             $dialog.find('#dress_tabs').tabs();
 
-            ['Arial', 'Verdana', 'Tahoma', 'Webdings', 'Courier New'].forEach(function(font_family) {
-                page.$("#font_family").append('<option>' + font_family + '</option>');
+            ['Arial', 'Verdana', 'Tahoma', 'Webdings', 'Comic Sans MS', 'Calibri', 'Georgia', 'Impact', 'Lucida Console', 'Papyrus'].sort().forEach(function(font_family) {
+                page.$("#chat_style #font_family").append('<option>' + font_family + '</option>');
+                page.$("#user_list_style #font_family").append('<option>' + font_family + '</option>');
             });
 
-            [8, 9, 10, 11, 12, 13, 14].forEach(function(size) {
-                page.$("#font_size").append('<option>' + size + '</option>');
+            [12, 13, 14, 15, 16, 17, 18].forEach(function(size) {
+                page.$("#chat_style #font_size").append('<option>' + size + '</option>');
+                page.$("#user_list_style #font_size").append('<option>' + size + '</option>');
             });
 
-            page.$("#chat_style input, select").on('change', function() {
+            page.$("#chat_style").find("input, select").on('change', function() {
                 var key = $(this).attr('id');
                 user_outfit.chat[key] = $(this).val();
+                apply_settings();
+            });
+
+            page.$("#user_list_style").find("input, select").on('change', function() {
+                var key = $(this).attr('id');
+                user_outfit.user[key] = $(this).val();
                 apply_settings();
             });
 
@@ -74,22 +90,32 @@ module.exports = function() {
                     user_outfit = toolio.copy_object(load_from);
                 }
 
-
                 for (var key in user_outfit.chat) {
-                    page.$("#" + key).val(user_outfit.chat[key]);
+                    page.$("#chat_style #" + key).val(user_outfit.chat[key]);
+                }
+
+                for (var key in user_outfit.user) {
+                    page.$("#user_list_style #" + key).val(user_outfit.user[key]);
                 }
             }
 
-            page.$("#example_wrapper").css({
+            page.$("#chat_style #example_wrapper").css({
                 background: user_outfit.chat.bg_color,
                 color: user_outfit.chat.fg_color,
                 fontSize: user_outfit.chat.font_size + 'px',
                 fontFamily: user_outfit.chat.font_family
             });
 
-            page.$("#example_username").css({
+            page.$("#chat_style #example_username").css({
                 color: user_outfit.chat.username_color
             });
+
+            page.$("#user_list_style #ul_example").css({
+                background: user_outfit.user.bg_color,
+                color: user_outfit.user.fg_color,
+                fontSize: user_outfit.user.font_size + 'px',
+                fontFamily: user_outfit.user.font_family
+            })
         }
     });
 

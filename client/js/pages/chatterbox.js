@@ -123,6 +123,7 @@ module.exports = function($parent, options) {
             var $message = $('<div class="message"><span class="timestamp">[' + moment().format("h:mm:ss A") + ']</span><span class="username">' + data.username + ': </span>' + message + '</div>');
             $message.css({background: outfit.bg_color, color: outfit.fg_color, fontFamily: outfit.font_family, fontSize: outfit.font_size + 'px'});
             $message.find('.username').css({color: outfit.username_color});
+            $message.find('a').css({color: outfit.username_color});
 
             $chat.append($message);
             show_notification(data.username + ": " + data.message);

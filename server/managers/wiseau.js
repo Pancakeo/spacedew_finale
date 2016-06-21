@@ -48,7 +48,7 @@ exports.create_room = function(room_name, room_id) {
                 }
             }
 
-            room.users.push({username: username, last_activity: Date.now(), idle: false});
+            room.users.push({username: username});
         },
         leave_room: function(username) {
             for (var i = 0; i < room.users.length; i++) {
