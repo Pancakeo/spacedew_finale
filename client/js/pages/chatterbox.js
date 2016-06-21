@@ -134,10 +134,10 @@ module.exports = function($parent, options) {
             show_notification(data.username + ": " + data.message);
 
             if ($link_box != null) {
-                $link_box.find('img').each(function() {
+                $link_box.find('img, video, iframe').each(function() {
                     $(this).on('load', function() {
                         if (app.settings.scroll_lock !== true) {
-                            $(this)[0].scrollIntoView();
+                            $(this)[0].scrollIntoView(false);
                         }
                     });
                 });
