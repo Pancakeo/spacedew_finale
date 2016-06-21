@@ -46,6 +46,13 @@ exports.handle_message = function handle_message(session, message) {
         },
         outfit: function() {
             var user_id = session.profile.user_id;
+
+            // TODO - add validations here!
+            if (JSON.stringify(data.outfit).length > (1024 * 1024)) {
+                console.error("Server settings exceeded limit!");
+                return;
+            }
+
             storage_thing.each_param_sql('SELECT * FROM user_settings WHERE user_id = ?', [user_id]).then(function(result) {
 
                 if (result.rows.length == 0) {

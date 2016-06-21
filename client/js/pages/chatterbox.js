@@ -1,6 +1,7 @@
 module.exports = function($parent, options) {
     get_page('chatterbox', function(page) {
         var event_bus = require('../../../shared/event_bus');
+        var linkomatic = require('../app/linkomatic')();
 
         $parent.append(page.$container);
 
@@ -86,12 +87,15 @@ module.exports = function($parent, options) {
             var lines = message.split('<br/>');
             message = '';
 
+            var maybe_something = [];
+
             lines.forEach(function(line) {
                 var parts = line.split(/\s/);
 
                 // Consider a more robust link parser (heh!)
                 for (var i = 0; i < parts.length; i++) {
                     parts[i] = parts[i].replace(/(http.*)/, function(url) {
+                        maybe_something.push(url);
                         return '<a target="_blank" href="' + encodeURI(url) + '">' + url + '</a>';
                     });
                 }
@@ -102,8 +106,9 @@ module.exports = function($parent, options) {
                 else {
                     message += '<br/>' + parts.join(' ');
                 }
-
             });
+
+            var $link_box = linkomatic(maybe_something);
 
             var this_fucking_guy = app.world.user_settings[data.username];
             this_fucking_guy = $.extend(true, {
@@ -127,6 +132,17 @@ module.exports = function($parent, options) {
 
             $chat.append($message);
             show_notification(data.username + ": " + data.message);
+
+            if ($link_box != null) {
+                $link_box.find('img').each(function() {
+                    $(this).on('load', function() {
+                        if (app.settings.scroll_lock !== true) {
+                            $(this)[0].scrollIntoView();
+                        }
+                    });
+                });
+                $message.after($link_box);
+            }
 
             if (app.settings.scroll_lock !== true) {
                 $message[0].scrollIntoView();

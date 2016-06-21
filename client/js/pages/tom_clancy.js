@@ -138,6 +138,10 @@ module.exports = function(options) {
                 $(this).closest('.blargh').remove();
             });
 
+            $room_box.on('click', '.link_box .remove', function() {
+                $(this).closest('.link_box').remove();
+            });
+
             // May actually not need these:
             $room_box.prop('room_tab', $room_tab);
             $room_tab.prop('room_box', $room_box);
