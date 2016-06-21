@@ -20,6 +20,7 @@ module.exports = function() {
             }
         });
 
+        if ($link_box.children('img, iframe, video, audio').length > 0) {
             return $link_box;
         }
         else {
