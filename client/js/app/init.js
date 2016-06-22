@@ -17,7 +17,7 @@ module.exports = (function() {
     });
 
     var server_settings = {
-        server: 'ws://localhost:2001'
+        server: 'ws://localhost:8080'
     };
 
     for (var server in server_settings) {

@@ -2,6 +2,7 @@
 var sessionator = require('../managers/sessionator');
 var wiseau = require('../managers/wiseau');
 var server_settings = require('../managers/server_settings');
+var chat_commands = require('../chat_commands');
 
 exports.handle_message = function handle_message(session, message) {
     var sub_type = message.sub_type;
@@ -17,12 +18,17 @@ exports.handle_message = function handle_message(session, message) {
             var clean_message = data.message;
             clean_message = clean_message.replace(/</g, '&lt;');
             clean_message = clean_message.replace(/>/g, '&gt;');
-
+            
             if (clean_message.length > 0) {
-                var recent_message = session.profile.username + ': ' + clean_message;
-                room.add_recent_message(recent_message);
+                var do_chat = chat_commands.exec(clean_message, sessionator, room.id);
+                
+                if (do_chat)
+                {
+                    var recent_message = session.profile.username + ': ' + clean_message;
+                    room.add_recent_message(recent_message);
 
-                sessionator.broadcast('chatterbox', 'chat', {message: clean_message, username: session.profile.username}, {room_id: room.id});
+                    sessionator.broadcast('chatterbox', 'chat', {message: clean_message, username: session.profile.username}, {room_id: room.id});
+                }
             }
         },
         blargh: function() {
