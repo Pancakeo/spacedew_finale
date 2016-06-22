@@ -12,11 +12,19 @@ module.exports = function(page_name, callback) {
             listen: function(event_type, listener) {
                 event_bus.on(page_name + '.' + event_type, listener);
             },
+            // Use to listen to any event
+            peepy: function(full_event_name, listener) {
+                event_bus.on(full_event_name, listener);
+            },
             emit: function(event_type, params) {
                 event_bus.emit(page_name + '.' + event_type, params);
             },
-            send: function(sub_type, data) {
-                ws.send(page_name, sub_type, data);
+            send: function(sub_type, data, send_options) {
+                send_options = $.extend({
+                    page_name: page_name
+                }, send_options);
+
+                ws.send(send_options.page_name, sub_type, data);
             },
             alert: function(title, message) {
                 toolio.alert.apply(this, arguments);

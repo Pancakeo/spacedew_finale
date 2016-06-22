@@ -25,9 +25,7 @@ module.exports = function() {
         if (m == null || m.length < 3) {
             return;
         }
-
-        console.log(m);
-
+        
         video_id = m[2];
 
         var start_time = '';

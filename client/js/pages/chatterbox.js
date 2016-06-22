@@ -165,7 +165,7 @@ module.exports = function($parent, options) {
         event_bus.on('tom_clancy.change_room_name', function(params) {
             page.send('change_room_name', params);
         });
-
+        
         event_bus.on('ws.disconnect', function() {
             if (app.disconnected === true) {
                 return;
@@ -206,19 +206,6 @@ module.exports = function($parent, options) {
         page.listen('change_room_name', function(data) {
             append_system(data.blame + ' changed the room name to ' + data.new_name, {room_id: data.room_id, class_name: 'wup'});
             app.rename_room_tab(data.room_id, data.new_name);
-        });
-
-        page.$("#composer").on('keypress', function(e) {
-            if (e.which === 13) {
-                var message = $(this).val();
-
-                if (message.length > 0) {
-                    var room_id = app.get_active_room(true);
-                    page.send('chat', {message: message, room_id: room_id});
-                }
-
-                $(this).val('');
-            }
         });
 
         var lobby = options.lobby;

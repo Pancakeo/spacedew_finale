@@ -15,8 +15,21 @@ module.exports = function(options) {
 
         do_resize();
 
-        require('./chatterbox')(page.$('#left_pane'), options);
+        var chatterbox = require('./chatterbox')(page.$('#left_pane'), options);
         require('./users')(page.$('#right_pane'));
+
+        page.$("#composer").on('keypress', function(e) {
+            if (e.which === 13) {
+                var message = $(this).val();
+
+                if (message.length > 0) {
+                    var room_id = app.get_active_room(true);
+                    page.send('chat', {message: message, room_id: room_id}, {page_name: 'chatterbox'});
+                }
+
+                $(this).val('');
+            }
+        });
 
         var menu_handlers = {
             logout: function() {
@@ -74,6 +87,9 @@ module.exports = function(options) {
             },
             change_password: function() {
                 require('./change_password')();
+            },
+            farmer: function() {
+                require('./farmer')();
             }
         };
 
@@ -169,5 +185,28 @@ module.exports = function(options) {
                 return $active.prop('room');
             }
         };
+
+        page.peepy('users.user_settings', function(params) {
+            var my_settings = params.user_settings[app.profile.username];
+            my_settings = my_settings && my_settings.outfit && my_settings.outfit.chat;
+
+            if (my_settings) {
+                var composer_style = {
+                    fg_color: 'black',
+                    bg_color: 'white',
+                    font_size: 14,
+                    font_family: 'Verdana'
+                };
+
+                my_settings = $.extend({}, composer_style, my_settings);
+
+                page.$("#composer").css({
+                    color: my_settings.fg_color,
+                    background: my_settings.bg_color,
+                    fontSize: my_settings.font_size,
+                    fontFamily: my_settings.font_family
+                })
+            }
+        });
     });
 };

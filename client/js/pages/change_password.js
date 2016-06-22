@@ -1,7 +1,5 @@
 module.exports = function() {
-
-    var toolio = require('../app/toolio');
-
+    
     get_page('change_password', function(page) {
         var $dialog = page.$container.dialog({
             title: 'Change Password',
@@ -17,11 +15,11 @@ module.exports = function() {
                     };
 
                     if (params.current_pw.length == 0 || params.new_pw.length == 0 || params.confirm_pw.length == 0) {
-                        toolio.alert("Whoops", "All fields must be filled in loldawg.");
+                        page.alert("Whoops", "All fields must be filled in loldawg.");
                     }
 
                     if (params.new_pw != params.confirm_pw) {
-                        toolio.alert("Whoops", "New passwords don't match");
+                        page.alert("Whoops", "New passwords don't match");
                     }
 
                     page.event_bus.on('user_settings.change_password', function(data) {
@@ -29,7 +27,7 @@ module.exports = function() {
                             $dialog.dialog('close');
                         }
                         else {
-                            toolio.alert("Uh oh", data.reason);
+                            page.alert("Uh oh", data.reason);
                         }
                     });
 
