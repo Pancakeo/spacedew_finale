@@ -4,7 +4,6 @@ exports.exec = function(message, session, room_id)
     {
         if (modules[module].test(message))
         {
-            console.log(module);
             return modules[module].exec(message, session, room_id);
         }
     }
