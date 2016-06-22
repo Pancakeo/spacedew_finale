@@ -1,4 +1,4 @@
-module.exports = function() {
+module.exports = function(initial_text) {
 
     get_page('blargher', function(page) {
 
@@ -8,6 +8,11 @@ module.exports = function() {
             height: 800,
             resizeable: true,
             modal: true,
+            open: function() {
+                if (initial_text != null) {
+                    $(this).find('#blargher').val(initial_text);
+                }
+            },
             buttons: {
                 'Send': function() {
                     var mess = $dialog.find('#blargher').val();

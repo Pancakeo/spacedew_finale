@@ -31,6 +31,81 @@ module.exports = function(options) {
             }
         });
 
+        $("#composer").on('paste', function(event) {
+            // Adapted from https://stackoverflow.com/questions/6333814/how-does-the-paste-image-from-clipboard-functionality-work-in-gmail-and-google-c/15369753#15369753
+            var items = (event.clipboardData || event.originalEvent.clipboardData).items;
+
+            var multi_line_text = event.originalEvent.clipboardData.getData("text");
+            if (multi_line_text.indexOf('\n') > 0) {
+                require('./blargher')(multi_line_text);
+                return false;
+            }
+
+
+            if (items == null) {
+                return;
+            }
+
+            var blob = null;
+            var file_type;
+
+            for (var i = 0; i < items.length; i++) {
+
+                if (items[i].type.indexOf("image") === 0) {
+                    var file_type = items[i].type;
+                    blob = items[i].getAsFile();
+                    break;
+                }
+            }
+
+            if (blob != null) {
+                var blob_url = URL.createObjectURL(blob);
+
+                var reader = new FileReader();
+                reader.onload = function() {
+                    $("<div>The following blerb will be blurghled:<br/><img style='max-width: 300px; max-height: 300px;'/></div>").dialog({
+                        title: 'Confirm Paste',
+                        modal: true,
+                        width: "auto",
+                        open: function() {
+                            $(this).find('img')[0].src = blob_url;
+                        },
+                        close: function() {
+                            URL.revokeObjectURL(blob_url);
+                        },
+                        buttons: {
+                            'Send': function() {
+                                // var id = toolio.generate_id();
+                                // var ext = '';
+                                // if (file_type != null && file_type.indexOf('/') >= 0) {
+                                //     ext = file_type.split('/')[1];
+                                // }
+                                //
+                                // var meta = toolio.get_meta({size: reader.result.byteLength, type: file_type, name: 'clipboard_' + id + '.' + ext});
+                                //
+                                // var active_tab = tab_guy.get_active_tab();
+                                // meta.room_id = active_tab.id;
+                                //
+                                // binary_client.send_buffer(reader.result, meta);
+                                // URL.revokeObjectURL(blob_url);
+
+                                $(this).dialog('close');
+                            },
+                            'Cancel': function() {
+                                $(this).dialog('close');
+                            }
+                        },
+                        destroy: function() {
+                            $(this).dialog('destroy');
+                        }
+                    });
+                };
+
+                reader.readAsArrayBuffer(blob);
+            }
+        });
+
+
         var menu_handlers = {
             logout: function() {
                 delete localStorage.auth_key;
@@ -77,7 +152,7 @@ module.exports = function(options) {
                 require('./blargher')();
             },
             browse: function() {
-
+                page.$("#browse_file_thing").click();
             },
             toggle_user_pane: function() {
                 $(this).toggleClass('active');
@@ -90,6 +165,9 @@ module.exports = function(options) {
             },
             farmer: function() {
                 require('./farmer')();
+            },
+            wrenches: function() {
+                require('./wrenches')();
             }
         };
 
