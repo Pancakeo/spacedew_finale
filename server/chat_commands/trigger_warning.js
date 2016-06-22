@@ -66,7 +66,7 @@ exports.exec = function(message, session, room_id)
         var response = triggers[last_found].responses[Math.floor(Math.random() * triggers[last_found].responses.length)];
         setTimeout(function()
         {
-            session.broadcast('chatterbox', 'chat', {message: response, username: 'TriggerWarning'}, {room_id: room_id});
+            session.broadcast('chatterbox', 'chat', {message: response, username: '#TriggerWarning#'}, {room_id: room_id});
         }, 0);
     }
     return true;
