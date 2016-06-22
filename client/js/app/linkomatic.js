@@ -16,16 +16,17 @@ module.exports = function() {
     video_regex = new RegExp(video_regex.join('|'), 'i');
 
     // var youtube_regex = /.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*/;
-    var youtube_regex = /^.*?(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*)(?:(\?t|&start|&t)=(\d+))?.*/;
+    var youtube_parser = /^.*?(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*)(?:(\?t|&start|&t)=(\d+))?.*/;
+    var probably_youtube = /.*youtube.*|.*youtu\.be.*/i;
 
     var add_youtube = function(url) {
-        var m = youtube_regex.exec(url);
+        var m = youtube_parser.exec(url);
         var video_id = null;
 
         if (m == null || m.length < 3) {
             return;
         }
-        
+
         video_id = m[2];
 
         var start_time = '';
@@ -60,7 +61,7 @@ module.exports = function() {
                 $video.append('<source src="' + thing + '">');
                 $link_box.append($video);
             }
-            else if (youtube_regex.test(thing)) {
+            else if (probably_youtube.test(thing)) {
                 var $youtube = add_youtube(thing);
                 $link_box.append($youtube);
             }
