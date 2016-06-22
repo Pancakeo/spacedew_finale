@@ -25,6 +25,12 @@ exports.random = function(lower, upper, inclusive) {
 
     var num = Math.floor(Math.random() * (max - min));
     num += min;
-    
+
     return num;
+};
+
+// Choose a thing from an arr-ay.
+exports.choose = function(arr) {
+    var idx = exports.random(0, arr.length, false);
+    return arr[idx];
 };
