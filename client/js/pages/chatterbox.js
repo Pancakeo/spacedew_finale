@@ -7,7 +7,7 @@ module.exports = function($parent, options) {
 
         var show_notification = function(message) {
 
-            if (app.hidden) {
+            if (!document.hasFocus()) {
                 if (app.settings.notify === true) {
                     var n = new Notification(message);
 
@@ -165,7 +165,7 @@ module.exports = function($parent, options) {
         event_bus.on('tom_clancy.change_room_name', function(params) {
             page.send('change_room_name', params);
         });
-        
+
         event_bus.on('ws.disconnect', function() {
             if (app.disconnected === true) {
                 return;

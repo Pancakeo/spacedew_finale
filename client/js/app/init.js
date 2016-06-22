@@ -1,6 +1,5 @@
 module.exports = (function() {
     window.app = {
-        hidden: (document.hidden === true),
         settings: {},
         profile: {},
         world: {user_settings: {}} // Users and shit.
@@ -20,10 +19,6 @@ module.exports = (function() {
     var server_settings = {
         server: 'ws://localhost:2001'
     };
-
-    document.addEventListener("visibilitychange", function() {
-        app.hidden = (document.hidden === true);
-    }, false);
 
     for (var server in server_settings) {
         if (server_settings[server].match('ws://localhost') !== null) {
