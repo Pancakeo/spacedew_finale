@@ -9,7 +9,7 @@ module.exports = function() {
     });
 
     video_exts.forEach(function(ext) {
-        video_regex.push('\.' + ext + '$');
+        video_regex.push('\.' + ext + '\??.*$');
     });
 
     image_regex = new RegExp(image_regex.join('|'), 'i');
@@ -52,8 +52,9 @@ module.exports = function() {
                 var $image = $('<img src="' + thing + '"/>');
                 $link_box.append($image);
             } else if (video_regex.test(thing)) {
-                if (thing.match(/\.gifv$/i)) {
-                    thing = thing.replace(/(\.gifv$)/i, '.webm');
+
+                if (thing.match(/\.gifv/i)) {
+                    thing = thing.replace(/(\.gifv)/i, '.webm');
                 }
 
                 var $video = $('<video style="max-width: 500px; max-height: 500px;" controls autoplay="true"/>');
