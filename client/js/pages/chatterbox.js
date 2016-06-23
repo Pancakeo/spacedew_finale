@@ -134,13 +134,27 @@ module.exports = function($parent, options) {
             show_notification(data.username + ": " + data.message);
 
             if ($link_box != null) {
-                $link_box.find('img, video, iframe').each(function() {
+                $link_box.find('img, iframe').each(function() {
                     $(this).on('load', function() {
                         if (app.settings.scroll_lock !== true) {
                             $(this)[0].scrollIntoView(false);
                         }
                     });
                 });
+
+                $link_box.find('video').each(function() {
+                    var $video = $(this);
+
+                    var scroll_of_doom = function() {
+                        $video[0].removeEventListener('canplay', scroll_of_doom);
+                        if (app.settings.scroll_lock !== true) {
+                            $video[0].scrollIntoView(false);
+                        }
+                    };
+
+                    $video[0].addEventListener('canplay', scroll_of_doom);
+                });
+
                 $message.after($link_box);
             }
 
