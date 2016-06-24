@@ -4,6 +4,7 @@ module.exports = function() {
     var image_regex = [];
     var video_regex = [];
 
+    // These are terrible:
     image_exts.forEach(function(ext) {
         image_regex.push('\.' + ext + '\\??.*$');
     });
@@ -11,6 +12,7 @@ module.exports = function() {
     video_exts.forEach(function(ext) {
         video_regex.push('\.' + ext + '\\??.*$');
     });
+    // </terrible>
 
     image_regex = new RegExp(image_regex.join('|'), 'i');
     video_regex = new RegExp(video_regex.join('|'), 'i');
@@ -48,19 +50,21 @@ module.exports = function() {
 
         various_things.forEach(function(thing) {
 
-            if (image_regex.test(thing)) {
-                var $image = $('<img src="' + thing + '"/>');
-                $link_box.append($image);
-            } else if (video_regex.test(thing)) {
+            if (video_regex.test(thing)) {
 
-                if (thing.match(/\.gifv/i)) {
-                    thing = thing.replace(/(\.gifv)/i, '.webm');
+                if (thing.match(/\.gifv|\.webm/i)) {
+                    thing = thing.replace(/(\.gifv)/i, '.mp4');
+                    thing = thing.replace(/(\.webm)/i, '.mp4');
                 }
 
                 var $video = $('<video style="max-width: 500px; max-height: 500px;" controls autoplay="true"/>');
                 $video[0].muted = true;
                 $video.append('<source src="' + thing + '">');
                 $link_box.append($video);
+            }
+            else if (image_regex.test(thing)) {
+                var $image = $('<img src="' + thing + '"/>');
+                $link_box.append($image);
             }
             else if (probably_youtube.test(thing)) {
                 var $youtube = add_youtube(thing);
