@@ -5,11 +5,11 @@ module.exports = function() {
     var video_regex = [];
 
     image_exts.forEach(function(ext) {
-        image_regex.push('\.' + ext + '\??.*$');
+        image_regex.push('\.' + ext + '\\??.*$');
     });
 
     video_exts.forEach(function(ext) {
-        video_regex.push('\.' + ext + '\??.*$');
+        video_regex.push('\.' + ext + '\\??.*$');
     });
 
     image_regex = new RegExp(image_regex.join('|'), 'i');
