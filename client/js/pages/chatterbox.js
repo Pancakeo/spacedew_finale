@@ -208,6 +208,7 @@ module.exports = function($parent, options) {
         });
 
         page.listen('system', function(data) {
+            append_system(data.message, {class_name: 'sad', room_id: data.room_id})
         });
 
         page.listen('blargh', function(data) {
