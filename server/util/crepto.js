@@ -1,5 +1,4 @@
 "use strict";
-var Promise = require("bluebird");
 var crypto = require('crypto');
 var storage_thing = require('../managers/storage_thing');
 

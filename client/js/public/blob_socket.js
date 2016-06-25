@@ -1,12 +1,12 @@
 var ws;
 var blob_socket = {};
-var toolio = {};
+var util = {};
 
-toolio.array_buffer_to_string = function(buf) {
+util.array_buffer_to_string = function(buf) {
     return String.fromCharCode.apply(null, new Uint16Array(buf));
 };
 
-toolio.string_to_array_buffer = function(str) {
+util.string_to_array_buffer = function(str) {
     var buf = new ArrayBuffer(str.length * 2);
     var buf_view = new DataView(buf);
 
@@ -17,8 +17,8 @@ toolio.string_to_array_buffer = function(str) {
     return buf;
 };
 
-toolio.blob_from_buffer = function(buffer, meta) {
-    var header = toolio.string_to_array_buffer(JSON.stringify(meta));
+util.blob_from_buffer = function(buffer, meta) {
+    var header = util.string_to_array_buffer(JSON.stringify(meta));
 
     var header_length = new ArrayBuffer(4);    // 4 bytes = 32-bits.
     new DataView(header_length).setUint32(0, header.byteLength, true); // explicit little endian
@@ -32,7 +32,7 @@ addEventListener('message', function(e) {
     switch (e.data.action) {
 
         case 'send':
-            var blob = toolio.blob_from_buffer(params.chunk, params.transfer_info);
+            var blob = util.blob_from_buffer(params.chunk, params.transfer_info);
             ws.send(blob);
             break;
 
@@ -69,7 +69,7 @@ addEventListener('message', function(e) {
                 var dv = new DataView(event.data, 0, 4);
                 var header_length = dv.getUint32(0, true);
 
-                var meta_string = toolio.array_buffer_to_string(event.data.slice(4, 4 + header_length));
+                var meta_string = util.array_buffer_to_string(event.data.slice(4, 4 + header_length));
                 var meta = JSON.parse(meta_string);
 
                 if (meta.transfer_id == null) {

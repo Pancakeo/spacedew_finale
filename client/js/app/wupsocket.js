@@ -12,8 +12,11 @@ module.exports = (function() {
     var manually_closed = false;
     var key;
 
-    var death_socket = new Worker('js/public/chat_socket.js');
-    death_socket.postMessage({});
+    var chat_socket = new Worker('js/public/chat_socket.js');
+    chat_socket.postMessage({});
+
+    var blob_socket = new Worker('js/public/blob_socket.js');
+    blob_socket.postMessage({});
 
     var ws_handlers = {
         connection: function(message) {
@@ -32,7 +35,7 @@ module.exports = (function() {
 
     };
 
-    death_socket.addEventListener('message', function(e) {
+    chat_socket.addEventListener('message', function(e) {
         var params = e.data.params;
 
         switch (e.data.action) {
@@ -84,7 +87,7 @@ module.exports = (function() {
             data: data
         };
 
-        death_socket.postMessage({
+        chat_socket.postMessage({
             action: 'send',
             params: {
                 message: wrapped_message
@@ -98,14 +101,14 @@ module.exports = (function() {
 
     wupsocket.close = function() {
         manually_closed = true;
-        death_socket.postMessage({action: 'disconnect'});
+        chat_socket.postMessage({action: 'disconnect'});
     };
 
     wupsocket.connect = function() {
-        death_socket.postMessage({action: 'disconnect'});
+        chat_socket.postMessage({action: 'disconnect'});
         wupsocket.reconnect_attempt++;
 
-        death_socket.postMessage({
+        chat_socket.postMessage({
             action: 'connect',
             params: {
                 server_ip: app.settings.server

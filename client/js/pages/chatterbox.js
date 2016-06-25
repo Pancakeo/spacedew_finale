@@ -207,6 +207,9 @@ module.exports = function($parent, options) {
             append_chat(data);
         });
 
+        page.listen('system', function(data) {
+        });
+
         page.listen('blargh', function(data) {
             var $blargh = $('<div class="blargh prehensile"/>');
             $blargh.append('<div class="header">' + data.username + ' <span class="close">x</span></div>');

@@ -57,7 +57,7 @@ module.exports = function() {
                     thing = thing.replace(/(\.webm)/i, '.mp4');
                 }
 
-                var $video = $('<video style="max-width: 500px; max-height: 500px;" controls autoplay="true"/>');
+                var $video = $('<video style="max-width: 100%;" controls autoplay="true"/>');
                 $video[0].muted = true;
                 $video.append('<source src="' + thing + '">');
                 $link_box.append($video);

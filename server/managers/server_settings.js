@@ -1,6 +1,5 @@
 "use strict";
 var storage_thing = require('./storage_thing');
-var Promise = require("bluebird");
 
 var settings = {
     http_port: 1991,

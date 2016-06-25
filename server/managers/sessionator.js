@@ -3,7 +3,24 @@ var sessions = {};
 var event_bus = require(global.shared_root + '/event_bus');
 var wiseau = require('./wiseau');
 
+const CONNECTION_TIMEOUT = 120 * 1000;
+
 setInterval(function() {
+    for (var key in sessions) {
+        var s = sessions[key];
+        if (s.ws.readyState == 1) { // Connected
+            if (Date.now() - s.last_activity >= CONNECTION_TIMEOUT) {
+                var well_what_happen = s.profile.username + " timed out.";
+
+                exports.broadcast('chatterbox', 'heartbeat', {ping_sent_at: Date.now()}, {require_logged_in: false});
+                exports.broadcast('chatterbox', 'system', {message: well_what_happen}, {room_id: wiseau.get_lobby().id});
+
+                console.log(well_what_happen);
+                s.logout();
+            }
+        }
+    }
+
     exports.broadcast('connection', 'heartbeat', {ping_sent_at: Date.now()}, {require_logged_in: false});
 }, 7500);
 
@@ -11,10 +28,12 @@ exports.get_sessions = function() {
     return sessions;
 };
 
+// TODO check for < and > here.
 exports.broadcast = function(type, sub_type, data, options) {
     options = Object.assign({
         require_logged_in: true,
-        room_id: null
+        room_id: null,
+        strip_entities: true
     }, options);
 
     if (options.room_id != null) {
@@ -29,15 +48,41 @@ exports.broadcast = function(type, sub_type, data, options) {
             if (room != null) {
 
                 if (room.is_member(session.profile.username) >= 0) {
-                    session.send(type, sub_type, data);
+                    session.send(type, sub_type, data, {strip_entities: options.strip_entities});
                 }
             }
             else {
-                session.send(type, sub_type, data);
+                session.send(type, sub_type, data, {strip_entities: options.strip_entities});
             }
         }
         else if (!options.require_logged_in) {
-            session.send(type, sub_type, data);
+            session.send(type, sub_type, data, {strip_entities: options.strip_entities});
+        }
+    }
+};
+
+var clean_up = function(obj) {
+
+    var clean_part = function(part) {
+        if (typeof(part) == "string") {
+            part = part.replace(/</g, '&lt;');
+            part = part.replace(/>/g, '&gt;');
+        }
+        else if (part && typeof(part) == "object") {
+            clean_up(part);
+        }
+
+        return part;
+    };
+
+    if (Array.isArray(obj)) {
+        for (var i = 0; i < obj.length; i++) {
+            obj[i] = clean_part(obj[i]);
+        }
+    }
+    else {
+        for (var key in obj) {
+            obj[key] = clean_part(obj[key]);
         }
     }
 };
@@ -52,21 +97,31 @@ exports.connect = function(connection_id, ws) {
         authenticated: false,
         profile: {},
         idle: false,
+        last_activity: Date.now(),
 
-        send: function(type, sub_type, data) {
+        send: function(type, sub_type, data, send_options) {
+            send_options = Object.assign({
+                strip_entities: true
+            }, send_options);
+
             var message = {
                 type: type,
                 sub_type: sub_type,
                 data: data
             };
 
-            try {
-                ws.send(JSON.stringify(message));
-            }
-            catch (e) {
-                console.log('uh oh ' + e);
+            if (send_options.strip_entities == true) {
+                clean_up(data);
             }
 
+            if (ws.readyState == 1) {
+                try {
+                    ws.send(JSON.stringify(message));
+                }
+                catch (e) {
+                    console.log('uh oh ' + e);
+                }
+            }
         },
         logout_existing: function(username) {
             for (var key in sessions) {
@@ -85,6 +140,7 @@ exports.connect = function(connection_id, ws) {
             session.authenticated = true;
             event_bus.emit('login', session.profile);
         },
+        // Also closes connection.
         logout: function() {
             session.logged_in = false;
             console.log(session.profile.username + " logged out.");
@@ -97,6 +153,8 @@ exports.connect = function(connection_id, ws) {
             catch (e) {
                 console.log('Logout failure', e);
             }
+
+
         },
         get_debug_info: function() {
             var wup = {};
