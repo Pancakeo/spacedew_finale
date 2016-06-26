@@ -110,12 +110,10 @@ module.exports = function($parent) {
                 page.send('idle', {idle: true});
             },
             onActive: function() {
-                // page.send('idle', {idle: false});
+                page.send('idle', {idle: false});
             },
             idle: 60000 * 5 // 5 minutes
         });
-
-        page.send('idle', {idle: true});
 
         var wait_for_app = setInterval(function() {
             if (app.ready) {
