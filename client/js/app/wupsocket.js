@@ -116,5 +116,9 @@ module.exports = (function() {
         });
     };
 
+    wupsocket.send_binary = function(blob, meta) {
+
+    };
+
     return wupsocket;
 })();

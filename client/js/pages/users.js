@@ -53,28 +53,29 @@ module.exports = function($parent) {
                 }
 
                 known_users[nice_username] = user.username;
-
                 var display_name = user.username;
+                var $user = $('<div class="user"><span class="username">' + display_name + '</span></div>');
 
                 if (user.idle == true) {
-                    var duration = user.idle_duration / 1000;
-                    var unit = " s";
+                    var duration = (user.idle_duration + (5000 * 60)) / 1000;
+                    var unit = "s";
 
                     if (duration >= 60) {
                         duration /= 60;
-                        unit = " m";
+                        unit = "m";
                     }
 
                     if (duration >= 60) {
                         duration /= 60;
-                        unit = " h";
+                        unit = "h";
                     }
 
                     duration = duration.toFixed(0);
-                    display_name += " (Away " + duration + " " + unit + ")";
+
+                    var $away = $('<div class="away">' + "Idle: " + duration + unit + "</div>");
+                    $user.append($away);
                 }
 
-                var $user = $('<div class="user">' + display_name + '</div>');
                 if (user.ping == null) {
                     user.ping = '';
                 }
@@ -109,10 +110,12 @@ module.exports = function($parent) {
                 page.send('idle', {idle: true});
             },
             onActive: function() {
-                page.send('idle', {idle: false});
+                // page.send('idle', {idle: false});
             },
             idle: 60000 * 5 // 5 minutes
         });
+
+        page.send('idle', {idle: true});
 
         var wait_for_app = setInterval(function() {
             if (app.ready) {

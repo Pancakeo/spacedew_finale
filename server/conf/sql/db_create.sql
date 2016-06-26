@@ -10,12 +10,6 @@ CREATE TABLE user (
 	PRIMARY KEY(user_id)
 );
 
-CREATE TABLE user_avatar (
-	user_id	INTEGER NOT NULL UNIQUE,
-	user_avatar	BLOB,
-	PRIMARY KEY(user_id)
-);
-
 CREATE TABLE user_settings (
 	user_id	INTEGER NOT NULL,
 	settings_json	TEXT,

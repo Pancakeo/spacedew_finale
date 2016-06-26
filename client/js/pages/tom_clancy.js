@@ -36,11 +36,10 @@ module.exports = function(options) {
             var items = (event.clipboardData || event.originalEvent.clipboardData).items;
 
             var multi_line_text = event.originalEvent.clipboardData.getData("text");
-            if (multi_line_text.indexOf('\n') > 0) {
+            if (multi_line_text.indexOf('\n') > 0 || multi_line_text.length > 140) {
                 require('./blargher')(multi_line_text);
                 return false;
             }
-
 
             if (items == null) {
                 return;
@@ -75,19 +74,20 @@ module.exports = function(options) {
                         },
                         buttons: {
                             'Send': function() {
-                                // var id = toolio.generate_id();
-                                // var ext = '';
-                                // if (file_type != null && file_type.indexOf('/') >= 0) {
-                                //     ext = file_type.split('/')[1];
-                                // }
-                                //
-                                // var meta = toolio.get_meta({size: reader.result.byteLength, type: file_type, name: 'clipboard_' + id + '.' + ext});
-                                //
-                                // var active_tab = tab_guy.get_active_tab();
-                                // meta.room_id = active_tab.id;
-                                //
-                                // binary_client.send_buffer(reader.result, meta);
-                                // URL.revokeObjectURL(blob_url);
+                                var transfer_id = page.toolio.generate_id();
+                                
+                                var ext = '';
+                                if (file_type != null && file_type.indexOf('/') >= 0) {
+                                    ext = file_type.split('/')[1];
+                                }
+
+                                var meta = toolio.get_meta({size: reader.result.byteLength, type: file_type, name: 'clipboard_' + transfer_id + '.' + ext});
+
+                                var active_tab = tab_guy.get_active_tab();
+                                meta.room_id = active_tab.id;
+
+                                binary_client.send_buffer(reader.result, meta);
+                                URL.revokeObjectURL(blob_url);
 
                                 $(this).dialog('close');
                             },
@@ -162,9 +162,6 @@ module.exports = function(options) {
             },
             change_password: function() {
                 require('./change_password')();
-            },
-            farmer: function() {
-                require('./farmer')();
             },
             wrenches: function() {
                 require('./wrenches')();

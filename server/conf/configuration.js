@@ -1,6 +1,8 @@
 /* Configuration specific to server. */
 // Custom values can be provided in conf/server_config.json
+// Note, there's also shared/shared_settings.js for settings that should be sync'd.
 
+// For avoiding making either config file dirty:
 // http://stackoverflow.com/questions/3319479/git-can-i-commit-a-file-and-ignore-the-content-changes
 "use strict";
 var fs = require('fs');

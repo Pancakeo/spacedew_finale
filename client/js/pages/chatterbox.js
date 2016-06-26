@@ -65,7 +65,9 @@ module.exports = function($parent, options) {
             }
 
             var $chat = page.$("div[room_id='" + append_options.room_id + "']");
-            var $message = $('<div class="message"><span class="timestamp">[' + moment().format("h:mm:ss A") + ']</span>' + message + '</div>');
+            var $message = $('<div class="message"><span class="timestamp">[' + moment().format("h:mm:ss A") + ']</span>' +
+                '<span class="message_text">' + message + '</span></div>');
+            
             $message.addClass(append_options.class_name);
             $chat.append($message);
 
@@ -125,7 +127,8 @@ module.exports = function($parent, options) {
 
             var outfit = this_fucking_guy.outfit.chat;
 
-            var $message = $('<div class="message"><span class="timestamp">[' + moment().format("h:mm:ss A") + ']</span><span class="username">' + data.username + ': </span>' + message + '</div>');
+            var $message = $('<div class="message"><span class="timestamp">[' + moment().format("h:mm:ss A") + ']</span><span class="username">' + data.username + ': </span>'
+                + '<span class="message_text">' + message + '</span></div>');
             $message.css({background: outfit.bg_color, color: outfit.fg_color, fontFamily: outfit.font_family, fontSize: outfit.font_size + 'px'});
             $message.find('.username').css({color: outfit.username_color});
             $message.find('a').css({color: outfit.username_color});
