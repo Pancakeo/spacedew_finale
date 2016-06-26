@@ -1,0 +1,5 @@
+{
+    "db_path": "conf/settings.db",
+    "connection_timeout": 120,
+    "lobby_room_name": "Tom Clancy's Rocket Ballz123"
+}
