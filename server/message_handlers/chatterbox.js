@@ -1,8 +1,8 @@
 "use strict";
 var sessionator = require('../managers/sessionator');
 var wiseau = require('../managers/wiseau');
-var server_settings = require('../managers/server_settings');
 var chat_commands = require('../chat_commands');
+var configuration = require('../conf/configuration');
 
 exports.handle_message = function handle_message(session, message) {
     var sub_type = message.sub_type;
@@ -41,7 +41,7 @@ exports.handle_message = function handle_message(session, message) {
             var room_name = data.name;
             room.name = room_name;
             sessionator.broadcast('chatterbox', 'change_room_name', {new_name: room.name, blame: session.profile.username}, {room_id: room.id});
-            server_settings.set('lobby_room_name', room.name);
+            configuration.set('lobby_room_name', room.name);
         }
     };
 

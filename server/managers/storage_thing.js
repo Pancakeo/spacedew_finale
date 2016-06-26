@@ -1,19 +1,13 @@
 "use strict";
 var sqlite3 = require('sqlite3').verbose();
-var fs = require('fs');
-var db_path = "conf/settings.db";
-
-if (fs.existsSync(db_path) === false) {
-    console.log("Database not found, aborting. Db path : " + db_path);
-    process.exit(1);
-}
+var _ = require('lodash');
 
 /*
  Seems fine for views and updates, but doesn't log some INSERT errors (and may not work at all in that regard).
  */
 exports.each_param_sql = function(sql, params) {
     return new Promise(function(resolve, reject) {
-        var db = new sqlite3.Database(db_path);
+        var db = new sqlite3.Database(app.config.db_path);
 
         var result = {rows: []};
 
@@ -27,7 +21,7 @@ exports.each_param_sql = function(sql, params) {
         }, function(error, rows) {
             if (error != null) {
                 console.log(sql, result, error, rows);
-                reject(Error(err));
+                reject(Error(error));
             }
 
             db.close();
@@ -40,16 +34,20 @@ exports.each_param_sql = function(sql, params) {
  Use for insert, and probably update.
  */
 exports.run_param_sql = function(sql, params) {
+    
     return new Promise(function(resolve, reject) {
-        var db = new sqlite3.Database(db_path);
+        var db = new sqlite3.Database(app.config.db_path);
 
         db.run(sql, params, function(error) {
+
             if (error != null) {
+                db.close();
                 reject(Error(error));
             }
-
-            resolve(null);
-            db.close();
+            else {
+                db.close();
+                resolve(null);
+            }
         });
     });
 

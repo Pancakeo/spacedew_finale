@@ -1,5 +1,5 @@
 "use strict";
-var event_bus = require(global.shared_root + '/event_bus');
+var event_bus = require(app.shared_root + '/event_bus');
 var sessionator = require('../managers/sessionator');
 var wiseau = require('../managers/wiseau');
 var wuptil = require('../util/wuptil');

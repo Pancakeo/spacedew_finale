@@ -1,15 +1,14 @@
 "use strict";
 var sessions = {};
-var event_bus = require(global.shared_root + '/event_bus');
+var event_bus = require(app.shared_root + '/event_bus');
 var wiseau = require('./wiseau');
 
-const CONNECTION_TIMEOUT = 120 * 1000;
-
+// Various tasks to do every so often.
 setInterval(function() {
     for (var key in sessions) {
         var s = sessions[key];
         if (s.ws.readyState == 1) { // Connected
-            if (Date.now() - s.last_activity >= CONNECTION_TIMEOUT) {
+            if (Date.now() - s.last_activity >= (app.config.connection_timeout * 1000)) {
                 var well_what_happen = s.profile.username + " timed out.";
 
                 exports.broadcast('chatterbox', 'heartbeat', {ping_sent_at: Date.now()}, {require_logged_in: false});
@@ -28,7 +27,6 @@ exports.get_sessions = function() {
     return sessions;
 };
 
-// TODO check for < and > here.
 exports.broadcast = function(type, sub_type, data, options) {
     options = Object.assign({
         require_logged_in: true,
@@ -61,6 +59,7 @@ exports.broadcast = function(type, sub_type, data, options) {
     }
 };
 
+// Strip < and > (which are one such way JV ruins the world, via <script>)
 var clean_up = function(obj) {
 
     var clean_part = function(part) {

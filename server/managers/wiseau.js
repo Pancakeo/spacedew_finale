@@ -1,9 +1,6 @@
 "use strict";
 
-const DEFAULT_LOBBY_NAME = "Tom Clancy's Rocket Ballz";
-
 var uuid = require('node-uuid');
-var server_settings = require('./server_settings');
 var moment = require('moment');
 
 var rooms = {};
@@ -81,5 +78,5 @@ exports.get_lobby = function() {
 
 // Create lobby
 var lobby_room_id = uuid.v4();
-var lobby_room_name = server_settings.get().lobby_room_name || DEFAULT_LOBBY_NAME;
+var lobby_room_name = app.config.lobby_room_name;
 lobby_room = exports.create_room(lobby_room_name, lobby_room_id);

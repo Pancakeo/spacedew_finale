@@ -16,8 +16,10 @@ module.exports = (function() {
         }
     });
 
+    var shared_config = require('../../../shared/shared_config'); // TODO - consider copying shared/* to a more relative folder.
+
     var server_settings = {
-        server: 'ws://localhost:2001'
+        server: 'ws://localhost:' + shared_config.chat_port
     };
 
     for (var server in server_settings) {
