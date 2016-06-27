@@ -36,7 +36,7 @@ module.exports = function(options) {
             var items = (event.clipboardData || event.originalEvent.clipboardData).items;
 
             var multi_line_text = event.originalEvent.clipboardData.getData("text");
-            if (multi_line_text.indexOf('\n') > 0 || multi_line_text.length > 140) {
+            if (multi_line_text.indexOf('\n') > 0) {
                 require('./blargher')(multi_line_text);
                 return false;
             }
@@ -75,7 +75,7 @@ module.exports = function(options) {
                         buttons: {
                             'Send': function() {
                                 var transfer_id = page.toolio.generate_id();
-                                
+
                                 var ext = '';
                                 if (file_type != null && file_type.indexOf('/') >= 0) {
                                     ext = file_type.split('/')[1];
