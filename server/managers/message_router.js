@@ -18,7 +18,7 @@ require("fs").readdirSync(normalized_path).forEach(function(file) {
 exports.handle = function(session, mixed_message) {
 
     if (mixed_message instanceof Buffer) {
-        console.log('heh binary!');
+        handlers.binary_dumptruck.handle_buffer(session, mixed_message);
         return;
     }
 

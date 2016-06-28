@@ -47,6 +47,25 @@ addEventListener('message', function(e) {
             };
 
             ws.onmessage = function(event) {
+                if (event.data instanceof ArrayBuffer) {
+                    var dv = new DataView(event.data, 0, 4);
+                    var header_length = dv.getUint32(0, true);
+
+                    var meta_string = util.array_buffer_to_string(event.data.slice(4, 4 + header_length));
+                    var meta = JSON.parse(meta_string);
+                    var buffer = event.data.slice(4 + header_length);
+
+                    postMessage({
+                        action: 'message_buffer',
+                        params: {
+                            meta: meta,
+                            buffer: buffer
+                        }
+                    }, [buffer]);
+
+                    return;
+                }
+
                 var parsed_message = JSON.parse(event.data);
                 postMessage({
                     action: 'message',

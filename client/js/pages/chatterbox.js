@@ -67,7 +67,7 @@ module.exports = function($parent, options) {
             var $chat = page.$("div[room_id='" + append_options.room_id + "']");
             var $message = $('<div class="message"><span class="timestamp">[' + moment().format("h:mm:ss A") + ']</span>' +
                 '<span class="message_text">' + message + '</span></div>');
-            
+
             $message.addClass(append_options.class_name);
             $chat.append($message);
 
@@ -232,6 +232,37 @@ module.exports = function($parent, options) {
         var lobby = options.lobby;
         app.add_room_tab(options.lobby, {focus: true});
         app.ready = true;
+
+        app.handle_binary = function(buffer, meta) {
+            if (meta.type && meta.type.indexOf('img/')) {
+                var blob = new Blob([buffer], {type: meta.type});
+                var blob_url = URL.createObjectURL(blob);
+
+                var nice_size = meta.size / (1024 * 1024);
+                nice_size = nice_size.toFixed(3);
+
+                var $blob_wrapper = $('<div class="file_transfer"/>');
+                var $header = $('<div class="header"/>');
+                var $author = $('<span class="username"/>').text(meta.username);
+                var $file_name = $('<span class="file_name"/>').text(meta.name);
+                var $file_size = $('<span class="file_size"/>').text(nice_size);
+                var $close = $('<span class="close">x</span>');
+
+                $header.append($author, ' has sent ', $file_name, ' size: ', $file_size, ' mb', $close);
+
+                var $img = $('<img/>').attr('src', blob_url);
+
+                $blob_wrapper.append($header);
+                $blob_wrapper.append($img);
+                $blob_wrapper.prop('blob_url', blob_url);
+
+                append_custom($blob_wrapper, {room_id: meta.room_id});
+            }
+            else {
+                console.log("unrecognized format", meta);
+            }
+
+        };
 
         if (lobby.recent_messages.length > 0) {
             var $blargh = $('<div class="blargh"/>');

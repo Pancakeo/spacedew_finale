@@ -236,6 +236,12 @@ module.exports = function(options) {
                 $(this).closest('.link_box').remove();
             });
 
+            $room_box.on('click', '.file_transfer .close', function() {
+                var blob_url = $(this).closest('.file_transfer').prop('blob_url');
+                URL.revokeObjectURL(blob_url);
+                $(this).closest('.file_transfer').remove();
+            });
+
             // May actually not need these:
             $room_box.prop('room_tab', $room_tab);
             $room_tab.prop('room_box', $room_box);

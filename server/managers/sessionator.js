@@ -59,6 +59,23 @@ exports.broadcast = function(type, sub_type, data, options) {
     }
 };
 
+// binary
+exports.broadcast_buffer = function(buffer, meta, options) {
+    options = Object.assign({
+        room_id: null
+    }, options);
+
+    var room = wiseau.get_room(options.room_id);
+
+    for (var key in sessions) {
+        var session = sessions[key];
+
+        if (session.logged_in && room.is_member(session.profile.username)) {
+            session.send_buffer(buffer, meta);
+        }
+    }
+};
+
 // Strip < and > (which are one such way JV ruins the world, via <script>)
 var clean_up = function(obj) {
 
@@ -118,7 +135,36 @@ exports.connect = function(connection_id, ws) {
                     ws.send(JSON.stringify(message));
                 }
                 catch (e) {
-                    console.log('uh oh ' + e);
+                    console.log('send - session not connected.');
+                }
+            }
+        },
+        send_buffer: function(buffer, meta, send_options) {
+            send_options = Object.assign({}, send_options);
+
+            if (ws.readyState == 1) {
+                var header_string = JSON.stringify(meta);
+                var header = new Buffer(header_string.length * 2);
+
+                for (var i = 0; i < header_string.length; i++) {
+                    header.writeUInt16LE(header_string.charCodeAt(i), i * 2);
+                }
+
+                var header_length = new Buffer(4);
+                header_length.writeUInt32LE(header.length, 0);
+
+                if (buffer != null) {
+                    var blob = Buffer.concat([header_length, header, buffer]);
+                }
+                else {
+                    var blob = Buffer.concat([header_length, header]);
+                }
+
+                try {
+                    ws.send(blob);
+                }
+                catch (e) {
+                    console.log('send_buffer - session not connected.');
                 }
             }
         },

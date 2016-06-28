@@ -61,6 +61,14 @@ module.exports = (function() {
 
                 break;
 
+            case 'message_buffer':
+                // I'm sure it's fine.
+                if (app.ready) {
+                    app.handle_binary(params.buffer, params.meta);
+                }
+
+                break;
+
             case 'error':
                 event_bus.emit('ws.error');
                 break;
