@@ -27,7 +27,6 @@ exports.set = function(key, value) {
             return;
         }
 
-        console.log(contents);
         var server_config = JSON.parse(contents);
         server_config[key] = value;
 

@@ -87,6 +87,10 @@ module.exports = function(grunt) {
                 files: ['client/js/**/*.js'],
                 tasks: ['browserify']
             },
+            public_scripts: {
+                files: ['client/js/public/*.js'],
+                tasks: ['copy']
+            },
             static_html: {
                 files: ['client/html/**/*.html'],
                 tasks: ['copy:html']

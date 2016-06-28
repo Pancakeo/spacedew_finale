@@ -115,6 +115,7 @@ module.exports = function($parent) {
             idle: 60000 * 5 // 5 minutes
         });
 
+        // I'm sure this is fine!
         var wait_for_app = setInterval(function() {
             if (app.ready) {
                 page.send('sync', {room_id: app.get_active_room(true)});

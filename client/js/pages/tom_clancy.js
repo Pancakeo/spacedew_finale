@@ -81,12 +81,15 @@ module.exports = function(options) {
                                     ext = file_type.split('/')[1];
                                 }
 
-                                var meta = toolio.get_meta({size: reader.result.byteLength, type: file_type, name: 'clipboard_' + transfer_id + '.' + ext});
+                                var meta = {
+                                    size: reader.result.byteLength,
+                                    type: file_type,
+                                    name: 'clipboard_' + transfer_id + '.' + ext
+                                };
 
-                                var active_tab = tab_guy.get_active_tab();
-                                meta.room_id = active_tab.id;
+                                meta.room_id = app.get_active_room(true);
 
-                                binary_client.send_buffer(reader.result, meta);
+                                page.ws.send_binary(reader.result, meta);
                                 URL.revokeObjectURL(blob_url);
 
                                 $(this).dialog('close');

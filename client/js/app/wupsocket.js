@@ -12,11 +12,8 @@ module.exports = (function() {
     var manually_closed = false;
     var key;
 
-    var chat_socket = new Worker('js/public/chat_socket.js');
-    chat_socket.postMessage({});
-
-    var blob_socket = new Worker('js/public/blob_socket.js');
-    blob_socket.postMessage({});
+    var prime_socket = new Worker('js/public/prime_socket.js');
+    prime_socket.postMessage({});
 
     var ws_handlers = {
         connection: function(message) {
@@ -35,7 +32,7 @@ module.exports = (function() {
 
     };
 
-    chat_socket.addEventListener('message', function(e) {
+    prime_socket.addEventListener('message', function(e) {
         var params = e.data.params;
 
         switch (e.data.action) {
@@ -74,6 +71,17 @@ module.exports = (function() {
     });
 
 
+    wupsocket.send_binary = function(blob, meta) {
+
+        prime_socket.postMessage({
+            action: 'send_binary',
+            params: {
+                blob: blob,
+                meta: meta
+            }
+        }, [blob]);
+    };
+
     wupsocket.send = function(type, sub_type, data) {
         if (connected === false) {
             console.error("Wupsocket is not connected");
@@ -87,7 +95,7 @@ module.exports = (function() {
             data: data
         };
 
-        chat_socket.postMessage({
+        prime_socket.postMessage({
             action: 'send',
             params: {
                 message: wrapped_message
@@ -101,23 +109,19 @@ module.exports = (function() {
 
     wupsocket.close = function() {
         manually_closed = true;
-        chat_socket.postMessage({action: 'disconnect'});
+        prime_socket.postMessage({action: 'disconnect'});
     };
 
     wupsocket.connect = function() {
-        chat_socket.postMessage({action: 'disconnect'});
+        prime_socket.postMessage({action: 'disconnect'});
         wupsocket.reconnect_attempt++;
 
-        chat_socket.postMessage({
+        prime_socket.postMessage({
             action: 'connect',
             params: {
                 server_ip: app.settings.server
             }
         });
-    };
-
-    wupsocket.send_binary = function(blob, meta) {
-
     };
 
     return wupsocket;

@@ -15,8 +15,14 @@ require("fs").readdirSync(normalized_path).forEach(function(file) {
     handlers[key] = handler;
 });
 
-exports.handle = function(session, json_message) {
-    var parsed_message = JSON.parse(json_message);
+exports.handle = function(session, mixed_message) {
+
+    if (mixed_message instanceof Buffer) {
+        console.log('heh binary!');
+        return;
+    }
+
+    var parsed_message = JSON.parse(mixed_message);
     var type = parsed_message.type;
 
     if (typeof(handlers[type]) == "object") {
