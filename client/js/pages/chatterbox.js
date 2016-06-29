@@ -2,8 +2,13 @@ module.exports = function($parent, options) {
     get_page('chatterbox', function(page) {
         var event_bus = require('../../../shared/event_bus');
         var linkomatic = require('../app/linkomatic')();
-
         $parent.append(page.$container);
+
+        var scroll_chat = function($chat) {
+            if ($chat.length > 0) {
+                $chat.scrollTop($chat[0].scrollHeight);
+            }
+        };
 
         var show_notification = function(message) {
 
@@ -47,10 +52,11 @@ module.exports = function($parent, options) {
             var $chat = page.$("div[room_id='" + append_options.room_id + "']");
             $chat.append($blargh);
 
-            show_notification("New multi-line message received!");
+            show_notification("New blargh/image/video/somethingElseEntirely message received!");
 
             if (app.settings.scroll_lock !== true) {
-                $blargh[0].scrollIntoView();
+                $chat.scrollTop($chat[0].scrollHeight);
+                scroll_chat($chat);
             }
         };
 
@@ -74,7 +80,7 @@ module.exports = function($parent, options) {
             show_notification(message);
 
             if (app.settings.scroll_lock !== true) {
-                $message[0].scrollIntoView();
+                scroll_chat($chat);
             }
         };
 
@@ -140,7 +146,7 @@ module.exports = function($parent, options) {
                 $link_box.find('img, iframe').each(function() {
                     $(this).on('load', function() {
                         if (app.settings.scroll_lock !== true) {
-                            $(this)[0].scrollIntoView(false);
+                            scroll_chat($chat);
                         }
                     });
                 });
@@ -151,7 +157,7 @@ module.exports = function($parent, options) {
                     var scroll_of_doom = function() {
                         $video[0].removeEventListener('canplay', scroll_of_doom);
                         if (app.settings.scroll_lock !== true) {
-                            $video[0].scrollIntoView(false);
+                            scroll_chat($chat);
                         }
                     };
 
@@ -162,7 +168,7 @@ module.exports = function($parent, options) {
             }
 
             if (app.settings.scroll_lock !== true) {
-                $message[0].scrollIntoView();
+                scroll_chat($chat);
             }
         };
 
@@ -251,6 +257,9 @@ module.exports = function($parent, options) {
                 $header.append($author, ' has sent ', $file_name, ' size: ', $file_size, ' mb', $close);
 
                 var $img = $('<img/>').attr('src', blob_url);
+                $img.on('load', function() {
+                   scroll_chat($img.closest('.chat_thing'));
+                });
 
                 $blob_wrapper.append($header);
                 $blob_wrapper.append($img);

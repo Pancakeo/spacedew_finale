@@ -111,6 +111,7 @@ module.exports = function(options) {
 
         var menu_handlers = {
             logout: function() {
+                app.force_logout = true;
                 delete localStorage.auth_key;
                 window.location = '/';
             },
@@ -292,5 +293,27 @@ module.exports = function(options) {
                 })
             }
         });
+
+        $(document).on('dragover dragenter drop', function(e) {
+            e.preventDefault();
+            return false;
+        });
+
+        $(document).on('dragover dragenter', '.chat_thing', function(e) {
+            e.preventDefault();
+            return false;
+        });
+
+        $(document).on('drop', '.chat_thing', function(e) {
+            e.preventDefault();
+            var room_id = $(this).attr('room_id');
+            return false;
+        });
+
+        window.onbeforeunload = function(e) {
+            if (app.force_logout != true) {
+                return true;
+            }
+        };
     });
 };
