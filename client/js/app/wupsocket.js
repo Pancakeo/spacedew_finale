@@ -3,9 +3,12 @@ module.exports = (function() {
     var toolio = require('./toolio');
     var event_bus = require('../../../shared/event_bus');
 
+    var CHUNK_SIZE = 1024 * 1024; // 1mb.
+
     var wupsocket = {
         reconnect_attempt: 0,
-        MAX_RECONNECT_ATTEMPTS: 10
+        MAX_RECONNECT_ATTEMPTS: 10,
+        binary_transfers: {}
     };
 
     var connected = false;
@@ -62,9 +65,25 @@ module.exports = (function() {
                 break;
 
             case 'message_buffer':
+                var meta = params.meta;
+
                 // I'm sure it's fine.
-                if (app.ready) {
-                    app.handle_binary(params.buffer, params.meta);
+                if (meta.debut === true && wupsocket.binary_transfers[meta.transfer_id] == null) {
+                    wupsocket.binary_transfers[meta.transfer_id] = {data: []};
+                }
+                else if (wupsocket.binary_transfers[meta.transfer_id] == null) {
+                    console.debug("Ignoring partial transfer " + meta.transfer_id);
+                    return;
+                }
+
+                if (meta.no_data !== true) {
+                    wupsocket.binary_transfers[meta.transfer_id].data.push(params.buffer);
+                }
+
+                if (meta.complete == true) {
+                    meta.file_info.username = meta.username;
+                    console.log(wupsocket.binary_transfers[meta.transfer_id].data);
+                    app.handle_binary(wupsocket.binary_transfers[meta.transfer_id].data, meta.file_info);
                 }
 
                 break;
@@ -80,14 +99,50 @@ module.exports = (function() {
 
 
     wupsocket.send_binary = function(blob, meta) {
+        var transfer_id = toolio.generate_id();
 
-        prime_socket.postMessage({
-            action: 'send_binary',
-            params: {
-                blob: blob,
-                meta: meta
+        var send_chunk = function(buffer, meta, start) {
+            var transfer_info = {
+                complete: false,
+                transfer_id: transfer_id,
+                room_id: meta.room_id
+            };
+
+            if (start === 0) {
+                transfer_info.debut = true;
             }
-        }, [blob]);
+
+            if (start + CHUNK_SIZE >= buffer.byteLength) {
+                transfer_info.complete = true;
+                transfer_info.file_info = meta;
+
+                var chunk = buffer.slice(start);
+                prime_socket.postMessage({
+                    action: 'send_binary',
+                    params: {
+                        blob: chunk,
+                        meta: transfer_info
+                    }
+                }, [chunk]);
+            }
+            else {
+                var chunk = buffer.slice(start, start + CHUNK_SIZE);
+                prime_socket.postMessage({
+                    action: 'send_binary',
+                    params: {
+                        blob: chunk,
+                        meta: transfer_info
+                    }
+                }, [chunk]);
+
+                setTimeout(function() {
+                    send_chunk(buffer, meta, start + CHUNK_SIZE);
+                }, 0);
+            }
+        };
+
+        // wupsocket.binary_transfers[meta.transfer_id] = {data: [blob]};
+        send_chunk(blob, meta, 0);
     };
 
     wupsocket.send = function(type, sub_type, data) {

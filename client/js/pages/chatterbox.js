@@ -239,8 +239,8 @@ module.exports = function($parent, options) {
         app.add_room_tab(options.lobby, {focus: true});
         app.ready = true;
 
-        app.handle_binary = function(buffer, meta) {
-            var blob = new Blob([buffer], {type: meta.type});
+        app.handle_binary = function(binary_parts, meta) {
+            var blob = new Blob(binary_parts, {type: meta.type});
             var blob_url = URL.createObjectURL(blob);
 
             var $blob_wrapper = $('<div class="file_transfer"/>');
