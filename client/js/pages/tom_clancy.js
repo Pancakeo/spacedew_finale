@@ -242,7 +242,7 @@ module.exports = function(options) {
                 URL.revokeObjectURL(blob_url);
                 $(this).closest('.file_transfer').remove();
             });
-
+            
             // May actually not need these:
             $room_box.prop('room_tab', $room_tab);
             $room_tab.prop('room_box', $room_box);
@@ -307,6 +307,36 @@ module.exports = function(options) {
         $(document).on('drop', '.chat_thing', function(e) {
             e.preventDefault();
             var room_id = $(this).attr('room_id');
+
+            var process_file = function(file) {
+                var reader = new FileReader();
+                reader.onload = function() {
+                    var meta = {
+                        size: reader.result.byteLength,
+                        type: file.type,
+                        name: file.name
+                    };
+
+                    meta.room_id = room_id;
+
+                    page.ws.send_binary(reader.result, meta);
+                };
+
+                reader.readAsArrayBuffer(file);
+            };
+
+            if (e.files != null) {
+                var files = e.files;
+            }
+            else {
+                var files = e.originalEvent.dataTransfer.files;
+            }
+
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                process_file(file);
+            }
+
             return false;
         });
 

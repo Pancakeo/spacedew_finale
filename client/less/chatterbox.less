@@ -69,8 +69,12 @@
       border: 1px black solid;
       font-size: 85%;
 
-      img {
+      img, audio, video {
         max-width: 100%;
+      }
+
+      audio {
+        margin: 5px;
       }
 
       .header {
@@ -84,13 +88,27 @@
 
         .close {
           position: absolute;
-          color: darkred;
-          right: 5px;
+          color: black;
+          right: 0;
           top: 0;
           cursor: pointer;
           font-weight: bold;
-          width: 16px;
           text-align: center;
+          background: red;
+          border: 1px black solid;
+          padding: 1px 5px;
+        }
+
+        .save {
+          text-decoration: none;
+          position: absolute;
+          right: 20px;
+          background: blue;
+          border: 1px black solid;
+          color: white;
+          padding: 1px 5px;
+          top: 0;
+          cursor: pointer;
         }
       }
     }

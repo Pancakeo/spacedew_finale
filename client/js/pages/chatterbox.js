@@ -52,7 +52,7 @@ module.exports = function($parent, options) {
             var $chat = page.$("div[room_id='" + append_options.room_id + "']");
             $chat.append($blargh);
 
-            show_notification("New blargh/image/video/somethingElseEntirely message received!");
+            show_notification("New MYSTERY message!");
 
             if (app.settings.scroll_lock !== true) {
                 $chat.scrollTop($chat[0].scrollHeight);
@@ -240,37 +240,73 @@ module.exports = function($parent, options) {
         app.ready = true;
 
         app.handle_binary = function(buffer, meta) {
-            if (meta.type && meta.type.indexOf('img/')) {
-                var blob = new Blob([buffer], {type: meta.type});
-                var blob_url = URL.createObjectURL(blob);
+            var blob = new Blob([buffer], {type: meta.type});
+            var blob_url = URL.createObjectURL(blob);
 
-                var nice_size = meta.size / (1024 * 1024);
-                nice_size = nice_size.toFixed(3);
+            var $blob_wrapper = $('<div class="file_transfer"/>');
+            $blob_wrapper.prop('blob_url', blob_url);
 
-                var $blob_wrapper = $('<div class="file_transfer"/>');
-                var $header = $('<div class="header"/>');
-                var $author = $('<span class="username"/>').text(meta.username);
-                var $file_name = $('<span class="file_name"/>').text(meta.name);
-                var $file_size = $('<span class="file_size"/>').text(nice_size);
-                var $close = $('<span class="close">x</span>');
+            var nice_size = meta.size / (1024 * 1024);
+            nice_size = nice_size.toFixed(3);
 
-                $header.append($author, ' has sent ', $file_name, ' size: ', $file_size, ' mb', $close);
+            var $header = $('<div class="header"/>');
+            var $author = $('<span class="username"/>').text(meta.username);
+            var $file_name = $('<span class="file_name"/>').text(meta.name);
+            var $file_size = $('<span class="file_size"/>').text(nice_size);
+            var $save = $('<a target="_blank" class="save">Save</a>').attr({download: meta.name, href: blob_url});
+            var $close = $('<span class="close">x</span>');
 
-                var $img = $('<img/>').attr('src', blob_url);
-                $img.on('load', function() {
-                   scroll_chat($img.closest('.chat_thing'));
-                });
+            $header.append($author, ' has sent ', $file_name, ' size: ', $file_size, ' mb', $save, $close);
+            $blob_wrapper.append($header);
 
-                $blob_wrapper.append($header);
-                $blob_wrapper.append($img);
-                $blob_wrapper.prop('blob_url', blob_url);
+            var handlers = {
+                image: function() {
+                    var $elm = $('<img/>').attr('src', blob_url);
+                    $elm.on('load', function() {
+                        scroll_chat($elm.closest('.chat_thing'));
+                    });
 
-                append_custom($blob_wrapper, {room_id: meta.room_id});
+                    $blob_wrapper.append($elm);
+                },
+                video: function() {
+                    var $elm = $('<video controls autoplay muted/>');
+                    var $src = $('<source/>').attr('src', blob_url);
+                    $elm.append($src);
+
+                    $elm[0].addEventListener('loadedmetadata', function scroll_of_doom() {
+                        this.removeEventListener('loadedmetadata', scroll_of_doom);
+                        scroll_chat($elm.closest('.chat_thing'));
+                    });
+
+                    $blob_wrapper.append($elm);
+                },
+                audio: function() {
+                    var $elm = $('<audio controls/>');
+                    var $src = $('<source/>').attr('src', blob_url);
+                    $elm.append($src);
+
+                    $elm.on('load', function() {
+                        scroll_chat($elm.closest('.chat_thing'));
+                    });
+
+                    $blob_wrapper.append($elm);
+                },
+                generic_file: function() {
+
+                }
+
+            };
+
+            var type = meta.type && meta.type.split('/')[0];
+
+            if (handlers[type]) {
+                handlers[type]();
             }
             else {
-                console.log("unrecognized format", meta);
+                handlers.generic_file();
             }
 
+            append_custom($blob_wrapper, {room_id: meta.room_id});
         };
 
         if (lobby.recent_messages.length > 0) {
