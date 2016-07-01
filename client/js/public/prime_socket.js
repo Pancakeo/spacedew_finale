@@ -72,6 +72,7 @@ addEventListener('message', function(e) {
 
                     var meta_string = util.array_buffer_to_string(event.data.slice(4, 4 + header_length));
                     var meta = JSON.parse(meta_string);
+
                     var buffer = event.data.slice(4 + header_length);
 
                     postMessage({

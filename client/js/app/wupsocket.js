@@ -83,7 +83,7 @@ module.exports = (function() {
                 if (meta.complete == true) {
                     meta.file_info.username = meta.username;
                     app.handle_binary(wupsocket.binary_transfers[meta.transfer_id].data, meta.file_info);
-                    // delete wupsocket.binary_transfers[meta.transfer_id];
+                    delete wupsocket.binary_transfers[meta.transfer_id];
                 }
 
                 break;
@@ -141,7 +141,7 @@ module.exports = (function() {
             }
         };
 
-        // wupsocket.binary_transfers[meta.transfer_id] = {data: [blob]};
+        wupsocket.binary_transfers[transfer_id] = {data: [blob]};
         send_chunk(blob, meta, 0);
     };
 

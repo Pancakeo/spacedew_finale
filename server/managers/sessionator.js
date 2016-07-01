@@ -59,10 +59,10 @@ exports.broadcast = function(type, sub_type, data, options) {
     }
 };
 
-// binary
 exports.broadcast_buffer = function(buffer, meta, options) {
     options = Object.assign({
-        room_id: null
+        room_id: null,
+        sender_session: null
     }, options);
 
     var room = wiseau.get_room(options.room_id);
@@ -70,8 +70,16 @@ exports.broadcast_buffer = function(buffer, meta, options) {
     for (var key in sessions) {
         var session = sessions[key];
 
-        if (session.logged_in && room.is_member(session.profile.username)) {
-            session.send_buffer(buffer, meta);
+        if (options.sender_session == session) {
+            if (meta.complete == true) {
+                var special_meta = Object.assign({no_data: true}, meta);
+                session.send_buffer(null, special_meta);
+            }
+        }
+        else {
+            if (session.logged_in && room.is_member(session.profile.username)) {
+                session.send_buffer(buffer, meta);
+            }
         }
     }
 };
