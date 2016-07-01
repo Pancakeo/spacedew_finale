@@ -1,5 +1,5 @@
 var ws;
-var BUFFER_QUEUE_THRESHOLD = 1024 * 1024 * 0.25; // Not a hard boundary
+var BUFFER_QUEUE_THRESHOLD = 1024 * 256;
 
 var prime_socket = {
     queued_things: [],
