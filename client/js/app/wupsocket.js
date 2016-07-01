@@ -3,7 +3,7 @@ module.exports = (function() {
     var toolio = require('./toolio');
     var event_bus = require('../../../shared/event_bus');
 
-    var CHUNK_SIZE = 1024 * 1024; // 1mb.
+    var CHUNK_SIZE = 1024 * 1024 * 0.5; // half-meg.
 
     var wupsocket = {
         reconnect_attempt: 0,
@@ -82,8 +82,8 @@ module.exports = (function() {
 
                 if (meta.complete == true) {
                     meta.file_info.username = meta.username;
-                    console.log(wupsocket.binary_transfers[meta.transfer_id].data);
                     app.handle_binary(wupsocket.binary_transfers[meta.transfer_id].data, meta.file_info);
+                    // delete wupsocket.binary_transfers[meta.transfer_id];
                 }
 
                 break;

@@ -1,4 +1,23 @@
 var ws;
+var BUFFER_QUEUE_THRESHOLD = 1024 * 1024 * 0.25; // Not a hard boundary
+
+var prime_socket = {
+    queued_things: [],
+    queue: function(thing) {
+        prime_socket.queued_things.push(thing);
+    },
+    send_next: function() {
+        if (prime_socket.queued_things.length > 0 && ws.bufferedAmount < BUFFER_QUEUE_THRESHOLD) {
+            var thing = prime_socket.queued_things.shift();
+            ws.send(thing);
+        }
+    }
+};
+
+// Check queue and send
+prime_socket.queue_checker = setInterval(function() {
+    prime_socket.send_next();
+}, 33);
 
 var util = {};
 util.array_buffer_to_string = function(buf) {
@@ -89,11 +108,10 @@ addEventListener('message', function(e) {
 
         case 'send_binary':
             var blob = util.blob_from_buffer(params.blob, params.meta);
-            ws.send(blob);
+            prime_socket.queue(blob);
             break;
 
         default:
             break;
     }
-
 });
