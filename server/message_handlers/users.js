@@ -12,7 +12,7 @@ var send_users_list = function(room, session) {
     if (room == null) {
         room = wiseau.get_lobby();
     }
-
+    
     var nice_users = wuptil.copy_object(room.users);
     var sessions = sessionator.get_sessions();
 

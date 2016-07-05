@@ -166,9 +166,6 @@ module.exports = function(options) {
             },
             change_password: function() {
                 require('./change_password')();
-            },
-            wrenches: function() {
-                require('./wrenches')();
             }
         };
 
@@ -214,6 +211,93 @@ module.exports = function(options) {
             });
         });
 
+        page.$('#browse_file_thing').on('change', function() {
+            var room_id = app.get_active_room(true);
+
+            var process_file = function(file) {
+                var reader = new FileReader();
+                reader.onload = function() {
+                    var meta = {
+                        size: reader.result.byteLength,
+                        type: file.type,
+                        name: file.name
+                    };
+
+                    meta.room_id = room_id;
+
+                    page.ws.send_binary(reader.result, meta);
+                };
+
+                reader.readAsArrayBuffer(file);
+            };
+
+            var e = this;
+
+            if (e.files != null) {
+                var files = e.files;
+            }
+            else {
+                var files = e.originalEvent.dataTransfer.files;
+            }
+
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                process_file(file);
+            }
+
+            this.value = '';
+        });
+
+        page.$("#add_thing").on('click', function() {
+            var $things = $('<div><div class="content"/></div>');
+            var $content = $things.children('.content');
+
+            var blurbs = [
+                {
+                    text: 'Join Room',
+                    action: function() {
+                        page.prompt("New Room", "Create/join a room:", "BotD's House of Pancakes", function(room_name) {
+                            if (room_name) {
+                                room_name = room_name.trim();
+
+                                // Maybe do that.
+                                if (room_name.length > 0) {
+                                    page.send('join_room', {name: room_name}, {page_name: 'chatterbox'});
+                                }
+                            }
+
+                        });
+                    }
+                },
+                {
+                    text: "Emagine",
+                    action: function() {
+                        window.open('index.html?wup=emagine', '_blank', 'width=1800,height=900');
+                    }
+                }
+            ];
+
+            blurbs.forEach(function(blurb) {
+                var $thing = $('<button class="blurb_button">' + blurb.text + '</button>');
+                $thing.on('click', function() {
+                    blurb.action();
+                    $things.dialog('close');
+                });
+
+                $content.append($thing);
+            });
+
+
+            $things.dialog({
+                modal: true,
+                title: 'Add Thing',
+                open: function() {
+                    $things.find('button').button();
+                }
+
+            });
+        });
+
         app.rename_room_tab = function(room_id, room_name) {
             page.$('#room_names [room_id="' + room_id + '"]').html(room_name).attr('title', room_name);
         };
@@ -242,7 +326,7 @@ module.exports = function(options) {
                 URL.revokeObjectURL(blob_url);
                 $(this).closest('.file_transfer').remove();
             });
-            
+
             // May actually not need these:
             $room_box.prop('room_tab', $room_tab);
             $room_tab.prop('room_box', $room_box);

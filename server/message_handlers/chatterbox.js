@@ -9,12 +9,12 @@ exports.handle_message = function handle_message(session, message) {
     var data = message.data;
     var room = wiseau.get_room(data.room_id);
 
-    if (room == null) {
-        return;
-    }
-
     var handle = {
         chat: function() {
+            if (room == null) {
+                return;
+            }
+
             var message = data.message;
 
             if (message.length > 0) {
@@ -29,6 +29,10 @@ exports.handle_message = function handle_message(session, message) {
             }
         },
         blargh: function() {
+            if (room == null) {
+                return;
+            }
+
             if (data.message.length > 0) {
                 sessionator.broadcast('chatterbox', 'blargh', {message: data.message, username: session.profile.username}, {room_id: room.id, strip_entities: false});
             }
@@ -42,6 +46,27 @@ exports.handle_message = function handle_message(session, message) {
             room.name = room_name;
             sessionator.broadcast('chatterbox', 'change_room_name', {new_name: room.name, blame: session.profile.username}, {room_id: room.id});
             configuration.set('lobby_room_name', room.name);
+        },
+        join_room: function() {
+            if (!data.name || data.name.length == 0) {
+                return;
+            }
+
+            var room = wiseau.get_room_by_name(data.name);
+
+            if (room == null) {
+                room = wiseau.create_room(data.name);
+                room.join_room(session.profile.username);
+                session.send('chatterbox', 'join_room', room, {});
+            }
+            else {
+                // already exists.
+
+                if (!room.is_member(session.profile.username)) {
+                    room.join_room(session.profile.username);
+                    session.send('chatterbox', 'join_room', room, {});
+                }
+            }
         }
     };
 

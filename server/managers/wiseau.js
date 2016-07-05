@@ -72,6 +72,15 @@ exports.get_room = function(room_id) {
     return rooms[room_id];
 };
 
+exports.get_room_by_name = function(room_name) {
+    for (var room_id in rooms) {
+        var room = rooms[room_id];
+        if (room.name.toLowerCase() == room_name.toLowerCase()) {
+          return room;
+        }
+    }
+};
+
 exports.get_lobby = function() {
     return lobby_room;
 };

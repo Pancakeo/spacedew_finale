@@ -25,7 +25,7 @@ exports.handle = function(session, mixed_message) {
 
     var parsed_message = JSON.parse(mixed_message);
     var type = parsed_message.type;
-
+    
     if (typeof(handlers[type]) == "object") {
         var handler = handlers[type];
 

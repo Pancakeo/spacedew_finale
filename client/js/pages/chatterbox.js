@@ -220,6 +220,10 @@ module.exports = function($parent, options) {
             append_system(data.message, {class_name: 'sad', room_id: data.room_id})
         });
 
+        page.listen('join_room', function(room) {
+            app.add_room_tab(room, {focus: true});
+        });
+
         page.listen('blargh', function(data) {
             var $blargh = $('<div class="blargh prehensile"/>');
             $blargh.append('<div class="header">' + data.username + ' <span class="close">x</span></div>');
