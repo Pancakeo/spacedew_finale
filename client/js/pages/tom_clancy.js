@@ -248,6 +248,9 @@ module.exports = function(options) {
             this.value = '';
         });
 
+        // Heh, test code! TODO
+        // window.open('index.html?wup=emagine', '_blank', 'width=800,height=600');
+
         page.$("#add_thing").on('click', function() {
             var $things = $('<div><div class="content"/></div>');
             var $content = $things.children('.content');
@@ -272,7 +275,11 @@ module.exports = function(options) {
                 {
                     text: "Emagine",
                     action: function() {
-                        window.open('index.html?wup=emagine', '_blank', 'width=1800,height=900');
+                        var blargh = window.open('index.html?wup=emagine', '_blank', 'width=800,height=600');
+
+                        if (blargh == null) {
+                            page.alert("Popup Blocked", "Disable your American Online popup blocker.");
+                        }
                     }
                 }
             ];

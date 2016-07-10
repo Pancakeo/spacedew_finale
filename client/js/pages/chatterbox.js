@@ -4,6 +4,8 @@ module.exports = function($parent, options) {
         var linkomatic = require('../app/linkomatic')();
         $parent.append(page.$container);
 
+        var url_validator = /(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/;
+
         var scroll_chat = function($chat) {
             if ($chat.length > 0) {
                 $chat.scrollTop($chat[0].scrollHeight);
@@ -102,7 +104,8 @@ module.exports = function($parent, options) {
 
                 // Consider a more robust link parser (heh!)
                 for (var i = 0; i < parts.length; i++) {
-                    parts[i] = parts[i].replace(/(http.*)/, function(url) {
+
+                    parts[i] = parts[i].replace(url_validator, function(url) {
                         maybe_something.push(url);
                         return '<a target="_blank" href="' + encodeURI(url) + '">' + url + '</a>';
                     });
@@ -206,6 +209,7 @@ module.exports = function($parent, options) {
                 },
                 close: function() {
                     app.disconnected = false;
+                    app.force_logout = true;
                     window.location = '/';
                     $(this).destroy();
                 }
