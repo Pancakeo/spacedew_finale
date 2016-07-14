@@ -50,7 +50,11 @@ module.exports = function() {
 
         various_things.forEach(function(thing) {
 
-            if (video_regex.test(thing)) {
+            if (probably_youtube.test(thing)) {
+                var $youtube = add_youtube(thing);
+                $link_box.append($youtube);
+            }
+            else if (video_regex.test(thing)) {
 
                 if (thing.match(/\.gifv|\.webm/i)) {
                     thing = thing.replace(/(\.gifv)/i, '.mp4');
@@ -65,10 +69,6 @@ module.exports = function() {
             else if (image_regex.test(thing)) {
                 var $image = $('<img src="' + thing + '"/>');
                 $link_box.append($image);
-            }
-            else if (probably_youtube.test(thing)) {
-                var $youtube = add_youtube(thing);
-                $link_box.append($youtube);
             }
         });
 
