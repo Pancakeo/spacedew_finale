@@ -9,6 +9,23 @@ module.exports = (function() {
         });
     };
 
+    toolio.nice_size = function(size) {
+        var units = ['kb', 'mb', 'gb'];
+        var unit = 'b';
+
+        units.some(function(u) {
+            if (size >= 1024) {
+                size /= 1024;
+                unit = u;
+            }
+            else {
+                return true;
+            }
+        });
+
+        return size.toFixed(2) + ' ' + unit;
+    };
+
     toolio.prompt = function(title, message, existing_value, cb) {
         var use_input = false;
 

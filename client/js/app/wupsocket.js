@@ -79,11 +79,34 @@ module.exports = (function() {
                 if (meta.no_data !== true) {
                     wupsocket.binary_transfers[meta.transfer_id].data.push(params.buffer);
                 }
+                else {
+                    if (wupsocket.binary_transfers[meta.transfer_id].chunk == null) {
+                        wupsocket.binary_transfers[meta.transfer_id].chunk = 0;
+                    }
+                    else {
+                        wupsocket.binary_transfers[meta.transfer_id].chunk++;
+                    }
+                }
 
                 if (meta.complete == true) {
                     meta.file_info.username = meta.username;
                     app.handle_binary(wupsocket.binary_transfers[meta.transfer_id].data, meta.file_info);
                     delete wupsocket.binary_transfers[meta.transfer_id];
+                    event_bus.emit('ws.transfer_complete', {transfer_id: meta.transfer_id});
+                }
+                else {
+                    if (meta.no_data == true) {
+                        var cur_chunk = wupsocket.binary_transfers[meta.transfer_id] && wupsocket.binary_transfers[meta.transfer_id].chunk;
+                        cur_chunk = cur_chunk || 0;
+                        stored_size = cur_chunk * CHUNK_SIZE;
+                    }
+                    else {
+                        var stored_size = wupsocket.binary_transfers[meta.transfer_id].data.reduce(function(prev, chunk) {
+                            return prev + chunk.byteLength;
+                        }, 0);
+                    }
+
+                    event_bus.emit('ws.transfer_update', {transfer_id: meta.transfer_id, stored_size: stored_size});
                 }
 
                 break;
@@ -99,7 +122,7 @@ module.exports = (function() {
 
 
     wupsocket.send_binary = function(blob, meta) {
-        var transfer_id = toolio.generate_id();
+        var transfer_id = meta.transfer_id;
 
         var send_chunk = function(buffer, meta, start) {
             var transfer_info = {

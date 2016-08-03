@@ -362,6 +362,23 @@ module.exports = function(options) {
             }
         };
 
+        page.peepy('ws.transfer_complete', function(params) {
+            page.$("div[transfer_id='" + params.transfer_id + "'] progress").remove();
+        });
+
+        page.peepy('ws.transfer_update', function(params) {
+            var $wrapper = page.$("div[transfer_id='" + params.transfer_id + "']");
+            if ($wrapper.length > 0) {
+                var total_size = $wrapper.prop('meta').size;
+
+                if (total_size > 0) {
+                    var progress = (params.stored_size / total_size) * 100;
+                    page.$("div[transfer_id='" + params.transfer_id + "'] progress")[0].value = progress.toFixed(0);
+                }
+            }
+
+        });
+
         page.peepy('users.user_settings', function(params) {
             var my_settings = params.user_settings[app.profile.username];
             my_settings = my_settings && my_settings.outfit && my_settings.outfit.chat;
@@ -401,15 +418,17 @@ module.exports = function(options) {
 
             var process_file = function(file) {
                 var reader = new FileReader();
+
                 reader.onload = function() {
                     var meta = {
                         size: reader.result.byteLength,
                         type: file.type,
-                        name: file.name
+                        name: file.name,
+                        transfer_id: page.toolio.generate_id()
                     };
 
                     meta.room_id = room_id;
-
+                    page.ws.send('chatterbox', 'create_transfer_progress', meta);
                     page.ws.send_binary(reader.result, meta);
                 };
 

@@ -71,10 +71,8 @@ exports.broadcast_buffer = function(buffer, meta, options) {
         var session = sessions[key];
 
         if (options.sender_session == session) {
-            if (meta.complete == true) {
-                var special_meta = Object.assign({no_data: true}, meta);
-                session.send_buffer(null, special_meta);
-            }
+            var special_meta = Object.assign({no_data: true}, meta);
+            session.send_buffer(null, special_meta);
         }
         else {
             if (session.logged_in && room.is_member(session.profile.username)) {

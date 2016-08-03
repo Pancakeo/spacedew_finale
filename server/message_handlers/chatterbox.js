@@ -67,6 +67,14 @@ exports.handle_message = function handle_message(session, message) {
                     session.send('chatterbox', 'join_room', room, {});
                 }
             }
+        },
+        create_transfer_progress: function() {
+            sessionator.broadcast('chatterbox', 'create_transfer_progress', {
+                size: data.size,
+                name: data.name,
+                transfer_id: data.transfer_id,
+                username: session.profile.username
+            }, {room_id: room.id});
         }
     };
 

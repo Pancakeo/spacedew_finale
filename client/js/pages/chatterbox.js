@@ -66,7 +66,8 @@ module.exports = function($parent, options) {
         var append_system = function(message, append_options) {
             append_options = $.extend({
                 room_id: null,
-                class_name: null
+                class_name: null,
+                color: null
             }, append_options);
 
             if (append_options.room_id == null) {
@@ -78,6 +79,11 @@ module.exports = function($parent, options) {
                 '<span class="message_text">' + message + '</span></div>');
 
             $message.addClass(append_options.class_name);
+
+            if (append_options.color != null) {
+                $message.css('color', append_options.color);
+            }
+
             $chat.append($message);
 
             show_notification(message);
@@ -222,7 +228,7 @@ module.exports = function($parent, options) {
         });
 
         page.listen('system', function(data) {
-            append_system(data.message, {class_name: 'sad', room_id: data.room_id})
+            append_system(data.message, {class_name: 'sad', color: data.color, room_id: data.room_id})
         });
 
         page.listen('join_room', function(room) {
@@ -242,6 +248,17 @@ module.exports = function($parent, options) {
         page.listen('change_room_name', function(data) {
             append_system(data.blame + ' changed the room name to ' + data.new_name, {room_id: data.room_id, class_name: 'wup'});
             app.rename_room_tab(data.room_id, data.new_name);
+        });
+
+        page.listen('create_transfer_progress', function(data) {
+            var $wrapper = $('<div class="transfer_progress" transfer_id="' + data.transfer_id + '"/>');
+            $wrapper.prop('meta', data);
+            var message = data.username + " is sending " + data.name + " (" + page.toolio.nice_size(data.size) + ")";
+
+            var $progress = $('<progress value="0" max="100"/>');
+            $wrapper.append(message);
+            $wrapper.append($progress);
+            append_custom($wrapper, {room_id: data.room_id});
         });
 
         var lobby = options.lobby;
