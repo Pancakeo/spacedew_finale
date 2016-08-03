@@ -373,7 +373,8 @@ module.exports = function(options) {
 
                 if (total_size > 0) {
                     var progress = (params.stored_size / total_size) * 100;
-                    page.$("div[transfer_id='" + params.transfer_id + "'] progress")[0].value = progress.toFixed(0);
+                    $wrapper.find("progress")[0].value = progress.toFixed(0);
+                    $wrapper.find("progress").attr('title', progress.toFixed(0) + '%');
                 }
             }
 
