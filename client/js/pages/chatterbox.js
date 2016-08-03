@@ -272,17 +272,14 @@ module.exports = function($parent, options) {
             var $blob_wrapper = $('<div class="file_transfer"/>');
             $blob_wrapper.prop('blob_url', blob_url);
 
-            var nice_size = meta.size / (1024 * 1024);
-            nice_size = nice_size.toFixed(3);
-
             var $header = $('<div class="header"/>');
             var $author = $('<span class="username"/>').text(meta.username);
             var $file_name = $('<span class="file_name"/>').text(meta.name);
-            var $file_size = $('<span class="file_size"/>').text(nice_size);
+            var $file_size = $('<span class="file_size"/>').text(page.toolio.nice_size(meta.size));
             var $save = $('<a target="_blank" class="save">Save</a>').attr({download: meta.name, href: blob_url});
             var $close = $('<span class="close">x</span>');
 
-            $header.append($author, ' has sent ', $file_name, ' size: ', $file_size, ' mb', $save, $close);
+            $header.append($author, ' has sent ', $file_name, ' (', $file_size, ')', $save, $close);
             $blob_wrapper.append($header);
 
             var handlers = {
