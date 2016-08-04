@@ -22,6 +22,30 @@ module.exports = function() {
             }
         });
 
+        event_bus.on('ws.disconnect', function() {
+            if (app.disconnected === true) {
+                return;
+            }
+
+            app.disconnected = true;
+
+            $("<div>Disconnected from server</div>").dialog({
+                title: "Oh shit",
+                modal: true,
+                buttons: {
+                    'Ok': function() {
+                        $(this).dialog('close');
+                    }
+                },
+                close: function() {
+                    app.disconnected = false;
+                    app.force_logout = true;
+                    window.location = '/';
+                    $(this).destroy();
+                }
+            });
+        });
+
         page.listen('login', function(data) {
 
             if (data.success !== true) {

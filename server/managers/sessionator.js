@@ -9,12 +9,13 @@ setInterval(function() {
         var s = sessions[key];
         if (s.ws.readyState == 1) { // Connected
             if (Date.now() - s.last_activity >= (app.config.connection_timeout * 1000)) {
-                var well_what_happen = s.profile.username + " timed out.";
 
-                exports.broadcast('chatterbox', 'heartbeat', {ping_sent_at: Date.now()}, {require_logged_in: false});
-                exports.broadcast('chatterbox', 'system', {message: well_what_happen}, {room_id: wiseau.get_lobby().id});
+                if (s.logged_in == true) {
+                    var well_what_happen = s.profile.username + " timed out.";
+                    exports.broadcast('chatterbox', 'system', {message: well_what_happen}, {room_id: wiseau.get_lobby().id});
+                    console.log(well_what_happen);
+                }
 
-                console.log(well_what_happen);
                 s.logout();
             }
         }
@@ -193,10 +194,13 @@ exports.connect = function(connection_id, ws) {
         },
         // Also closes connection.
         logout: function() {
+            if (session.logged_in) {
+                console.log(session.profile.username + " logged out.");
+                event_bus.emit('logout', session.profile);
+            }
+
             session.logged_in = false;
-            console.log(session.profile.username + " logged out.");
             session.authenticated = false;
-            event_bus.emit('logout', session.profile);
 
             try {
                 session.ws.close();
@@ -204,8 +208,6 @@ exports.connect = function(connection_id, ws) {
             catch (e) {
                 console.log('Logout failure', e);
             }
-
-
         },
         get_debug_info: function() {
             var wup = {};
