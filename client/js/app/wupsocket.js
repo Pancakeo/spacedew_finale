@@ -6,8 +6,6 @@ module.exports = (function() {
     var CHUNK_SIZE = 1024 * 128; // xx kb.
 
     var wupsocket = {
-        reconnect_attempt: 0,
-        MAX_RECONNECT_ATTEMPTS: 10,
         binary_transfers: {}
     };
 
@@ -40,6 +38,8 @@ module.exports = (function() {
 
         switch (e.data.action) {
             case 'connect':
+                wupsocket.reconnecting = false;
+                wupsocket.last_reconnect_attempt = 0;
                 connected = true;
                 break;
 
@@ -198,9 +198,30 @@ module.exports = (function() {
         prime_socket.postMessage({action: 'disconnect'});
     };
 
+    wupsocket.reconnect = function() {
+        wupsocket.reconnecting = true;
+
+        if (Date.now() - wupsocket.last_reconnect_attempt >= 5000) {
+            wupsocket.last_reconnect_attempt = Date.now();
+
+            prime_socket.postMessage({
+                action: 'connect',
+                params: {
+                    server_ip: app.settings.server
+                }
+            });
+        }
+        else {
+            var diff = 5000 - (Date.now() - wupsocket.last_reconnect_attempt);
+            setTimeout(function() {
+                wupsocket.reconnect();
+            }, diff)
+        }
+
+    };
+
     wupsocket.connect = function() {
         prime_socket.postMessage({action: 'disconnect'});
-        wupsocket.reconnect_attempt++;
 
         prime_socket.postMessage({
             action: 'connect',

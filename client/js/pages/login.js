@@ -12,18 +12,20 @@ module.exports = function() {
         ws.connect();
 
         event_bus.on('ws.connect', function() {
-            page.$("#status").text('Connected!');
-            page.$('button').prop('disabled', false);
+            if (!app.logged_in) {
+                page.$("#status").text('Connected!');
+                page.$('button').prop('disabled', false);
 
-            if (localStorage.auth_key != null) {
-                page.$("#status").text('Logging in (auth_key)...');
-                page.$('button').prop('disabled', true);
-                page.send('login_with_auth_key', {username: localStorage.username, auth_key: localStorage.auth_key});
+                if (localStorage.auth_key != null) {
+                    page.$("#status").text('Logging in (auth_key)...');
+                    page.$('button').prop('disabled', true);
+                    page.send('login_with_auth_key', {username: localStorage.username, auth_key: localStorage.auth_key});
+                }
             }
         });
 
         event_bus.on('ws.disconnect', function() {
-            if (app.disconnected === true) {
+            if (app.disconnected || app.logged_in) {
                 return;
             }
 

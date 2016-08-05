@@ -348,6 +348,22 @@ module.exports = function(options) {
             }
         };
 
+        app.get_lobby = function(just_id) {
+            var $lobby = page.$("#room_names .room_tab").first();
+
+            // uh oh
+            if ($lobby.length == 0) {
+                throw 'heh';
+            }
+
+            if (just_id) {
+                return $lobby.attr('room_id');
+            }
+            else {
+                return $lobby.prop('room');
+            }
+        };
+
         app.get_active_room = function(just_id) {
             var $active = page.$("#room_names .room_tab.active");
 

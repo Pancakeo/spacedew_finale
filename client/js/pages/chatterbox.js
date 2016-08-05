@@ -199,28 +199,29 @@ module.exports = function($parent, options) {
             page.send('change_room_name', params);
         });
 
+        event_bus.on('ws.connect', function() {
+            var room_id = app.get_active_room(true);
+            append_system("Reconnected! Soothing lobster bisque...", {room_id: room_id, color: 'green'});
+
+            page.ws.send('login', 'reconnect', {auth_key: localStorage.auth_key});
+        });
+
         event_bus.on('ws.disconnect', function() {
-            if (app.disconnected === true) {
-                return;
+
+            if (!page.ws.reconnecting) {
+                var room_id = app.get_active_room(true);
+                var $blargh = $('<div class="reconnect_meter">Disconnected from server. Attempting to reconnect (attempt: <span id="reconnect_attempt">1</span>)</div>');
+                append_custom($blargh, {room_id: room_id});
+            }
+            else {
+                var attempt = page.$(".reconnect_meter").last().find('#reconnect_attempt').text();
+                attempt = parseInt(attempt);
+                attempt++;
+                page.$(".reconnect_meter").last().find('#reconnect_attempt').text(attempt)
             }
 
             app.disconnected = true;
-
-            $("<div>Disconnected from server</div>").dialog({
-                title: "Oh shit",
-                modal: true,
-                buttons: {
-                    'Ok': function() {
-                        $(this).dialog('close');
-                    }
-                },
-                close: function() {
-                    app.disconnected = false;
-                    app.force_logout = true;
-                    window.location = '/';
-                    $(this).destroy();
-                }
-            });
+            page.ws.reconnect();
         });
 
         page.listen('chat', function(data) {
@@ -264,6 +265,7 @@ module.exports = function($parent, options) {
         var lobby = options.lobby;
         app.add_room_tab(options.lobby, {focus: true});
         app.ready = true;
+        app.logged_in = true;
 
         app.handle_binary = function(binary_parts, meta) {
             var blob = new Blob(binary_parts, {type: meta.type});

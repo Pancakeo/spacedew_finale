@@ -56,6 +56,10 @@ exports.handle_message = function handle_message(session, message) {
     };
 
     var handle = {
+        reconnect: function() {
+            // TODO...
+            console.log("soothing");
+        },
         login: function() {
             crepto.get_hashed_password(data.username, data.password).then(function(result) {
 
