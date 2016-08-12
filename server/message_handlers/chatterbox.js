@@ -69,6 +69,10 @@ exports.handle_message = function handle_message(session, message) {
             }
         },
         create_transfer_progress: function() {
+            if (room == null) {
+                return;
+            }
+
             sessionator.broadcast('chatterbox', 'create_transfer_progress', {
                 size: data.size,
                 name: data.name,

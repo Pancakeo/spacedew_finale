@@ -11,7 +11,11 @@ exports.handle_message = function handle_message(session, message) {
     var sub_type = message.sub_type;
     var data = message.data;
 
-    var do_login = function(user) {
+    var do_login = function(user, options) {
+        options = Object.assign({
+            reconnect: false
+        }, options);
+
         storage_thing.each_param_sql('SELECT * FROM user_settings WHERE user_id = ?', [user.user_id]).then(function(result) {
             session.login(data.username, user.user_id);
 
@@ -28,7 +32,15 @@ exports.handle_message = function handle_message(session, message) {
             var room = wiseau.get_lobby();
             room.join_room(session.profile.username);
 
-            session.send('login', 'login', {
+            var page_key = 'login';
+            var message_key = 'login';
+
+            if (options.reconnect) {
+                page_key = 'chatterbox';
+                message_key = 'reconnect';
+            }
+
+            session.send(page_key, message_key, {
                     success: true,
                     username: data.username,
                     auth_key: auth_key,
@@ -57,8 +69,18 @@ exports.handle_message = function handle_message(session, message) {
 
     var handle = {
         reconnect: function() {
-            // TODO...
-            console.log("soothing");
+            storage_thing.each_param_sql("SELECT user_id from user WHERE auth_key = ? AND username = lower(?)", [data.auth_key, data.username]).then(function(result) {
+                if (result.rows.length > 0) {
+                    var user = {user_id: result.rows[0].user_id};
+                    do_login(user, {reconnect: true});
+                }
+                else {
+                    session.send('chatterbox', 'reconnect', {success: false, reason: "Fuck you"});
+                }
+
+            }, function(err) {
+                session.send('chatterbox', 'reconnect', {success: false, reason: "Internal error."});
+            });
         },
         login: function() {
             crepto.get_hashed_password(data.username, data.password).then(function(result) {

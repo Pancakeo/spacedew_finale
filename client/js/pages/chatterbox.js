@@ -55,7 +55,7 @@ module.exports = function($parent, options) {
             var $chat = page.$("div[room_id='" + append_options.room_id + "']");
             $chat.append($blargh);
 
-            show_notification("New MYSTERY message!");
+            show_notification("New multipart message! " + $blargh.text());
 
             if (app.settings.scroll_lock !== true) {
                 $chat.scrollTop($chat[0].scrollHeight);
@@ -202,8 +202,7 @@ module.exports = function($parent, options) {
         event_bus.on('ws.connect', function() {
             var room_id = app.get_active_room(true);
             append_system("Reconnected! Soothing lobster bisque...", {room_id: room_id, color: 'green'});
-
-            page.ws.send('login', 'reconnect', {auth_key: localStorage.auth_key});
+            page.ws.send('login', 'reconnect', {auth_key: localStorage.auth_key, username: app.profile.username});
         });
 
         event_bus.on('ws.disconnect', function() {
@@ -260,6 +259,31 @@ module.exports = function($parent, options) {
             $wrapper.append(message);
             $wrapper.append($progress);
             append_custom($wrapper, {room_id: data.room_id});
+        });
+
+        page.listen('reconnect', function(data) {
+            if (!data.success) {
+                app.force_logout = true;
+                delete localStorage.auth_key;
+                window.location = '/';
+                return;
+            }
+
+            localStorage.auth_key = data.auth_key;
+            lobby = data.lobby;
+
+            if (lobby.recent_messages.length > 0) {
+                var $blargh = $('<div class="blargh"/>');
+                $blargh.append('<div class="header">Recent Messages <span class="close">x</span></div>');
+                $blargh.append('<div class="body"/>');
+                var $body = $blargh.find('.body');
+
+                lobby.recent_messages.forEach(function(mess) {
+                    $body.append('<div>[' + moment(mess.timestamp).format('hh:mm:ss A') + '] ' + mess.message + '</div>');
+                });
+
+                append_custom($blargh, {room_id: lobby.id});
+            }
         });
 
         var lobby = options.lobby;
