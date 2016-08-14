@@ -200,7 +200,7 @@ module.exports = function($parent, options) {
         });
 
         event_bus.on('ws.connect', function() {
-            var room_id = app.get_active_room(true);
+            var room_id = app.get_lobby(true);
             append_system("Reconnected! Soothing lobster bisque...", {room_id: room_id, color: 'green'});
             page.ws.send('login', 'reconnect', {auth_key: localStorage.auth_key, username: app.profile.username});
         });
@@ -268,6 +268,9 @@ module.exports = function($parent, options) {
                 window.location = '/';
                 return;
             }
+
+            var room_id = app.get_lobby(true);
+            append_system("Logged in (again).", {room_id: room_id, color: 'green'});
 
             localStorage.auth_key = data.auth_key;
             lobby = data.lobby;

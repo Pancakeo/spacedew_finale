@@ -25,6 +25,13 @@ module.exports = (function() {
                 case 'connection_info':
                     wupsocket.connection_info = message.data;
                     event_bus.emit('ws.connect');
+
+                    // Thinking here is that if the client sends a message on a regular interval, it'll trigger a disconnect faster.
+                    clearInterval(wupsocket.pong);
+                    wupsocket.pong = setInterval(function() {
+                        wupsocket.send('connection', 'pong', {});
+                    }, 7500);
+
                     break;
                 default:
                     break;
