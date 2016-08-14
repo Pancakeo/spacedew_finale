@@ -16,7 +16,8 @@ module.exports = function(options) {
         do_resize();
 
         var chatterbox = require('./chatterbox')(page.$('#left_pane'), options);
-        require('./users')(page.$('#right_pane'));
+        require('./users')(page.$('#users_placeholder'));
+        require('./mini_black_board')(page.$('#mini_black_board_placeholder'));
 
         page.$("#composer").on('keypress', function(e) {
             if (e.which === 13) {
@@ -154,6 +155,9 @@ module.exports = function(options) {
             },
             blargher: function() {
                 require('./blargher')();
+            },
+            black_board: function() {
+                app.open_black_board();
             },
             browse: function() {
                 page.$("#browse_file_thing").click();
@@ -346,6 +350,10 @@ module.exports = function(options) {
             if (add_options.focus == true) {
                 $room_tab.click();
             }
+        };
+
+        app.open_black_board = function() {
+            window.open('index.html?wup=black_board', '_blank', 'width=800,height=600');
         };
 
         app.get_lobby = function(just_id) {

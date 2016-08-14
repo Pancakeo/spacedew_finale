@@ -1,8 +1,8 @@
-module.exports = function($parent) {
+module.exports = function($target) {
     var known_users = {};
 
     get_page('users', function(page) {
-        $parent.append(page.$container);
+        $target.replaceWith(page.$container);
 
         var update_user_list_style = function() {
             page.$("#users_list .user").each(function() {

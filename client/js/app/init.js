@@ -49,6 +49,10 @@ module.exports = (function() {
             require('../pages/emagine')();
             break;
 
+        case 'black_board':
+            require('../pages/black_board')();
+            break;
+
         default:
             require('../pages/login')();
             break;
