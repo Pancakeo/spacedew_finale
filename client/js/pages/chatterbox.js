@@ -13,6 +13,36 @@ module.exports = function($parent, options) {
             }
         };
 
+        var get_links_from_message = function(message) {
+            var lines = message.split('<br/>');
+            message = '';
+
+            var maybe_something = [];
+
+            lines.forEach(function(line) {
+                var parts = line.split(/\s/);
+
+                // Consider a more robust link parser (heh!)
+                for (var i = 0; i < parts.length; i++) {
+
+                    parts[i] = parts[i].replace(url_validator, function(url) {
+                        maybe_something.push(url);
+                        return '<a target="_blank" href="' + encodeURI(url) + '">' + url + '</a>';
+                    });
+                }
+
+                if (message == '') {
+                    message = parts.join(' ');
+                }
+                else {
+                    message += '<br/>' + parts.join(' ');
+                }
+
+            });
+
+            return {message: message, maybe_something: maybe_something};
+        };
+
         var show_notification = function(message) {
 
             if (!document.hasFocus()) {
@@ -101,31 +131,9 @@ module.exports = function($parent, options) {
             var $chat = page.$("div[room_id='" + data.room_id + "']");
             var message = data.message;
 
-            var lines = message.split('<br/>');
-            message = '';
-
-            var maybe_something = [];
-
-            lines.forEach(function(line) {
-                var parts = line.split(/\s/);
-
-                // Consider a more robust link parser (heh!)
-                for (var i = 0; i < parts.length; i++) {
-
-                    parts[i] = parts[i].replace(url_validator, function(url) {
-                        maybe_something.push(url);
-                        return '<a target="_blank" href="' + encodeURI(url) + '">' + url + '</a>';
-                    });
-                }
-
-                if (message == '') {
-                    message = parts.join(' ');
-                }
-                else {
-                    message += '<br/>' + parts.join(' ');
-                }
-            });
-
+            var message_parts = get_links_from_message(message);
+            message = message_parts.message;
+            var maybe_something = message_parts.maybe_something;
             var $link_box = linkomatic(maybe_something);
 
             var this_fucking_guy = app.world.user_settings[data.username];
@@ -368,7 +376,8 @@ module.exports = function($parent, options) {
             var $body = $blargh.find('.body');
 
             lobby.recent_messages.forEach(function(mess) {
-                $body.append('<div>[' + moment(mess.timestamp).format('hh:mm:ss A') + '] ' + mess.message + '</div>');
+                var message = get_links_from_message(mess.message).message;
+                $body.append('<div>[' + moment(mess.timestamp).format('hh:mm:ss A') + '] ' + message + '</div>');
             });
 
             append_custom($blargh, {room_id: lobby.id});
