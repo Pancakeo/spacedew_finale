@@ -490,5 +490,6 @@ module.exports = function(options) {
                 return true;
             }
         };
+
     });
 };

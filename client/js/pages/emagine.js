@@ -14,6 +14,13 @@ module.exports = function() {
         if (window.outerHeight < screen.availHeight || window.outerWidth < screen.availWidth) {
             window.resizeTo(screen.availWidth, screen.availHeight);
         }
+
+        setInterval(function() {
+            if (!window.opener || window.opener.closed) {
+                window.close();
+            }
+
+        }, 100);
     });
 
     return {};
