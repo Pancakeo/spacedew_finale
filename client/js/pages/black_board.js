@@ -22,8 +22,6 @@ module.exports = function() {
             }
 
             var message = {type: type, data: data};
-            console.log(message);
-
             window.opener.postMessage(message, domain);
         };
 

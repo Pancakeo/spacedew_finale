@@ -9,7 +9,7 @@ module.exports = function(options) {
             page.$('#content').height(height);
         };
 
-        window.addEventListener('resize', function(e) {
+        $(window).on('resize', function(e) {
             do_resize();
         });
 
@@ -373,7 +373,7 @@ module.exports = function(options) {
 
         window.addEventListener('message', function(e) {
             var data = e.data;
-            console.log(data);
+            page.ws.send('black_board', 'draw', data)
         });
 
         app.get_lobby = function(just_id) {
