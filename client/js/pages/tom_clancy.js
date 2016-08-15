@@ -353,8 +353,28 @@ module.exports = function(options) {
         };
 
         app.open_black_board = function() {
-            window.open('index.html?wup=black_board', '_blank', 'width=800,height=600');
+
+            if (app.black_board) {
+                app.black_board.focus();
+                return;
+            }
+
+            clearInterval(app.black_board_monitor);
+            app.black_board_monitor = setInterval(function() {
+                if (app.black_board && app.black_board.closed == true) {
+                    clearInterval(app.black_board_monitor);
+                    app.black_board = null;
+                }
+
+            }, 100);
+
+            app.black_board = window.open('index.html?wup=black_board', '_blank', 'width=800,height=600');
         };
+
+        window.addEventListener('message', function(e) {
+            var data = e.data;
+            console.log(data);
+        });
 
         app.get_lobby = function(just_id) {
             var $lobby = page.$("#room_names .room_tab").first();

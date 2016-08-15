@@ -15,17 +15,32 @@ module.exports = function() {
 
         $(window).on('resize', resize_canvas);
 
+        var send_thing = function(type, data) {
+            var domain = window.location.protocol + '//' + window.location.hostname;
+            if (window.location.port != 80) {
+                domain += ":" + window.location.port
+            }
+
+            var message = {type: type, data: data};
+            console.log(message);
+
+            window.opener.postMessage(message, domain);
+        };
+
         page.$("#black_board_canvas").on('click', function(e) {
-            console.log(page.toolio);
-            var start_x = page.toolio.random(0, 700);
-            var start_y = page.toolio.random(0, 500);
-            var end_x = page.toolio.random(0, 700);
-            var end_y = page.toolio.random(0, 500);
+            var line = {
+                start_x: page.toolio.random(0, 700),
+                start_y: page.toolio.random(0, 500),
+                end_x: page.toolio.random(0, 700),
+                end_y: page.toolio.random(0, 500)
+            };
 
             ctx.beginPath();
-            ctx.moveTo(start_x, start_y);
-            ctx.lineTo(end_x, end_y);
+            ctx.moveTo(line.start_x, line.start_x);
+            ctx.lineTo(line.end_x, line.end_y);
             ctx.stroke();
+
+            send_thing('line', line);
         });
 
         setInterval(function() {
