@@ -85,7 +85,7 @@ module.exports = function($parent, options) {
             var $chat = page.$("div[room_id='" + append_options.room_id + "']");
             $chat.append($blargh);
 
-            show_notification("New multipart message! " + $blargh.text());
+            show_notification($blargh.text());
 
             if (app.settings.scroll_lock !== true) {
                 $chat.scrollTop($chat[0].scrollHeight);
@@ -368,6 +368,8 @@ module.exports = function($parent, options) {
 
             append_custom($blob_wrapper, {room_id: meta.room_id});
         };
+
+        append_system("Jake: Welcome to yehrye! I'm here if you need anything :)) :) :p ;). Remember to respect FrayedKnot, Canister1989, and wup.", {color: 'green', room_id: lobby.id});
 
         if (lobby.recent_messages.length > 0) {
             var $blargh = $('<div class="blargh"/>');

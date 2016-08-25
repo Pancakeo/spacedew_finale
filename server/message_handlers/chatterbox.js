@@ -44,6 +44,10 @@ exports.handle_message = function handle_message(session, message) {
 
             var room_name = data.name;
             room.name = room_name;
+
+            var recent_message = session.profile.username + ' changed the room name to ' + data.name;
+            room.add_recent_message(recent_message);
+
             sessionator.broadcast('chatterbox', 'change_room_name', {new_name: room.name, blame: session.profile.username}, {room_id: room.id});
             configuration.set('lobby_room_name', room.name);
         },
@@ -72,6 +76,9 @@ exports.handle_message = function handle_message(session, message) {
             if (room == null) {
                 return;
             }
+
+            var recent_message = session.profile.username + ' sent ' + data.name;
+            room.add_recent_message(recent_message);
 
             sessionator.broadcast('chatterbox', 'create_transfer_progress', {
                 size: data.size,
