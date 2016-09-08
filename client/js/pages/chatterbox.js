@@ -369,7 +369,7 @@ module.exports = function($parent, options) {
             append_custom($blob_wrapper, {room_id: meta.room_id});
         };
 
-        append_system("Jake: Welcome to yehrye! I'm here if you need anything :)) :) :p ;). Remember to respect FrayedKnot, Canister1989, and wup.", {color: 'green', room_id: lobby.id});
+        append_system("Jake: HAVE AN AMAZING DAY!!!!!!", {color: 'green', room_id: lobby.id});
 
         if (lobby.recent_messages.length > 0) {
             var $blargh = $('<div class="blargh"/>');

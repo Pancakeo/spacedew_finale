@@ -85,7 +85,8 @@ module.exports = function(options) {
                                 var meta = {
                                     size: reader.result.byteLength,
                                     type: file_type,
-                                    name: 'clipboard_' + transfer_id + '.' + ext
+                                    name: 'clipboard_' + transfer_id + '.' + ext,
+                                    transfer_id: page.toolio.generate_id()
                                 };
 
                                 meta.room_id = app.get_active_room(true);
