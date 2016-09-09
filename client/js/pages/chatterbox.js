@@ -8,6 +8,10 @@ module.exports = function($parent, options) {
         var url_validator = /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$/i;
 
         var scroll_chat = function($chat) {
+            if (app.settings.scroll_lock == true) {
+                return;
+            }
+
             if ($chat.length > 0) {
                 $chat.scrollTop($chat[0].scrollHeight);
             }
@@ -86,11 +90,7 @@ module.exports = function($parent, options) {
             $chat.append($blargh);
 
             show_notification($blargh.text());
-
-            if (app.settings.scroll_lock !== true) {
-                $chat.scrollTop($chat[0].scrollHeight);
-                scroll_chat($chat);
-            }
+            scroll_chat($chat);
         };
 
         var append_system = function(message, append_options) {
@@ -117,10 +117,7 @@ module.exports = function($parent, options) {
             $chat.append($message);
 
             show_notification(message);
-
-            if (app.settings.scroll_lock !== true) {
-                scroll_chat($chat);
-            }
+            scroll_chat($chat);
         };
 
         var append_chat = function(data) {
@@ -163,9 +160,7 @@ module.exports = function($parent, options) {
             if ($link_box != null) {
                 $link_box.find('img, iframe').each(function() {
                     $(this).on('load', function() {
-                        if (app.settings.scroll_lock !== true) {
-                            scroll_chat($chat);
-                        }
+                        scroll_chat($chat);
                     });
                 });
 
@@ -174,9 +169,7 @@ module.exports = function($parent, options) {
 
                     var scroll_of_doom = function() {
                         $video[0].removeEventListener('canplay', scroll_of_doom);
-                        if (app.settings.scroll_lock !== true) {
-                            scroll_chat($chat);
-                        }
+                        scroll_chat($chat);
                     };
 
                     $video[0].addEventListener('canplay', scroll_of_doom);
@@ -185,9 +178,7 @@ module.exports = function($parent, options) {
                 $message.after($link_box);
             }
 
-            if (app.settings.scroll_lock !== true) {
-                scroll_chat($chat);
-            }
+            scroll_chat($chat);
         };
 
         event_bus.on('users.roams_the_earth', function(event) {
