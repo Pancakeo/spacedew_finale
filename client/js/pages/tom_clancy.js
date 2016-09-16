@@ -410,6 +410,10 @@ module.exports = function(options) {
         };
 
         page.peepy('chatterbox.reconnect', function(data) {
+            if (!data.success) {
+                return;
+            }
+
             var lobby = app.get_lobby();
             app.rename_room_tab(lobby.id, data.lobby.name);
 

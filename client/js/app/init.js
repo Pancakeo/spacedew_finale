@@ -1,5 +1,11 @@
 module.exports = (function() {
+    var toolio = require('../app/toolio');
+
+    var instance_id = toolio.generate_id();
+    localStorage.instance_id = instance_id;
+
     window.app = {
+        instance_id: instance_id,
         settings: {},
         profile: {},
         world: {user_settings: {}} // Users and shit.
