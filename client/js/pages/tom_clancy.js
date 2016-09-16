@@ -417,7 +417,7 @@ module.exports = function(options) {
             var lobby = app.get_lobby();
             app.rename_room_tab(lobby.id, data.lobby.name);
 
-            page.$('#room_names [room_id="' + lobby.id + '"]').attr('room_id', data.lobby.id);
+            page.$('#room_names [room_id="' + lobby.id + '"]').attr('room_id', data.lobby.id).prop('room', data.lobby);
             page.$('#chat_rooms [room_id="' + lobby.id + '"]').attr('room_id', data.lobby.id);
         });
 
