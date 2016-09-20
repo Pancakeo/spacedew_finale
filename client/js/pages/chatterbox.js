@@ -152,7 +152,7 @@ module.exports = function($parent, options) {
                 + '<span class="message_text">' + message + '</span></div>');
             $message.css({background: outfit.bg_color, color: outfit.fg_color, fontFamily: outfit.font_family, fontSize: outfit.font_size + 'px'});
             $message.find('.username').css({color: outfit.username_color});
-            $message.find('a').css({color: outfit.username_color});
+            $message.find('a').css({color: outfit.fg_color});
 
             $chat.append($message);
             show_notification(data.username + ": " + data.message);
@@ -364,7 +364,7 @@ module.exports = function($parent, options) {
             append_custom($blob_wrapper, {room_id: meta.room_id});
         };
 
-        append_system("Jake: HAVE AN AMAZING DAY!!!!!!", {color: 'green', room_id: lobby.id});
+        append_system("[TEAM] Jake: Whew.", {color: 'green', room_id: lobby.id});
 
         if (lobby.recent_messages.length > 0) {
             var $blargh = $('<div class="blargh"/>');
