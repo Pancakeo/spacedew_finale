@@ -40,6 +40,13 @@ module.exports = function($target) {
             var logging_in = Object.keys(known_users).length == 0;
             var gone_to_a_better_place = Object.keys(known_users);
 
+            data.users.sort(function(a, b) {
+                var rank_a = a.rocket_league_rank || 0;
+                var rank_b = b.rocket_league_rank || 0;
+
+                return rank_b - rank_a;
+            });
+
             data.users.map(function(user) {
                 var nice_username = user.username.toLowerCase();
 
