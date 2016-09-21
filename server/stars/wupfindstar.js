@@ -5,6 +5,30 @@ var cheerio = require('cheerio');
 var sessionator = require('../managers/sessionator');
 var storage_thing = require('../managers/storage_thing');
 
+// Heh heh
+exports.update_user = function(user_id) {
+    var sessions = sessionator.get_sessions();
+
+    storage_thing.each_param_sql("SELECT username, steam_id FROM user WHERE steam_id <> '' AND user_id = ?", [user_id]).then(function(result) {
+        if (result && result.rows.length > 0) {
+            result.rows.forEach(function(row) {
+                exports.get_max_rank(row.steam_id, function(max_rank) {
+                    if (max_rank != null) {
+                        storage_thing.run_param_sql('UPDATE user SET rl_max_rank = ? WHERE user_id = ?', [max_rank, row.user_id]);
+
+                        for (var s in sessions) {
+                            var username = sessions[s].profile.username && sessions[s].profile.username.toLowerCase();
+                            if (username == row.username) {
+                                sessions[s].profile.rocket_league_rank = max_rank;
+                            }
+                        }
+                    }
+                });
+            });
+        }
+    });
+};
+
 exports.update_all = function() {
     var sessions = sessionator.get_sessions();
 
@@ -18,7 +42,7 @@ exports.update_all = function() {
                         for (var s in sessions) {
                             var username = sessions[s].profile.username && sessions[s].profile.username.toLowerCase();
                             if (username == row.username) {
-                                sessions[s].profile.rocket_league_rank = max_rank; // TODO - should assign this on login.
+                                sessions[s].profile.rocket_league_rank = max_rank;
                             }
                         }
                     }

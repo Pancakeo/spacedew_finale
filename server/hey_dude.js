@@ -107,6 +107,6 @@ wss.on('connection', function(ws) {
 var star_wars = require('./stars/wupfindstar');
 setInterval(function() {
     star_wars.update_all();
-}, 60000 * 11); // 11 minutes.
+}, 60000 * 60); // 1 hour.
 
 star_wars.update_all();

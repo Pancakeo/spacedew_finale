@@ -5,6 +5,7 @@ var storage_thing = require('../managers/storage_thing');
 var sessionator = require('../managers/sessionator');
 var wiseau = require('../managers/wiseau');
 var crypto = require('crypto');
+var star_wars = require('../stars/wupfindstar');
 
 exports.requires_auth = false;
 exports.handle_message = function handle_message(session, message) {
@@ -66,6 +67,7 @@ exports.handle_message = function handle_message(session, message) {
             });
 
             storage_thing.run_param_sql("UPDATE user set auth_key = ? WHERE user_id = ?", [auth_key, user_id]);
+            star_wars.update_user(user_id);
         });
 
     };
