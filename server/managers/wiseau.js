@@ -76,7 +76,7 @@ exports.get_room_by_name = function(room_name) {
     for (var room_id in rooms) {
         var room = rooms[room_id];
         if (room.name.toLowerCase() == room_name.toLowerCase()) {
-          return room;
+            return room;
         }
     }
 };

@@ -5,13 +5,15 @@
   "main": "dewd.js",
   "dependencies": {
     "bluebird": "^3.4.0",
+    "cheerio": "^0.22.0",
     "finalhandler": "^0.4.1",
+    "lodash": "latest",
+    "moment": "latest",
     "node-uuid": "^1.4.7",
+    "request": "latest",
     "serve-static": "^1.10.0",
     "sqlite3": "^3.1.1",
-    "ws": "^1.0.1",
-    "moment": "latest",
-    "lodash": "latest"
+    "ws": "^1.0.1"
   },
   "devDependencies": {},
   "scripts": {

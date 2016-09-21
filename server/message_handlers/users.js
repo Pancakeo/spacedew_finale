@@ -30,7 +30,8 @@ var send_users_list = function(room, session) {
         if (idx >= 0) {
             nice_users[idx].idle = (s.idle == true);
             nice_users[idx].ping = s.ping;
-            
+            nice_users[idx].rocket_league_rank = s.profile.rocket_league_rank;
+
             if (s.idle == true && s.idle_start) {
                 nice_users[idx].idle_duration = Date.now() - s.idle_start;
             }

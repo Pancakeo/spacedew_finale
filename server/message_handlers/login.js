@@ -12,6 +12,7 @@ exports.handle_message = function handle_message(session, message) {
     var data = message.data;
 
     var do_login = function(user, options) {
+
         options = Object.assign({
             reconnect: false
         }, options);
@@ -25,6 +26,8 @@ exports.handle_message = function handle_message(session, message) {
             else {
                 session.profile.user_settings = {};
             }
+
+            session.profile.rocket_league_rank = user.rl_max_rank;
 
             var auth_key = crypto.randomBytes(16).toString('hex');
             var user_id = user.user_id;
@@ -69,9 +72,9 @@ exports.handle_message = function handle_message(session, message) {
 
     var handle = {
         reconnect: function() {
-            storage_thing.each_param_sql("SELECT user_id from user WHERE auth_key = ? AND username = lower(?)", [data.auth_key, data.username]).then(function(result) {
+            storage_thing.each_param_sql("SELECT * from user WHERE auth_key = ? AND username = lower(?)", [data.auth_key, data.username]).then(function(result) {
                 if (result.rows.length > 0) {
-                    var user = {user_id: result.rows[0].user_id};
+                    var user = result.rows[0];
                     do_login(user, {reconnect: true});
                 }
                 else {
@@ -85,9 +88,9 @@ exports.handle_message = function handle_message(session, message) {
         login: function() {
             crepto.get_hashed_password(data.username, data.password).then(function(result) {
 
-                storage_thing.each_param_sql("SELECT user_id from user WHERE username = lower(?) AND password = ?", [data.username, result.hashed_password]).then(function(db_result) {
+                storage_thing.each_param_sql("SELECT * from user WHERE username = lower(?) AND password = ?", [data.username, result.hashed_password]).then(function(db_result) {
                     if (db_result.rows.length > 0) {
-                        do_login({user_id: result.user_id});
+                        do_login(db_result.rows[0]);
                     }
                     else {
                         session.send('login', 'login', {success: false, reason: "Fuck you (bad login)."});
@@ -102,9 +105,9 @@ exports.handle_message = function handle_message(session, message) {
             })
         },
         login_with_auth_key: function() {
-            storage_thing.each_param_sql("SELECT user_id from user WHERE auth_key = ? AND username = lower(?)", [data.auth_key, data.username]).then(function(result) {
+            storage_thing.each_param_sql("SELECT * from user WHERE auth_key = ? AND username = lower(?)", [data.auth_key, data.username]).then(function(result) {
                 if (result.rows.length > 0) {
-                    var user = {user_id: result.rows[0].user_id};
+                    var user = result.rows[0];
                     do_login(user);
                 }
                 else {
@@ -133,7 +136,7 @@ exports.handle_message = function handle_message(session, message) {
                 return;
             }
 
-            storage_thing.each_param_sql("SELECT user_id from user WHERE username = lower(?)", [data.username]).then(function(result) {
+            storage_thing.each_param_sql("SELECT * from user WHERE username = lower(?)", [data.username]).then(function(result) {
                 if (result.rows.length > 0) {
                     session.send('login', 'create_account', {success: false, reason: "Username already exists!"});
                 } else {

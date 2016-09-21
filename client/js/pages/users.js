@@ -93,6 +93,16 @@ module.exports = function($target) {
                     $user.addClass('idle');
                 }
 
+                var $star = $('<div class="woah_star"><img/></div>');
+
+                if (user.rocket_league_rank != null) {
+                    $star.find('img').attr('src', 'http://rocketleague.tracker.network/Images/RL/ranked/' + user.rocket_league_rank + '.png');
+                }
+                else {
+                    $star.find('img').attr('src', 'http://rocketleague.tracker.network/Images/RL/ranked/0.png');
+                }
+
+                $user.prepend($star);
                 $users.append($user);
             });
 

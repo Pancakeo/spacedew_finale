@@ -10,56 +10,69 @@ var storage_thing = require('./managers/storage_thing');
 
 // Verify database exists and prompt user to create. TODO: Warm Prompt.
 // TODO - split this section into own source file.
-if (!fs.existsSync(app.config.db_path)) {
-    var create_db = false;
 
-    process.argv.forEach(function(val, index, array) {
-        if (val.match(/create_db/i)) {
-            create_db = true;
+var create_db = false;
+var update_db = false;
+process.argv.forEach(function(val, index, array) {
+    if (val.match(/create_db/i)) {
+        create_db = true;
+    }
+
+    if (val.match(/update_db/i)) {
+        update_db = true;
+    }
+});
+
+var execute_sql_file = function(sql_file) {
+    var contents = fs.readFileSync('./conf/sql/' + sql_file, 'utf8');
+
+    var create_statements = contents.split(";"); // flawless strategy
+
+    for (var i = 0; i < create_statements.length; i++) {
+        create_statements[i] = create_statements[i].trim();
+
+        if (create_statements[i].length == 0) {
+            create_statements.splice(i, 1);
+            i--;
         }
-    });
+        else {
+            create_statements[i] = create_statements[i].trim() + ';';
+        }
+    }
 
-    if (create_db) {
-        var contents = fs.readFileSync('./conf/db_create.sql', 'utf8');
-
-        console.log("Creating database...");
-
-        var create_statements = contents.split(";"); // flawless strategy
-
-        for (var i = 0; i < create_statements.length; i++) {
-            create_statements[i] = create_statements[i].trim();
-
-            if (create_statements[i].length == 0) {
-                create_statements.splice(i, 1);
-                i--;
-            }
-            else {
-                create_statements[i] = create_statements[i].trim() + ';';
-            }
+    var run_statement = function(idx) {
+        if (idx >= create_statements.length) {
+            console.log("Database probably created/updated. Run the server again to start (without the create_db or update_db arg)");
+            return;
         }
 
-        var run_statement = function(idx) {
-            if (idx >= create_statements.length) {
-                console.log("Database probably created. Run the server again to start.");
-                return;
-            }
-
-            var statement = create_statements[idx];
-            storage_thing.run_param_sql(statement, []).then(function() {
-                setTimeout(function() {
-                    run_statement(idx + 1);
-                });
-
+        var statement = create_statements[idx];
+        storage_thing.run_param_sql(statement, []).then(function() {
+            setTimeout(function() {
+                run_statement(idx + 1);
             });
-        };
 
+        });
+    };
 
-        run_statement(0);
+    run_statement(0);
+};
+
+if (!fs.existsSync(app.config.db_path)) {
+    if (create_db) {
+        console.log("Creating database...");
+        execute_sql_file('db_create.sql')
     }
     else {
         console.log("No database found. Execute with argument 'create_db' to create the database.");
     }
 
+    return;
+}
+
+if (update_db) {
+    console.log("Updating database...");
+    execute_sql_file('db_upgrade.sql');
     return;
 }
 
@@ -88,3 +101,12 @@ wss.on('connection', function(ws) {
     });
 
 });
+
+//
+// ---
+var star_wars = require('./stars/wupfindstar');
+setInterval(function() {
+    star_wars.update_all();
+}, 60000 * 11); // 11 minutes.
+
+star_wars.update_all();

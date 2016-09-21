@@ -7,6 +7,8 @@ CREATE TABLE user (
 	email_address	TEXT,
 	salty	TEXT,
 	last_ip_address	TEXT,
+	steam_id TEXT,
+	rl_max_rank INTEGER,
 	PRIMARY KEY(user_id)
 );
 
