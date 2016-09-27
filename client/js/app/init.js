@@ -1,16 +1,6 @@
 module.exports = (function() {
     var toolio = require('../app/toolio');
 
-    var instance_id = toolio.generate_id();
-    localStorage.instance_id = instance_id;
-
-    window.app = {
-        instance_id: instance_id,
-        settings: {},
-        profile: {},
-        world: {user_settings: {}} // Users and shit.
-    };
-
     var search = window.location.search;
     var matches = search.split('&');
     var query_params = {};
@@ -23,6 +13,22 @@ module.exports = (function() {
         var parts = match.split('=');
         query_params[parts[0]] = parts[1];
     });
+
+    if (!query_params.wup) {
+        var instance_id = toolio.generate_id();
+        localStorage.instance_id = instance_id;
+    }
+    else {
+        // popup
+        instance_id = localStorage.instance_id;
+    }
+
+    window.app = {
+        instance_id: instance_id,
+        settings: {},
+        profile: {},
+        world: {user_settings: {}} // Users and shit.
+    };
 
     // Dialog stuff.
     $.widget("yehrye.dialog", $.ui.dialog, {
