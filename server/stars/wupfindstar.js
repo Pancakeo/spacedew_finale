@@ -61,6 +61,7 @@ exports.get_max_rank = function(profile_id, callback) {
             var $table = $(".stats-panel .table-striped").first();
             var $heh = $table.find('img');
             var max_rank = 0;
+            var found_rank = false;
 
             $heh.each(function() {
                 var $woboy = $(this);
@@ -69,11 +70,18 @@ exports.get_max_rank = function(profile_id, callback) {
                 var matches = raw_rank.match(/(\d+).png/);
                 if (matches.length >= 2) {
                     var rank = matches[1];
+                    found_rank = true;
                     max_rank = Math.max(max_rank, rank);
                 }
             });
 
-            callback(max_rank);
+            if (found_rank) {
+                callback(max_rank);
+            }
+            else {
+                callback(null);
+            }
+
         }
         else {
             callback(null);
