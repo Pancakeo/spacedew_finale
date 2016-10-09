@@ -372,8 +372,7 @@ module.exports = function($parent, options) {
             append_options = $.extend({
                 room_id: room_id
             }, append_options);
-
-            debugger;
+            
             append_system(message, append_options);
         };
 
