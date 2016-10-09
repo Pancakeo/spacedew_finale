@@ -364,7 +364,18 @@ module.exports = function($parent, options) {
             append_custom($blob_wrapper, {room_id: meta.room_id});
         };
 
-        append_system("[TEAM] Jake: Whew.", {color: 'green', room_id: lobby.id});
+        append_system("Your numpad does something it didn't do before.", {color: 'darkgreen', room_id: lobby.id});
+
+        app.append_system = function(message, append_options) {
+            var room_id = app.get_active_room(true);
+
+            append_options = $.extend({
+                room_id: room_id
+            }, append_options);
+
+            debugger;
+            append_system(message, append_options);
+        };
 
         if (lobby.recent_messages.length > 0) {
             var $blargh = $('<div class="blargh"/>');
