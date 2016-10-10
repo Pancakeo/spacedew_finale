@@ -27,26 +27,17 @@ module.exports = function(options) {
             var emote = emus.handle_key(e.keyCode);
 
             if (emote) {
-                // if (last_emote_ts && Date.now() - last_emote_ts < 1500) {
-                //     if (!shown_flood) {
-                //         app.append_system("Yes I am flood, but I am real.", {color: 'red'});
-                //         shown_flood = true;
-                //     }
-                //
-                //     e.preventDefault();
-                //     return;
-                // }
-
                 shown_flood = false;
                 last_emote_ts = Date.now();
                 var room_id = app.get_active_room(true);
 
-                var message = emote.text;
-                if (emote.team) {
-                    message = '[TEAM] ' + emote.text;
-                }
+                var message_obj = {
+                    message: emote.text,
+                    team: emote.team,
+                    room_id: room_id
+                };
 
-                page.send('chat', {message: message, room_id: room_id}, {page_name: 'chatterbox'});
+                page.send('chat', message_obj, {page_name: 'chatterbox'});
                 e.preventDefault();
             }
         });

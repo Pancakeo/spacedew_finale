@@ -147,8 +147,12 @@ module.exports = function($parent, options) {
             }, this_fucking_guy);
 
             var outfit = this_fucking_guy.outfit.chat;
+            var username_thing = data.username;
+            if (data.team == true) {
+                username_thing = '[TEAM] ' + data.username;
+            }
 
-            var $message = $('<div class="message"><span class="timestamp">[' + moment().format("h:mm:ss A") + ']</span><span class="username">' + data.username + ': </span>'
+            var $message = $('<div class="message"><span class="timestamp">[' + moment().format("h:mm:ss A") + ']</span><span class="username">' + username_thing + ': </span>'
                 + '<span class="message_text">' + message + '</span></div>');
             $message.css({background: outfit.bg_color, color: outfit.fg_color, fontFamily: outfit.font_family, fontSize: outfit.font_size + 'px'});
             $message.find('.username').css({color: outfit.username_color});

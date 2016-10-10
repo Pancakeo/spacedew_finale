@@ -24,7 +24,7 @@ exports.handle_message = function handle_message(session, message) {
                     var recent_message = session.profile.username + ': ' + message;
                     room.add_recent_message(recent_message);
 
-                    sessionator.broadcast('chatterbox', 'chat', {message: message, username: session.profile.username}, {room_id: room.id});
+                    sessionator.broadcast('chatterbox', 'chat', {message: message, username: session.profile.username, team: data.team}, {room_id: room.id});
                 }
             }
         },
