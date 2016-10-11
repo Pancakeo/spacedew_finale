@@ -84,26 +84,41 @@ exports.handle_message = function handle_message(session, message) {
             send_users_list(room, session);
         },
         warn: function() {
-            if (!session.profile.warning_level) {
-                session.profile.warning_level = 5;
-            }
-            else {
-                session.profile.warning_level += 5;
+            var sessions = sessionator.get_sessions();
+            var evil_session = null;
+
+            for (var cid in sessions) {
+                var s = sessions[cid];
+                if (s.profile.username == data.username) {
+                    evil_session = s;
+                    break;
+                }
             }
 
-            if (session.profile.username == data.username) {
-                var message = session.profile.username + ' warned himself.';
-            }
-            else {
-                var message = session.profile.username + ' warned ' + data.username + '.';
+            if (!evil_session) {
+                return;
             }
 
-            message += " " + data.username + "'s warning level has been increased to " + session.profile.warning_level + '.';
+            if (!evil_session.profile.warning_level) {
+                evil_session.profile.warning_level = 5;
+            }
+            else {
+                evil_session.profile.warning_level += 5;
+            }
+
+            if (evil_session.profile.username == data.username) {
+                var message = evil_session.profile.username + ' warned himself.';
+            }
+            else {
+                var message = evil_session.profile.username + ' warned ' + data.username + '.';
+            }
+
+            message += " " + data.username + "'s warning level has been increased to " + evil_session.profile.warning_level + '.';
             sessionator.broadcast('chatterbox', 'system', {message: message, color: 'darkblue'}, {room_id: data.room_id});
 
-            if (session.profile.warning_level == 100) {
-                session.profile.warning_level = 0;
-                session.logout();
+            if (evil_session.profile.warning_level == 100) {
+                evil_session.profile.warning_level = 0;
+                evil_session.logout();
             }
         }
     };
