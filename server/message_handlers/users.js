@@ -110,7 +110,7 @@ exports.handle_message = function handle_message(session, message) {
                 var message = evil_session.profile.username + ' warned himself.';
             }
             else {
-                var message = evil_session.profile.username + ' warned ' + data.username + '.';
+                var message = session.profile.username + ' warned ' + data.username + '.';
             }
 
             message += " " + data.username + "'s warning level has been increased to " + evil_session.profile.warning_level + '.';
