@@ -120,6 +120,31 @@ module.exports = function($target) {
 
             update_user_list_style();
             page.$("#users_list").append($users);
+
+            $users.contextMenu({
+                selector: '.user',
+                build: function($trigger, e) {
+                    var username = $trigger.find('.username').text();
+
+                    return {
+                        callback: function(key, options) {
+                            switch (key) {
+                                case 'warn':
+                                    var room_id = app.get_active_room(true);
+                                    page.send('warn', {username: username, room_id: room_id});
+                                    break;
+
+                                default:
+                                    break;
+                            }
+
+                        },
+                        items: {
+                            warn: {name: "Warn " + username, icon: "fa-exclamation-triangle"}
+                        }
+                    };
+                }
+            });
         });
 
         $(document).idle({

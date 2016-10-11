@@ -12,7 +12,7 @@ var send_users_list = function(room, session) {
     if (room == null) {
         room = wiseau.get_lobby();
     }
-    
+
     var nice_users = wuptil.copy_object(room.users);
     var sessions = sessionator.get_sessions();
 
@@ -82,6 +82,29 @@ exports.handle_message = function handle_message(session, message) {
 
             send_user_settings();
             send_users_list(room, session);
+        },
+        warn: function() {
+            if (!session.profile.warning_level) {
+                session.profile.warning_level = 5;
+            }
+            else {
+                session.profile.warning_level += 5;
+            }
+
+            if (session.profile.username == data.username) {
+                var message = session.profile.username + ' warned himself.';
+            }
+            else {
+                var message = session.profile.username + ' warned ' + data.username + '.';
+            }
+
+            message += " " + data.username + "'s warning level has been increased to " + session.profile.warning_level + '.';
+            sessionator.broadcast('chatterbox', 'system', {message: message, color: 'darkblue'}, {room_id: data.room_id});
+
+            if (session.profile.warning_level == 100) {
+                session.profile.warning_level = 0;
+                session.logout();
+            }
         }
     };
 
