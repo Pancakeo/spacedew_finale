@@ -15,6 +15,11 @@ exports.handle_message = function handle_message(session, message) {
                 return;
             }
 
+            if (session.is_silenced) {
+                session.send('chatterbox', 'system', {message: "You've been silenced due to a recent warning.", color: 'red', room_id: room.id});
+                return;
+            }
+
             var message = data.message;
 
             if (message.length > 0) {
@@ -30,6 +35,11 @@ exports.handle_message = function handle_message(session, message) {
         },
         blargh: function() {
             if (room == null) {
+                return;
+            }
+
+            if (session.is_silenced) {
+                session.send('chatterbox', 'system', {message: "You've been silenced due to a recent warning.", color: 'red', room_id: room.id});
                 return;
             }
 

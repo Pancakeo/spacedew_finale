@@ -4,7 +4,14 @@ var sessionator = require('../managers/sessionator');
 var wiseau = require('../managers/wiseau');
 var wuptil = require('../util/wuptil');
 
+var warning_levels = {};
+var WARNING_MAX = 100;
+
 setInterval(function() {
+    for (var key in warning_levels) {
+        var decrease = wuptil.random(0, 5, true);
+        warning_levels[key] = Math.max(warning_levels[key] - decrease, 0);
+    }
     send_users_list();
 }, 15000);
 
@@ -31,6 +38,7 @@ var send_users_list = function(room, session) {
             nice_users[idx].idle = (s.idle == true);
             nice_users[idx].ping = s.ping;
             nice_users[idx].rocket_league_rank = s.profile.rocket_league_rank;
+            nice_users[idx].warning_level = warning_levels[s.profile.username] || 0;
 
             if (s.idle == true && s.idle_start) {
                 nice_users[idx].idle_duration = Date.now() - s.idle_start;
@@ -95,31 +103,41 @@ exports.handle_message = function handle_message(session, message) {
                 }
             }
 
-            if (!evil_session) {
+            if (!evil_session || evil_session.is_silenced) {
                 return;
             }
 
-            if (!evil_session.profile.warning_level) {
-                evil_session.profile.warning_level = 5;
-            }
-            else {
-                evil_session.profile.warning_level += 5;
+            var warning_increment = wuptil.random(1, 31, true);
+
+            if (warning_levels[evil_session.profile.username] == null) {
+                warning_levels[evil_session.profile.username] = 0
             }
 
+            warning_levels[evil_session.profile.username] += warning_increment;
+            var current_warning = Math.min(100, warning_levels[evil_session.profile.username]);
+
             if (session.profile.username == data.username) {
-                var message = evil_session.profile.username + ' warned himself.';
+                var message = evil_session.profile.username + ' warned xemself.';
             }
             else {
                 var message = session.profile.username + ' warned ' + data.username + '.';
             }
 
-            message += " " + data.username + "'s warning level has been increased to " + evil_session.profile.warning_level + '.';
+            message += " " + data.username + "'s warning level has been increased to " + current_warning + '%.';
             sessionator.broadcast('chatterbox', 'system', {message: message, color: 'darkblue'}, {room_id: data.room_id});
 
-            if (evil_session.profile.warning_level == 100) {
-                evil_session.profile.warning_level = 0;
-                evil_session.logout();
+            if (current_warning >= WARNING_MAX) {
+                evil_session.is_silenced = true;
+
+                setTimeout(function() {
+                    evil_session.is_silenced = false;
+                    warning_levels[evil_session.profile.username] = 0
+                }, 30 * 1000);
+
+                sessionator.broadcast('chatterbox', 'system', {message: evil_session.profile.username + " has been silenced for 30 seconds.", color: 'red'}, {room_id: data.room_id});
             }
+
+            send_users_list();
         }
     };
 

@@ -110,6 +110,11 @@ module.exports = function($target) {
                 }
 
                 $user.prepend($star);
+
+                var $warn_bar = $("<progress title='Warning Level: " + user.warning_level + "%' class='warn_bar' max='100'/>");
+                $warn_bar.attr('value', user.warning_level);
+                $user.append($warn_bar);
+
                 $users.append($user);
             });
 
