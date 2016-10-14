@@ -131,7 +131,6 @@ exports.handle_message = function handle_message(session, message) {
 
                 setTimeout(function() {
                     evil_session.is_silenced = false;
-                    warning_levels[evil_session.profile.username] = 0
                 }, 30 * 1000);
 
                 sessionator.broadcast('chatterbox', 'system', {message: evil_session.profile.username + " has been silenced for 30 seconds.", color: 'red'}, {room_id: data.room_id});
