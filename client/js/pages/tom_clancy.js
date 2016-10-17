@@ -394,7 +394,7 @@ module.exports = function(options) {
 
             }, 100);
 
-            app.black_board = window.open('index.html?wup=black_board', '_blank', 'width=800,height=600');
+            app.black_board = window.open('index.html?wup=black_board', '_blank', 'width=1300,height=800');
         };
 
         window.addEventListener('message', function(e) {

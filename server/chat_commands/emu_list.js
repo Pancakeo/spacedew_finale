@@ -38,7 +38,18 @@ var emu_choices = [
     "Thanks!",
     'Die.',
     'Die!',
-    'Time to die.'
+    'Time to die.',
+    "I'm sure it's fine.",
+    "fucking jared, right?",
+    "there's a couple of things I'm not going to tell you about",
+    "Mastery of Protoss",
+    "Mastery of Terran",
+    "That whole situation with the psynets was pretty weird",
+    "There may have been one point where I was out of position",
+    "Woboy",
+    "Hoboy",
+    "Hell, Cowboy.",
+    "Let Harlan know that I'll take 80k"
 ];
 
 exports.contains = function(emu) {
