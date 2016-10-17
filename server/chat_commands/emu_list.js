@@ -50,7 +50,9 @@ var emu_choices = [
     "Hoboy",
     "Hell, Cowboy.",
     "Let Harlan know that I'll take 80k",
-    "Seize the objective."
+    "Seize the objective.",
+    "Everything is fine.",
+    "@_@"
 ];
 
 exports.contains = function(emu) {
