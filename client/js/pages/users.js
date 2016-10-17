@@ -1,5 +1,6 @@
 module.exports = function($target) {
     var known_users = {};
+    var default_emus = require('../app/default_emus');
 
     get_page('users', function(page) {
         $target.replaceWith(page.$container);
@@ -29,6 +30,13 @@ module.exports = function($target) {
         };
 
         page.listen('user_settings', function(data) {
+            if (data.user_settings[app.profile.username] && data.user_settings[app.profile.username].outfit && data.user_settings[app.profile.username].outfit.holy_cow) {
+                app.holy_cow = data.user_settings[app.profile.username].outfit.holy_cow;
+            }
+            else {
+                app.holy_cow = default_emus;
+            }
+
             app.world.user_settings = data.user_settings;
             update_user_list_style();
         });
@@ -156,12 +164,14 @@ module.exports = function($target) {
 
         $(document).idle({
             onIdle: function() {
+                alert('wup');
                 page.send('idle', {idle: true});
             },
             onActive: function() {
                 page.send('idle', {idle: false});
             },
-            idle: 60000 * 5 // 5 minutes
+            idle: 60000 * 5, // 5 minutes
+            recurIdleCall: true
         });
 
         // I'm sure this is fine!

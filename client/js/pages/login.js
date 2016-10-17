@@ -70,6 +70,7 @@ module.exports = function() {
                 lobby: data.lobby
             };
 
+            app.emu_list = data.emu_list || [];
             app.profile.username = data.username;
             require('../pages/tom_clancy')(clancy_stuff);
         });

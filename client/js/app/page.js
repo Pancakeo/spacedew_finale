@@ -31,8 +31,13 @@ module.exports = function(page_name, callback) {
             },
             prompt: function(title, message, existing_value, cb) {
                 toolio.prompt.apply(this, arguments);
+            },
+            get_template: function(template_id) {
+                return $templates.filter('[template="' + template_id + '"]').clone().removeAttr('template');
             }
         };
+
+        var $templates = page.$('[template]').detach();
 
         Object.defineProperty(page, 'toolio', {
             get: function() {

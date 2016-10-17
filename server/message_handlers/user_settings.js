@@ -3,6 +3,7 @@ var sessionator = require('../managers/sessionator');
 var storage_thing = require('../managers/storage_thing');
 var crepto = require('../util/crepto');
 var crypto = require('crypto');
+var emu_list = require('../chat_commands/emu_list');
 
 exports.handle_message = function handle_message(session, message) {
     var sub_type = message.sub_type;
@@ -47,10 +48,24 @@ exports.handle_message = function handle_message(session, message) {
         outfit: function() {
             var user_id = session.profile.user_id;
 
-            // TODO - add validations here!
             if (JSON.stringify(data.outfit).length > (1024 * 1024)) {
                 console.error("Server settings exceeded limit!");
                 return;
+            }
+
+            if (data.outfit.holy_cow) {
+                for (var key in data.outfit.holy_cow) {
+                    var enum_val = data.outfit.holy_cow[key].text;
+
+                    if (!emu_list.contains(enum_val)) {
+                        console.log(enum_val + ' not found');
+                        data.outfit.holy_cow[key] = {
+                            text: 'Whew.',
+                            team_play: true
+                        }
+                    }
+                }
+
             }
 
             storage_thing.each_param_sql('SELECT * FROM user_settings WHERE user_id = ?', [user_id]).then(function(result) {

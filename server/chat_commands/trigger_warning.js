@@ -41,10 +41,10 @@ var triggers = {
     'ccsaw': {
         frequency: 1,
         triggers: [
-            "satan has tricked me"        
+            "satan has tricked me"
         ],
         responses: [
-            "It's funny, really."    
+            "It's funny, really."
         ]
     },
     'lori': {
@@ -84,40 +84,33 @@ var triggers = {
             "Just so we could sleep for a few hours."
         ]
     }
-    
-}
+
+};
 
 var last_found = null;
 
-exports.test = function(message)
-{
-    for (var key in triggers)
-    {
-        for (var i = 0; i < triggers[key].triggers.length; i++)
-        {
-            
-            if (message.toLowerCase().indexOf(triggers[key].triggers[i]) != -1)
-            {
+exports.test = function(message) {
+    for (var key in triggers) {
+        for (var i = 0; i < triggers[key].triggers.length; i++) {
+
+            if (message.toLowerCase().indexOf(triggers[key].triggers[i]) != -1) {
                 last_found = key;
                 return true;
             }
         }
     }
     return false;
-}
+};
 
-exports.exec = function(message, session, room_id)
-{
-    if (last_found !== null && Math.random() < triggers[last_found].frequency)
-    {
+exports.exec = function(message, session, room_id) {
+    if (last_found !== null && Math.random() < triggers[last_found].frequency) {
         var response = wuptil.choose(triggers[last_found].responses);
         var responder = triggers[last_found].responder || '#TriggerWarning#';
-        var delay = wuptil.random(200,500);
-        
-        setTimeout(function()
-        {
+        var delay = wuptil.random(200, 500);
+
+        setTimeout(function() {
             session.broadcast('chatterbox', 'chat', {message: response, username: responder}, {room_id: room_id});
         }, delay);
     }
     return true;
-}
+};

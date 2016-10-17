@@ -8,7 +8,7 @@ exports.exec = function(message, session, room_id)
         }
     }
     return true; // if we return false from exec the chat message will not be broadcast
-}
+};
 
 var modules = {};
 

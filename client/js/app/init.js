@@ -27,6 +27,7 @@ module.exports = (function() {
         instance_id: instance_id,
         settings: {},
         profile: {},
+        emu_list: [],
         world: {user_settings: {}} // Users and shit.
     };
 

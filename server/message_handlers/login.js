@@ -6,6 +6,7 @@ var sessionator = require('../managers/sessionator');
 var wiseau = require('../managers/wiseau');
 var crypto = require('crypto');
 var star_wars = require('../stars/wupfindstar');
+var emu_list = require('../chat_commands/emu_list').get();
 
 exports.requires_auth = false;
 exports.handle_message = function handle_message(session, message) {
@@ -48,7 +49,8 @@ exports.handle_message = function handle_message(session, message) {
                     success: true,
                     username: data.username,
                     auth_key: auth_key,
-                    lobby: wiseau.get_lobby()
+                    lobby: wiseau.get_lobby(),
+                    emu_list: emu_list
                 }
             );
 

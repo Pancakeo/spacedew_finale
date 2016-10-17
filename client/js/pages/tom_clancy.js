@@ -16,7 +16,6 @@ module.exports = function(options) {
         do_resize();
 
         var chatterbox = require('./chatterbox')(page.$('#left_pane'), options);
-        var emus = require('../app/emus')();
 
         require('./users')(page.$('#users_placeholder'));
         require('./mini_black_board')(page.$('#mini_black_board_placeholder'));
@@ -24,16 +23,18 @@ module.exports = function(options) {
         var last_emote_ts = null;
         var shown_flood = false;
         page.$("#composer").on('keydown', function(e) {
-            var emote = emus.handle_key(e.keyCode);
+            var normal_key_code = String.fromCharCode(e.keyCode - 48);
 
+            var emote = app.holy_cow[normal_key_code];
             if (emote) {
+                console.log(emote);
                 shown_flood = false;
                 last_emote_ts = Date.now();
                 var room_id = app.get_active_room(true);
 
                 var message_obj = {
                     message: emote.text,
-                    team: emote.team,
+                    team: emote.team_play,
                     room_id: room_id
                 };
 
