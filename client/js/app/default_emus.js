@@ -7,7 +7,7 @@ var emus = {
     5: {text: 'Nice one!'},
     6: {text: 'This is for you.'},
     7: {text: 'Incoming!'},
-    8: {text: 'Siiiiick!'},
+    8: {text: 'Siiiick!'},
     9: {text: 'csaw'}
 };
 
