@@ -16,7 +16,7 @@ var emu_choices = [
     "GDOAT*",
     "HEH",
     "heh heh",
-    "Does it... Does it say cheethos are not for your eyes?",
+    "Does it... Does it say cheetos are not for your eyes?",
     "All yours.",
     "Calculated.",
     "Go for it!",
@@ -49,7 +49,8 @@ var emu_choices = [
     "Woboy",
     "Hoboy",
     "Hell, Cowboy.",
-    "Let Harlan know that I'll take 80k"
+    "Let Harlan know that I'll take 80k",
+    "Seize the objective."
 ];
 
 exports.contains = function(emu) {
