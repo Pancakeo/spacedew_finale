@@ -164,7 +164,6 @@ module.exports = function($target) {
 
         $(document).idle({
             onIdle: function() {
-                alert('wup');
                 page.send('idle', {idle: true});
             },
             onActive: function() {
