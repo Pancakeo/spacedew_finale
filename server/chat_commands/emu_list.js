@@ -52,7 +52,17 @@ var emu_choices = [
     "Let Harlan know that I'll take 80k",
     "Seize the objective.",
     "Everything is fine.",
-    "@_@"
+    "@_@",
+    "Glorious!",
+    "Yeah, you said that.",
+    "Wow!",
+    "Wow, that's good.",
+    "Oh, brother!",
+    "It's the seasonin... it's the flavor... it's the texture",
+    "Girls need napkins",
+    "You said that!",
+    "Watch out for snakes!",
+    "Who said that?"
 ];
 
 exports.contains = function(emu) {
