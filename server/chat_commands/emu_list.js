@@ -62,7 +62,9 @@ var emu_choices = [
     "Girls need napkins",
     "You said that!",
     "Watch out for snakes!",
-    "Who said that?"
+    "Who said that?",
+    "gg",
+    "gg wp"
 ];
 
 exports.contains = function(emu) {
