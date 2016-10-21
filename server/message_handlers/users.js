@@ -75,7 +75,7 @@ exports.handle_message = function handle_message(session, message) {
 
     var handle = {
         idle: function() {
-            if (data.idle == true) {
+            if (session.idle != true && data.idle == true) {
                 session.idle_start = Date.now();
             }
 
