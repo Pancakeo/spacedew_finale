@@ -48,6 +48,10 @@ exports.handle_message = function handle_message(session, message) {
         outfit: function() {
             var user_id = session.profile.user_id;
 
+            if (!data.outfit) {
+                return;
+            }
+
             if (JSON.stringify(data.outfit).length > (1024 * 1024)) {
                 console.error("Server settings exceeded limit!");
                 return;
