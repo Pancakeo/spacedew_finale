@@ -204,12 +204,12 @@ module.exports = function(options) {
             Notification.requestPermission(function(permission) {
                 app.settings.notify = (permission == "granted");
                 if (app.settings.notify) {
-                    page.$("#button_jar img[menu_item='notify']").addClass('active');
+                    page.$("#button_jar [menu_item='notify']").addClass('active');
                 }
             });
         }
 
-        page.$container.on('click', 'img[menu_item]', function() {
+        page.$container.on('click', '[menu_item]', function() {
             var menu_item = $(this).attr('menu_item');
 
             if (menu_handlers[menu_item] != null) {

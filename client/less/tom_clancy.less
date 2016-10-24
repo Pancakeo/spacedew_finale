@@ -6,22 +6,23 @@
   }
 
   #add_thing {
+    font-size: 12px;
     display: inline-block;
     vertical-align: middle;
     cursor: pointer;
     background: orange;
     color: black;
     border: 1px black solid;
-    border-radius: 8px;
-    padding: 2px 5px;
+    padding: 2px 4px;
   }
 
   #room_names {
+    padding-top: 1px;
     padding-left: 5px;
-    padding-top: 4px;
 
     .room_tab {
-      margin-right: 5px;
+      font-size: 12px;
+      margin-right: 3px;
       max-width: 800px;
       overflow-x: hidden;
       text-overflow: ellipsis;
@@ -31,10 +32,9 @@
       background: #0086b3;
       color: #ccc;
       border: 1px black solid;
-      border-radius: 8px;
       display: inline-block;
       vertical-align: middle;
-      padding: 2px 5px;
+      padding: 2px 4px;
     }
 
     .room_tab.active {
@@ -43,32 +43,18 @@
   }
 
   #top {
-    height: 32px;
+    height: 26px;
     background: lightblue;
     position: relative;
 
-    span.heading {
-      cursor: pointer;
-      position: absolute;
-      top: 5px;
-      left: 5px;
-    }
-
     #button_jar {
-      font-size: 0;
       position: absolute;
       right: 5px;
       top: 0;
     }
-
-    #logout {
-      position: absolute;
-      top: 5px;
-      right: 5px;
-    }
   }
 
-  img[menu_item] {
+  [menu_item] {
     vertical-align: middle;
     margin-right: 2px;
     cursor: pointer;
@@ -76,7 +62,7 @@
     padding-right: 2px;
   }
 
-  img[menu_item].active {
+  [menu_item].active {
     background: orange;
   }
 
