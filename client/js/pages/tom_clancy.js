@@ -538,5 +538,13 @@ module.exports = function(options) {
             }
         };
 
+        var user_agent = navigator.userAgent.toLowerCase();
+        var is_android = user_agent.indexOf("android") > -1;
+        if (is_android) {
+            alert('heh!');
+            // Do something!
+            // Redirect to Android-site?
+            // window.location = 'http://android.davidwalsh.name';
+        }
     });
 };
