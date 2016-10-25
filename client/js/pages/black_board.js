@@ -127,7 +127,7 @@ module.exports = function() {
             if (Date.now() - position.last_change <= 100) {
                 send_thing('position', position);
             }
-        }, 16);
+        }, 100);
 
         page.$("#overlay_canvas").on('mousemove', function(e) {
             var end_x = e.clientX - this.offsetLeft;
@@ -199,14 +199,19 @@ module.exports = function() {
                 }
             }
 
-            if (info.type == 'position') {
+            if (info.type == 'positions') {
+                var contrast_color = invertColor(bg_color);
                 overlay_ctx.beginPath();
                 overlay_ctx.clearRect(0, 0, 1280, 720);
-
-                var contrast_color = invertColor(bg_color);
-
                 overlay_ctx.fillStyle = contrast_color;
-                overlay_ctx.fillText(info.username, data.x, data.y);
+
+                for (var key in info.positions) {
+                    if (key != app.profile.username) {
+                        var p = info.positions[key];
+                        overlay_ctx.fillText(key, p.x, p.y);
+                    }
+                }
+
                 overlay_ctx.stroke();
             }
 

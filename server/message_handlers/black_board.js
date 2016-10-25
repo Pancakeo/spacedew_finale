@@ -4,6 +4,24 @@ var sessionator = require('../managers/sessionator');
 var wiseau = require('../managers/wiseau');
 var wuptil = require('../util/wuptil');
 
+var positions = {};
+setInterval(function() {
+    var at_least_one = false;
+
+    for (var key in positions) {
+        var p = positions[key];
+        if (Date.now() - p.last_change <= 100) {
+            at_least_one = true;
+        }
+    }
+
+    if (at_least_one) {
+        var room_id = wiseau.get_lobby().id;
+        sessionator.broadcast('black_board', 'draw', {type: 'positions', positions: positions, room_id: room_id});
+    }
+
+}, 50);
+
 exports.handle_message = function handle_message(session, message) {
     var sub_type = message.sub_type;
     var data = message.data;
@@ -34,6 +52,10 @@ exports.handle_message = function handle_message(session, message) {
         case 'draw':
             if (data.type == 'great_clear' || data.type == 'colorful_clear') {
                 sessionator.broadcast('chatterbox', 'system', {message: session.profile.username + ' cleared the X-board.', room_id: data.room_id, color: 'green'});
+            }
+
+            if (data.type == 'position') {
+                positions[session.profile.username] = data.data;
             }
 
             room.tent.handle_thing(data);
