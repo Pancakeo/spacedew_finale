@@ -23,7 +23,8 @@ exports.handle_message = function handle_message(session, message) {
                 var data = {
                     room_id: room.id,
                     data_src: png,
-                    mini: false
+                    mini: false,
+                    bg_color: room.tent.bg_color
                 };
 
                 session.send('black_board', 'load', data)
@@ -31,6 +32,10 @@ exports.handle_message = function handle_message(session, message) {
             break;
 
         case 'draw':
+            if (data.type == 'great_clear' || data.type == 'colorful_clear') {
+                sessionator.broadcast('chatterbox', 'system', {message: session.profile.username + ' cleared the X-board.', room_id: data.room_id, color: 'green'});
+            }
+
             room.tent.handle_thing(data);
             data.username = session.profile.username;
             sessionator.broadcast('black_board', sub_type, data);

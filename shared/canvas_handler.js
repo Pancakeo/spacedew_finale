@@ -34,8 +34,14 @@ module.exports = function(ctx) {
                 ctx.stroke();
                 break;
 
+            case 'colorful_clear':
+                ctx.beginPath();
+                ctx.fillStyle = data.color;
+                ctx.fillRect(0, 0, 1280, 720);
+                ctx.stroke();
+                break;
+
             case 'great_clear':
-                // Blame?
                 ctx.clearRect(0, 0, 1280, 720);
                 break;
 

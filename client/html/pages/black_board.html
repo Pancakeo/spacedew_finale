@@ -2,7 +2,7 @@
     <div id="controls">
         <i class="fa fa-motorcycle fa-2x" aria-hidden="true" title="Clear" menu_item="great_clear"></i>
 
-        <input type="color" id="fg_color"/>
+        <input type="color" id="fg_color" value="#ffffff"/>
 
         <div id="color_wheel"></div>
 
@@ -10,7 +10,11 @@
         <div id="size_thing">
             <div id="custom-handle" class="ui-slider-handle"></div>
         </div>
+
+        Background:
+        <input type="color" id="bg_color" value="#000000"/>
     </div>
 
-    <canvas id="black_board_canvas"></canvas>
+    <canvas id="black_board_canvas" width="1280" height="720"></canvas>
+    <canvas id="overlay_canvas" width="1280" height="720"></canvas>
 </div>

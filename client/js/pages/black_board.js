@@ -8,9 +8,10 @@ module.exports = function() {
         var pinned_y = null;
         var left_mouse_down = false;
         var hold_up = null;
-        var fg_color = '#000000';
+        var fg_color = '#ffffff';
         var stroke_width = 1;
         var alpha = 255;
+        var bg_color = '#000000';
 
         // Thanks, StarkOverflow.
         function rgb2hex(rgb) {
@@ -25,33 +26,30 @@ module.exports = function() {
         var ctx = page.$("#black_board_canvas")[0].getContext('2d');
         ctx.strokeStyle = fg_color;
 
-        var ch = canvas_handler(ctx);
-
-        var resize_canvas = function() {
-            var width = 1280;
-            var height = 720;
-            page.$("#black_board_canvas").attr({width: width, height: height});
+        var position = {
+            x: -500,
+            y: -500
         };
 
-        resize_canvas();
+        var overlay_ctx = page.$("#overlay_canvas")[0].getContext('2d');
+        overlay_ctx.font = "14px serif";
+
+        var ch = canvas_handler(ctx);
 
         var send_thing = function(type, data) {
             var message = {action: 'draw', type: type, data: data};
             window.opener.postMessage(message, app.domain);
         };
 
-        page.$("#black_board_canvas").on('mouseup', function(e) {
-            if (e.which == 1) {
-                left_mouse_down = false;
-            }
-        });
-
         page.$("#controls").on('click', '[menu_item]', function() {
             var menu_item = $(this).attr('menu_item');
             switch (menu_item) {
                 case 'great_clear':
-                    ctx.clearRect(0, 0, 1280, 720);
-                    send_thing('great_clear', {});
+                    ctx.beginPath();
+                    ctx.fillStyle = bg_color;
+                    ctx.fillRect(0, 0, 1280, 720);
+                    ctx.stroke();
+                    send_thing('colorful_clear', {color: bg_color});
                     break;
 
                 default:
@@ -71,6 +69,15 @@ module.exports = function() {
             fg_color = this.value;
         });
 
+        page.$("#bg_color").on('change', function() {
+            ctx.beginPath();
+            ctx.fillStyle = this.value;
+            ctx.fillRect(0, 0, 1280, 720);
+            ctx.stroke();
+
+            send_thing('colorful_clear', {color: this.value});
+        });
+
         page.$("#black_board_canvas").on('mouseleave', function(e) {
             hold_up = setTimeout(function() {
                 left_mouse_down = false;
@@ -84,8 +91,13 @@ module.exports = function() {
             }
         }, 250);
 
+        page.$("#overlay_canvas").on('mouseup', function(e) {
+            if (e.which == 1) {
+                left_mouse_down = false;
+            }
+        });
 
-        page.$("#black_board_canvas").on('mousedown', function(e) {
+        page.$("#overlay_canvas").on('mousedown', function(e) {
 
             if (e.which == 1) {
                 left_mouse_down = true;
@@ -111,12 +123,32 @@ module.exports = function() {
             }
         });
 
-        page.$("#black_board_canvas").on('mousemove', function(e) {
+        setInterval(function() {
+            if (Date.now() - position.last_change <= 100) {
+                send_thing('position', position);
+            }
+        }, 16);
+
+        page.$("#overlay_canvas").on('mousemove', function(e) {
+            var end_x = e.clientX - this.offsetLeft;
+            var end_y = e.clientY - this.offsetTop;
+
+            var changed = false;
+            if (position.x != end_x || position.y != end_y) {
+                changed = true;
+            }
+
+            position = {
+                x: end_x,
+                y: end_y
+            };
+
+            if (changed) {
+                position.last_change = Date.now();
+            }
+
             if (left_mouse_down) {
                 clearTimeout(hold_up);
-                
-                var end_x = e.clientX - this.offsetLeft;
-                var end_y = e.clientY - this.offsetTop;
 
                 var line = {
                     start_x: pinned_x,
@@ -142,14 +174,44 @@ module.exports = function() {
             }
         });
 
+        function invertColor(hexTripletColor) {
+            var color = hexTripletColor;
+            color = color.substring(1);           // remove #
+            color = parseInt(color, 16);          // convert to integer
+            color = 0xFFFFFF ^ color;             // invert three bytes
+            color = color.toString(16);           // convert to hex
+            color = ("000000" + color).slice(-6); // pad with leading zeros
+            color = "#" + color;                  // prepend #
+            return color;
+        }
+
         window.addEventListener('message', function(e) {
             var info = e.data;
             var data = info.data;
+
+            if (info.type == 'colorful_clear') {
+                bg_color = data.color;
+            }
 
             if (info.type != 'load') {
                 if (info.username == app.profile.username) {
                     return;
                 }
+            }
+
+            if (info.type == 'position') {
+                overlay_ctx.beginPath();
+                overlay_ctx.clearRect(0, 0, 1280, 720);
+
+                var contrast_color = invertColor(bg_color);
+
+                overlay_ctx.fillStyle = contrast_color;
+                overlay_ctx.fillText(info.username, data.x, data.y);
+                overlay_ctx.stroke();
+            }
+
+            if (info.type == 'load') {
+                bg_color = info.bg_color;
             }
 
             ch.handle_thing(info);

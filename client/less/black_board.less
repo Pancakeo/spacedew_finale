@@ -1,5 +1,6 @@
 #black_board {
   width: 100%;
+  position: relative;
   height: 100%;
   -webkit-user-select: none;
   user-select: none;
@@ -21,12 +22,20 @@
     line-height: 1.6em;
   }
 
-  canvas {
-    max-width: 100%;
+  #black_board_canvas {
+    z-index: 0;
+    position: absolute;
     border: 1px black solid;
   }
 
-  #fg_color {
+  #overlay_canvas {
+    background: transparent;
+    z-index: 1;
+    position: absolute;
+    border: 1px black solid;
+  }
+
+  input[type="color"] {
     vertical-align: top;
     margin-top: 7px;
   }
