@@ -16,7 +16,6 @@ exports.create_room = function(room_name, room_id) {
         id: room_id,
         users: [],
         recent_messages: [],
-        bob_ross: [],
         add_recent_message: function(message) {
             if (room.recent_messages.length >= MAX_MESSAGES) {
                 room.recent_messages.shift();
