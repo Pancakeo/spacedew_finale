@@ -182,9 +182,6 @@ module.exports = function(options) {
             blargher: function() {
                 require('./blargher')();
             },
-            black_board: function() {
-                app.open_black_board();
-            },
             browse: function() {
                 page.$("#browse_file_thing").click();
             },

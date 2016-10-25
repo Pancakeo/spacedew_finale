@@ -190,7 +190,7 @@ module.exports = function($parent, options) {
         });
 
         event_bus.on('users.has_gone_to_a_better_place', function(event) {
-            append_system(event.username + " has gone to a better place.", {class_name: 'sad', room_id: event.room_id})
+            append_system(event.username + " went to pickup a motorcycle.", {class_name: 'sad', room_id: event.room_id})
         });
 
         event_bus.on('blargher.send', function(params) {
