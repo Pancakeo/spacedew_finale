@@ -1,6 +1,8 @@
 module.exports = function(ctx) {
     var handler = {};
 
+    // ctx.lineCap = 'round';
+
     handler.handle_thing = function(info) {
         var data = info.data;
 
@@ -18,9 +20,9 @@ module.exports = function(ctx) {
 
             case 'line':
                 ctx.beginPath();
+                ctx.moveTo(data.start_x, data.start_y);
                 ctx.strokeStyle = data.color;
                 ctx.lineWidth = data.line_width || 1;
-                ctx.moveTo(data.start_x, data.start_y);
                 ctx.lineTo(data.end_x, data.end_y);
                 ctx.stroke();
                 break;

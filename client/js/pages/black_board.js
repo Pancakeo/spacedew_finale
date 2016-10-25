@@ -9,6 +9,7 @@ module.exports = function() {
         var left_mouse_down = false;
         var hold_up = null;
         var fg_color = '#000000';
+        var stroke_width = 1;
         var alpha = 255;
 
         // Thanks, StarkOverflow.
@@ -126,11 +127,12 @@ module.exports = function() {
                     end_y: end_y,
                     color: fg_color,
                     alpha: 255,
-                    line_width: ctx.lineWidth
+                    line_width: stroke_width
                 };
 
                 ctx.beginPath();
                 ctx.strokeStyle = fg_color;
+                ctx.lineWidth = stroke_width;
                 ctx.moveTo(line.start_x, line.start_y);
                 ctx.lineTo(line.end_x, line.end_y);
                 ctx.stroke();
@@ -186,7 +188,7 @@ module.exports = function() {
                 },
                 slide: function(event, ui) {
                     $handle.text(ui.value);
-                    ctx.lineWidth = ui.value;
+                    stroke_width = ui.value;
                 }
             }
         );
