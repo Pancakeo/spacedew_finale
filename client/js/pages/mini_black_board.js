@@ -1,10 +1,14 @@
 module.exports = function($target) {
+    var canvas_handler = require('../../../shared/canvas_handler');
+
     get_page('mini_black_board', function(page) {
         $target.replaceWith(page.$container);
 
         var canvas = page.$("#mini_black_board_canvas")[0];
         var ctx = canvas.getContext('2d');
         ctx.scale(0.2, 0.2);
+
+        var ch = canvas_handler(ctx);
 
         page.$("#mini_black_board_canvas").on('click', function() {
             app.open_black_board();
@@ -37,34 +41,8 @@ module.exports = function($target) {
         });
 
         page.peepy('black_board.draw', function(info) {
-            var data = info.data;
             pass_it_up(info);
-
-            switch (info.type) {
-                case 'line':
-                    ctx.beginPath();
-                    var r = 0, g = 0, b = 0, a = 255;
-                    ctx.fillStyle = "rgba(" + r + "," + g + "," + b + "," + (a / 255) + ")";
-                    ctx.moveTo(data.start_x, data.start_y);
-                    ctx.lineTo(data.end_x, data.end_y);
-                    ctx.stroke();
-                    break;
-
-                case 'rekt':
-                    ctx.beginPath();
-                    ctx.fillStyle = "rgba(" + data.r + "," + data.g + "," + data.b + "," + (data.a / 255) + ")";
-                    ctx.fillRect(data.x, data.y, data.size, data.size);
-                    ctx.stroke();
-                    break;
-
-                case 'great_clear':
-                    // Blame?
-                    ctx.clearRect(0, 0, 1280, 720);
-                    break;
-
-                default:
-                    break;
-            }
+            ch.handle_thing(info);
         });
 
         // Not hacky at all.

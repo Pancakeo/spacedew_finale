@@ -80,4 +80,10 @@ module.exports = (function() {
             break;
     }
 
+    $(window).on('beforeunload', function() {
+        if (app.black_board && app.black_board.closed != true) {
+            app.black_board.close();
+        }
+    });
+
 }());

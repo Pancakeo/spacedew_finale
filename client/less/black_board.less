@@ -12,8 +12,42 @@
     height: 40px;
   }
 
+  #custom-handle {
+    width: 3em;
+    height: 1.6em;
+    top: 50%;
+    margin-top: -.8em;
+    text-align: center;
+    line-height: 1.6em;
+  }
+
   canvas {
     max-width: 100%;
     border: 1px black solid;
+  }
+
+  #fg_color {
+    vertical-align: top;
+    margin-top: 7px;
+  }
+
+  #size_thing {
+    margin-left: 10px;
+    display: inline-block;
+    width: 400px;
+  }
+
+  #color_wheel {
+    display: inline-block;
+
+    .color {
+      cursor: pointer;
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      margin-left: 3px;
+      margin-right: 3px;
+      border: 1px black solid;
+    }
   }
 }
