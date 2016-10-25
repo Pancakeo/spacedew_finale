@@ -23,8 +23,14 @@ module.exports = (function() {
         instance_id = localStorage.instance_id;
     }
 
+    var domain = window.location.protocol + '//' + window.location.hostname;
+    if (window.location.port != 80) {
+        domain += ":" + window.location.port
+    }
+
     window.app = {
         instance_id: instance_id,
+        domain: domain,
         settings: {},
         profile: {},
         emu_list: [],
@@ -63,6 +69,9 @@ module.exports = (function() {
             break;
 
         case 'black_board':
+            if (window.opener && window.opener.app) {
+                window.app = window.opener.app;
+            }
             require('../pages/black_board')();
             break;
 

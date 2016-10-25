@@ -9,8 +9,15 @@ module.exports = function($target) {
             app.open_black_board();
         });
 
+        var pass_it_up = function(data) {
+            if (app.black_board && app.black_board.closed != true) {
+                app.black_board.postMessage(data, app.domain);
+            }
+        };
+
         page.peepy('black_board.draw', function(info) {
             var data = info.data;
+            pass_it_up(info);
 
             switch (info.type) {
                 case 'line':
