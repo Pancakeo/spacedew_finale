@@ -21,5 +21,13 @@ module.exports = function($target) {
             }
         });
 
+        // Not hacky at all.
+        var user_agent = navigator.userAgent.toLowerCase();
+        var is_android = user_agent.indexOf("android") > -1;
+        if (is_android) {
+            $("#mini_black_board").hide();
+            $("#users").attr('style', 'height: 100%;');
+        }
+
     });
 };
