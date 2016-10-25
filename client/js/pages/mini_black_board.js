@@ -3,6 +3,7 @@ module.exports = function($target) {
         $target.replaceWith(page.$container);
 
         var ctx = page.$("#mini_black_board_canvas")[0].getContext('2d');
+        ctx.scale(0.2, 0.2);
 
         page.$("#mini_black_board_canvas").on('click', function() {
             app.open_black_board();
@@ -14,9 +15,26 @@ module.exports = function($target) {
             switch (info.type) {
                 case 'line':
                     ctx.beginPath();
-                    ctx.moveTo(data.start_x, data.start_x);
+                    var r = 0, g = 0, b = 0, a = 255;
+                    ctx.fillStyle = "rgba(" + r + "," + g + "," + b + "," + (a / 255) + ")";
+                    ctx.moveTo(data.start_x, data.start_y);
                     ctx.lineTo(data.end_x, data.end_y);
                     ctx.stroke();
+                    break;
+
+                case 'rekt':
+                    ctx.beginPath();
+                    ctx.fillStyle = "rgba(" + data.r + "," + data.g + "," + data.b + "," + (data.a / 255) + ")";
+                    ctx.fillRect(data.x, data.y, data.size, data.size);
+                    ctx.stroke();
+                    break;
+
+                case 'great_clear':
+                    // Blame?
+                    ctx.clearRect(0, 0, 1280, 720);
+                    break;
+
+                default:
                     break;
             }
         });

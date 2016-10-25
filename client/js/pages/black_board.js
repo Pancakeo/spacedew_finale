@@ -26,13 +26,85 @@ module.exports = function() {
 
         var pinned_x = null;
         var pinned_y = null;
-        page.$("#black_board_canvas").on('click', function(e) {
-            // ctx.beginPath();
-            // ctx.moveTo(line.start_x, line.start_x);
-            // ctx.lineTo(line.end_x, line.end_y);
-            // ctx.stroke();
-            //
-            // send_thing('line', line);
+        var left_mouse_down = false;
+
+        page.$("#black_board_canvas").on('mouseup', function(e) {
+            if (e.which == 1) {
+                left_mouse_down = false;
+            }
+        });
+
+        page.$("#controls").on('click', '[menu_item]', function() {
+            var menu_item = $(this).attr('menu_item');
+            switch (menu_item) {
+                case 'great_clear':
+                    ctx.clearRect(0, 0, 1280, 720);
+                    send_thing('great_clear', {});
+                    break;
+
+                default:
+                    break;
+            }
+        });
+
+        page.$("#black_board_canvas").on('mousedown', function(e) {
+            // probably the LMB?
+            if (e.which == 1) {
+                left_mouse_down = true;
+                pinned_x = e.clientX - this.offsetLeft;
+                pinned_y = e.clientY - this.offsetTop;
+
+                var r = 0;
+                var g = 0;
+                var b = 0;
+                var a = 255;
+                var size = 5;
+
+                var x = pinned_x;
+                var y = pinned_y;
+
+                ctx.beginPath();
+                ctx.fillStyle = "rgba(" + r + "," + g + "," + b + "," + (a / 255) + ")";
+                ctx.fillRect(x, y, size, size);
+                ctx.stroke();
+
+                var rekt = {
+                    r: r,
+                    g: g,
+                    b: b,
+                    a: a,
+                    x: pinned_x,
+                    y: pinned_y,
+                    size: 5
+                };
+
+                send_thing('rekt', rekt);
+            }
+        });
+
+        page.$("#black_board_canvas").on('mousemove', function(e) {
+            if (left_mouse_down) {
+                left_mouse_down = true;
+                var end_x = e.clientX - this.offsetLeft;
+                var end_y = e.clientY - this.offsetTop;
+
+                var line = {
+                    start_x: pinned_x,
+                    start_y: pinned_y,
+                    end_x: end_x,
+                    end_y: end_y
+                };
+
+                ctx.beginPath();
+                ctx.moveTo(line.start_x, line.start_y);
+                ctx.lineTo(line.end_x, line.end_y);
+                ctx.stroke();
+
+                pinned_x = end_x;
+                pinned_y = end_y;
+
+                send_thing('line', line);
+            }
         });
 
         setInterval(function() {
