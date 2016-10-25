@@ -92,9 +92,8 @@ module.exports = function() {
                 pinned_x = e.clientX - this.offsetLeft;
                 pinned_y = e.clientY - this.offsetTop;
 
-                var x = pinned_x;
-                var y = pinned_y;
-
+                // var x = pinned_x;
+                // var y = pinned_y;
                 // var size = 1;
                 // ctx.beginPath();
                 // ctx.fillStyle = fg_color;
@@ -115,8 +114,7 @@ module.exports = function() {
         page.$("#black_board_canvas").on('mousemove', function(e) {
             if (left_mouse_down) {
                 clearTimeout(hold_up);
-
-                left_mouse_down = true;
+                
                 var end_x = e.clientX - this.offsetLeft;
                 var end_y = e.clientY - this.offsetTop;
 
