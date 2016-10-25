@@ -2,6 +2,7 @@
 
 var uuid = require('node-uuid');
 var moment = require('moment');
+var tent_thing = require('../madness/tent');
 
 var rooms = {};
 var lobby_room;
@@ -57,6 +58,14 @@ exports.create_room = function(room_name, room_id) {
             }
         }
     };
+
+    var tent = tent_thing();
+
+    Object.defineProperty(room, 'tent', {
+        enumerable: false,
+        configurable: true,
+        value: tent
+    });
 
     rooms[room_id] = room;
     return room;

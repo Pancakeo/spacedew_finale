@@ -15,13 +15,8 @@ module.exports = function() {
         // $(window).on('resize', resize_canvas);
 
         var send_thing = function(type, data) {
-            var domain = window.location.protocol + '//' + window.location.hostname;
-            if (window.location.port != 80) {
-                domain += ":" + window.location.port
-            }
-
-            var message = {type: type, data: data};
-            window.opener.postMessage(message, domain);
+            var message = {action: 'draw', type: type, data: data};
+            window.opener.postMessage(message, app.domain);
         };
 
         var pinned_x = null;
@@ -110,12 +105,26 @@ module.exports = function() {
         window.addEventListener('message', function(e) {
             var info = e.data;
             var data = info.data;
+            console.log(info);
 
-            if (info.username == app.profile.username) {
-                return;
+            if (info.type != 'load') {
+                if (info.username == app.profile.username) {
+                    return;
+                }
             }
 
             switch (info.type) {
+                case 'load':
+                    ctx.clearRect(0, 0, 1280, 720);
+
+                    var image = new Image();
+                    image.onload = function() {
+                        ctx.drawImage(image, 0, 0);
+                    };
+
+                    image.src = info.data_src;
+                    break;
+
                 case 'line':
                     ctx.beginPath();
                     var r = 0, g = 0, b = 0, a = 255;
@@ -147,5 +156,7 @@ module.exports = function() {
                 window.close();
             }
         }, 100);
+
+        window.opener.postMessage({action: 'load'}, app.domain);
     });
 };

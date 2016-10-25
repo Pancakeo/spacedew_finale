@@ -2,7 +2,8 @@ module.exports = function($target) {
     get_page('mini_black_board', function(page) {
         $target.replaceWith(page.$container);
 
-        var ctx = page.$("#mini_black_board_canvas")[0].getContext('2d');
+        var canvas = page.$("#mini_black_board_canvas")[0];
+        var ctx = canvas.getContext('2d');
         ctx.scale(0.2, 0.2);
 
         page.$("#mini_black_board_canvas").on('click', function() {
@@ -14,6 +15,26 @@ module.exports = function($target) {
                 app.black_board.postMessage(data, app.domain);
             }
         };
+
+        page.peepy('black_board.load', function(data) {
+
+            if (!data.mini) {
+                data.type = 'load';
+                pass_it_up(data);
+            }
+            else {
+                ctx.clearRect(0, 0, 1280, 720);
+
+                var image = new Image();
+                image.onload = function() {
+                    ctx.scale(5, 5);
+                    ctx.drawImage(image, 0, 0);
+                    ctx.scale(0.2, 0.2);
+                };
+
+                image.src = data.data_src;
+            }
+        });
 
         page.peepy('black_board.draw', function(info) {
             var data = info.data;

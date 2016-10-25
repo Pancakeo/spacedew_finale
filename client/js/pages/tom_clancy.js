@@ -27,7 +27,6 @@ module.exports = function(options) {
 
             var emote = app.holy_cow[normal_key_code];
             if (emote) {
-                console.log(emote);
                 shown_flood = false;
                 last_emote_ts = Date.now();
                 var room_id = app.get_active_room(true);
@@ -277,9 +276,6 @@ module.exports = function(options) {
             this.value = '';
         });
 
-        // Heh, test code! TODO
-        // window.open('index.html?wup=emagine', '_blank', 'width=800,height=600');
-
         page.$("#add_thing").on('click', function() {
             var $things = $('<div><div class="content"/></div>');
             var $content = $things.children('.content');
@@ -395,8 +391,21 @@ module.exports = function(options) {
         };
 
         window.addEventListener('message', function(e) {
-            var data = e.data;
-            page.ws.send('black_board', 'draw', data)
+            switch (e.data.action) {
+                case 'load':
+                    page.ws.send('black_board', 'sync', {room_id: app.get_active_room(true), mini: false});
+                    break;
+
+                case 'draw':
+                    var data = e.data;
+                    data.room_id = app.get_active_room(true);
+                    page.ws.send('black_board', 'draw', data);
+                    break;
+
+                default:
+                    break;
+            }
+
         });
 
         app.get_lobby = function(just_id) {
