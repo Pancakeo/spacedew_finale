@@ -1,5 +1,28 @@
 module.exports = function() {
-    var Canvas = require('canvas');
+    // TODO - better support for Canvas not existing.
+    try {
+        var Canvas = require('canvas');
+    }
+    catch (e) {
+        return {
+            canvas: {
+                toDataURL: function() {
+
+                }
+            },
+            handle_thing: function() {
+
+            },
+            mini: {
+                canvas: {
+                    toDataURL: function() {
+
+                    }
+                }
+            }
+        };
+    }
+
     var canvas = new Canvas(1280, 720);
     var ctx = canvas.getContext('2d');
     var canvas_handler = require(app.shared_root + '/canvas_handler');
