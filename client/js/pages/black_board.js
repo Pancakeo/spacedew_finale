@@ -352,7 +352,12 @@ module.exports = function() {
         });
 
         page.$("#overlay_canvas").on('keydown', function(e) {
-            if (selecting) {
+            if (!selecting) {
+                if (e.keyCode == 66) {
+                    page.$("#rect_tool").click();
+                }
+            }
+            else {
                 var stop_selecting = function() {
                     page.$("#rect_tool").removeClass('active');
                     selecting = false;
@@ -360,27 +365,35 @@ module.exports = function() {
                     // TODO redraw.
                 };
 
-                // Escape
-                if (e.keyCode == 27) {
-                    stop_selecting();
-                }
-                // 'f' = fill
-                else if (e.keyCode == 70) {
-                    var data = {color: fg_color};
-                    $.extend(data, select_box);
+                switch (e.keyCode) {
+                    // Escape
+                    case 27:
+                        stop_selecting();
+                        break;
+                    // 'f' = fill
+                    case 70:
+                        var data = {color: fg_color};
+                        $.extend(data, select_box);
 
-                    send_thing('colorful_clear', data);
-                    stop_selecting();
-                }
-                // delete = erase
-                else if (e.keyCode == 46) {
-                    var data = $.extend({color: bg_color}, select_box);
+                        send_thing('colorful_clear', data);
+                        stop_selecting();
+                        break;
+                    // delete = erase
+                    case 46:
+                        var data = $.extend({color: bg_color}, select_box);
 
-                    send_thing('colorful_clear', data);
-                    stop_selecting();
+                        send_thing('colorful_clear', data);
+                        stop_selecting();
+                        break;
                 }
+
             }
 
         });
+
+        setTimeout(function() {
+            page.$("#overlay_canvas").focus();
+        }, 100);
+
     });
 };
