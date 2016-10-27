@@ -9,10 +9,10 @@ module.exports = function(ctx) {
         switch (info.type) {
             case 'load':
                 ctx.clearRect(0, 0, 1280, 720);
-                ctx.globalAlpha = 1;
 
                 var image = new Image();
                 image.onload = function() {
+                    ctx.globalAlpha = 1;
                     ctx.drawImage(image, 0, 0);
                 };
 
@@ -41,6 +41,7 @@ module.exports = function(ctx) {
                 ctx.beginPath();
                 ctx.globalAlpha = 1;
                 ctx.fillStyle = data.color;
+                ctx.clearRect(0, 0, 1280, 720);
                 ctx.fillRect(0, 0, 1280, 720);
                 ctx.stroke();
                 break;

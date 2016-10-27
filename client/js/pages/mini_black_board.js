@@ -32,6 +32,7 @@ module.exports = function($target) {
                 var image = new Image();
                 image.onload = function() {
                     ctx.scale(5, 5);
+                    ctx.globalAlpha = 1;
                     ctx.drawImage(image, 0, 0);
                     ctx.scale(0.2, 0.2);
                 };
