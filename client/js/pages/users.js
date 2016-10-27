@@ -69,7 +69,7 @@ module.exports = function($target) {
 
                 known_users[nice_username] = user.username;
                 // var display_name = user.username;
-                var display_name = '[Flare] ' + user.username;
+                var display_name = user.username;
                 var $user = $('<div class="user"><span class="username">' + display_name + '</span></div>');
 
                 if (user.idle == true) {
