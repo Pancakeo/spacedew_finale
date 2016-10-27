@@ -60,7 +60,7 @@ exports.handle_message = function handle_message(session, message) {
             break;
 
         case 'draw':
-            if (data.type == 'great_clear' || data.type == 'colorful_clear') {
+            if (data.type == 'colorful_clear' && data.data.nuke) {
                 sessionator.broadcast('chatterbox', 'system', {message: session.profile.username + ' cleared the X-board.', room_id: data.room_id, color: 'green'});
             }
 

@@ -73,7 +73,6 @@ module.exports = function(ctx) {
                     ctx.fillRect(data.start_x, data.start_y, data.width, data.height);
                 }
 
-                ctx.stroke();
                 break;
 
             default:
