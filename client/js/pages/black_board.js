@@ -10,7 +10,7 @@ module.exports = function() {
         var hold_up = null;
         var fg_color = '#ffffff';
         var stroke_width = 1;
-        var alpha = 255;
+        var alpha = 1;
         var bg_color = '#000000';
 
         // Thanks, StarkOverflow.
@@ -46,6 +46,7 @@ module.exports = function() {
             switch (menu_item) {
                 case 'great_clear':
                     ctx.beginPath();
+                    ctx.globalAlpha = 1;
                     ctx.fillStyle = bg_color;
                     ctx.fillRect(0, 0, 1280, 720);
                     ctx.stroke();
@@ -72,6 +73,7 @@ module.exports = function() {
         page.$("#bg_color").on('change', function() {
             ctx.beginPath();
             ctx.fillStyle = this.value;
+            ctx.globalAlpha = 1;
             ctx.fillRect(0, 0, 1280, 720);
             ctx.stroke();
 
@@ -103,23 +105,6 @@ module.exports = function() {
                 left_mouse_down = true;
                 pinned_x = e.clientX - this.offsetLeft;
                 pinned_y = e.clientY - this.offsetTop;
-
-                // var x = pinned_x;
-                // var y = pinned_y;
-                // var size = 1;
-                // ctx.beginPath();
-                // ctx.fillStyle = fg_color;
-                // ctx.fillRect(x, y, size, size);
-                // ctx.stroke();
-                //
-                // var rekt = {
-                //     color: fg_color,
-                //     alpha: alpha,
-                //     x: pinned_x,
-                //     y: pinned_y,
-                //     size: size
-                // };
-                // send_thing('rekt', rekt);
             }
         });
 
@@ -156,11 +141,12 @@ module.exports = function() {
                     end_x: end_x,
                     end_y: end_y,
                     color: fg_color,
-                    alpha: 255,
+                    alpha: alpha,
                     line_width: stroke_width
                 };
 
                 ctx.beginPath();
+                ctx.globalAlpha = alpha;
                 ctx.strokeStyle = fg_color;
                 ctx.lineWidth = stroke_width;
                 ctx.moveTo(line.start_x, line.start_y);
@@ -203,6 +189,7 @@ module.exports = function() {
                 var contrast_color = invertColor(bg_color);
                 overlay_ctx.beginPath();
                 overlay_ctx.clearRect(0, 0, 1280, 720);
+                ctx.globalAlpha = 0.5;
                 overlay_ctx.fillStyle = contrast_color;
 
                 for (var key in info.positions) {
@@ -244,16 +231,31 @@ module.exports = function() {
             fg_color = bg_color;
         });
 
-        var $handle = $("#custom-handle");
+        var $size_thing_handle = $("#size_thing_handle");
         page.$("#size_thing").slider({
                 min: 1,
                 max: 100,
                 create: function() {
-                    $handle.text($(this).slider("value"));
+                    $size_thing_handle.text($(this).slider("value"));
                 },
                 slide: function(event, ui) {
-                    $handle.text(ui.value);
+                    $size_thing_handle.text(ui.value);
                     stroke_width = ui.value;
+                }
+            }
+        );
+
+        var $alpha_thing_handle = $("#alpha_thing_handle");
+        page.$("#alpha_thing").slider({
+                min: 0,
+                max: 100,
+                value: 100,
+                create: function() {
+                    $alpha_thing_handle.text($(this).slider("value"));
+                },
+                slide: function(event, ui) {
+                    $alpha_thing_handle.text(ui.value);
+                    alpha = ui.value / 100;
                 }
             }
         );

@@ -9,6 +9,7 @@ module.exports = function(ctx) {
         switch (info.type) {
             case 'load':
                 ctx.clearRect(0, 0, 1280, 720);
+                ctx.globalAlpha = 1;
 
                 var image = new Image();
                 image.onload = function() {
@@ -22,6 +23,7 @@ module.exports = function(ctx) {
                 ctx.beginPath();
                 ctx.moveTo(data.start_x, data.start_y);
                 ctx.strokeStyle = data.color;
+                ctx.globalAlpha = data.alpha;
                 ctx.lineWidth = data.line_width || 1;
                 ctx.lineTo(data.end_x, data.end_y);
                 ctx.stroke();
@@ -30,18 +32,21 @@ module.exports = function(ctx) {
             case 'rekt':
                 ctx.beginPath();
                 ctx.fillStyle = data.color;
+                ctx.globalAlpha = data.alpha;
                 ctx.fillRect(data.x, data.y, data.size, data.size);
                 ctx.stroke();
                 break;
 
             case 'colorful_clear':
                 ctx.beginPath();
+                ctx.globalAlpha = 1;
                 ctx.fillStyle = data.color;
                 ctx.fillRect(0, 0, 1280, 720);
                 ctx.stroke();
                 break;
 
             case 'great_clear':
+                ctx.globalAlpha = 1;
                 ctx.clearRect(0, 0, 1280, 720);
                 break;
 
