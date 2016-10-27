@@ -56,6 +56,7 @@ module.exports = function() {
 
         var send_thing = function(type, data) {
             var message = {action: 'draw', type: type, data: data};
+            ch.handle_thing(message);
             window.opener.postMessage(message, app.domain);
         };
 
@@ -148,14 +149,6 @@ module.exports = function() {
                     line_width: stroke_width
                 };
 
-                ctx.beginPath();
-                ctx.globalAlpha = alpha;
-                ctx.strokeStyle = fg_color;
-                ctx.lineWidth = stroke_width;
-                ctx.moveTo(line.start_x, line.start_y);
-                ctx.lineTo(line.end_x, line.end_y);
-                ctx.stroke();
-
                 send_thing('line', line);
             },
             rekt: function(end_x, end_y) {
@@ -168,17 +161,6 @@ module.exports = function() {
                     phil: phil
                 };
 
-                ctx.beginPath();
-                ctx.globalAlpha = alpha;
-                ctx.strokeStyle = fg_color;
-                ctx.rect(pinned_x, pinned_y, stroke_width, stroke_width);
-                ctx.stroke();
-
-                if (phil) {
-                    ctx.fillStyle = fg_color;
-                    ctx.fill();
-                }
-
                 send_thing('rekt', rekt);
             },
             circle: function(end_x, end_y) {
@@ -190,18 +172,7 @@ module.exports = function() {
                     radius: stroke_width,
                     phil: phil
                 };
-
-                ctx.beginPath();
-                ctx.globalAlpha = alpha;
-                ctx.arc(pinned_x, pinned_y, stroke_width, 0, 2 * Math.PI, false);
-
-                if (phil) {
-                    ctx.fillStyle = fg_color;
-                    ctx.fill();
-                }
-
-                ctx.strokeStyle = fg_color;
-                ctx.stroke();
+                
                 send_thing('circle', circle);
             }
         };

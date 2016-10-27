@@ -33,6 +33,7 @@ module.exports = function(ctx) {
                 ctx.beginPath();
                 ctx.globalAlpha = data.alpha;
                 ctx.strokeStyle = data.color;
+                ctx.lineWidth = 1;
                 ctx.rect(data.start_x, data.start_y, data.size, data.size);
                 ctx.stroke();
 
@@ -61,6 +62,7 @@ module.exports = function(ctx) {
                     ctx.fill();
                 }
 
+                ctx.lineWidth = 1;
                 ctx.strokeStyle = data.color;
                 ctx.stroke();
                 break;
