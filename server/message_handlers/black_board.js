@@ -14,8 +14,12 @@ setInterval(function() {
 
     for (var key in positions) {
         var p = positions[key];
+
         if (Date.now() - p.last_change <= 100) {
             at_least_one = true;
+        }
+        else if (Date.now() - p.last_change >= (1000 * 10)) {
+            delete positions[key];
         }
     }
 
@@ -49,7 +53,7 @@ exports.handle_message = function handle_message(session, message) {
                     bg_color: room.tent.bg_color
                 };
 
-                session.send('black_board', 'load', data)
+                session.send('black_board', 'load', data);
             });
             break;
 

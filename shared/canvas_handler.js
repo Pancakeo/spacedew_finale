@@ -24,17 +24,22 @@ module.exports = function(ctx) {
                 ctx.moveTo(data.start_x, data.start_y);
                 ctx.strokeStyle = data.color;
                 ctx.globalAlpha = data.alpha;
-                ctx.lineWidth = data.line_width || 1;
+                ctx.lineWidth = data.line_width;
                 ctx.lineTo(data.end_x, data.end_y);
                 ctx.stroke();
                 break;
 
             case 'rekt':
                 ctx.beginPath();
-                ctx.fillStyle = data.color;
                 ctx.globalAlpha = data.alpha;
-                ctx.fillRect(data.x, data.y, data.size, data.size);
+                ctx.strokeStyle = data.color;
+                ctx.rect(data.start_x, data.start_y, data.size, data.size);
                 ctx.stroke();
+
+                if (data.phil) {
+                    ctx.fillStyle = data.color;
+                    ctx.fill();
+                }
                 break;
 
             case 'colorful_clear':
@@ -43,6 +48,20 @@ module.exports = function(ctx) {
                 ctx.fillStyle = data.color;
                 ctx.clearRect(0, 0, 1280, 720);
                 ctx.fillRect(0, 0, 1280, 720);
+                ctx.stroke();
+                break;
+
+            case 'circle':
+                ctx.beginPath();
+                ctx.globalAlpha = data.alpha;
+                ctx.arc(data.start_x, data.start_y, data.radius, 0, 2 * Math.PI, false);
+
+                if (data.phil) {
+                    ctx.fillStyle = data.color;
+                    ctx.fill();
+                }
+
+                ctx.strokeStyle = data.color;
                 ctx.stroke();
                 break;
 

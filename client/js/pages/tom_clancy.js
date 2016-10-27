@@ -196,7 +196,7 @@ module.exports = function(options) {
         };
 
         // Turn on Notifications if already set.
-        if (Boolean(localStorage.auto_notify) == true) {
+        if (localStorage.auto_notify == "true") {
             Notification.requestPermission(function(permission) {
                 app.settings.notify = (permission == "granted");
                 if (app.settings.notify) {
@@ -387,7 +387,7 @@ module.exports = function(options) {
 
             }, 100);
 
-            app.black_board = window.open('index.html?wup=black_board', '_blank', 'width=1300,height=800');
+            app.black_board = window.open('index.html?wup=black_board', '_blank', 'width=1300,height=830');
         };
 
         window.addEventListener('message', function(e) {
