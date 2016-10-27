@@ -4,6 +4,11 @@ module.exports = function() {
     get_page('black_board', function(page) {
         $('body').append(page.$container);
 
+        var $wait_dialog = $('<div>Syncing...</div>').dialog({
+            title: "Loading",
+            modal: true
+        });
+
         var pinned_x = null;
         var pinned_y = null;
         var left_mouse_down = false;
@@ -12,16 +17,29 @@ module.exports = function() {
         var stroke_width = 1;
         var alpha = 1;
         var bg_color = '#000000';
+        var draw_style = 'line';
+        var phil = true;
 
         // Thanks, StarkOverflow.
-        function rgb2hex(rgb) {
+        var rgb2hex = function(rgb) {
             rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
             function hex(x) {
                 return ("0" + parseInt(x).toString(16)).slice(-2);
             }
 
             return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
-        }
+        };
+
+        var invertColor = function(hexTripletColor) {
+            var color = hexTripletColor;
+            color = color.substring(1);           // remove #
+            color = parseInt(color, 16);          // convert to integer
+            color = 0xFFFFFF ^ color;             // invert three bytes
+            color = color.toString(16);           // convert to hex
+            color = ("000000" + color).slice(-6); // pad with leading zeros
+            color = "#" + color;                  // prepend #
+            return color;
+        };
 
         var ctx = page.$("#black_board_canvas")[0].getContext('2d');
         ctx.strokeStyle = fg_color;
@@ -105,6 +123,10 @@ module.exports = function() {
                 left_mouse_down = true;
                 pinned_x = e.clientX - this.offsetLeft;
                 pinned_y = e.clientY - this.offsetTop;
+
+                if (draw_style != 'line') {
+                    draw_handlers[draw_style](pinned_x, pinned_y);
+                }
             }
         });
 
@@ -113,6 +135,76 @@ module.exports = function() {
                 send_thing('position', position);
             }
         }, 100);
+
+        var draw_handlers = {
+            line: function(end_x, end_y) {
+                var line = {
+                    start_x: pinned_x,
+                    start_y: pinned_y,
+                    end_x: end_x,
+                    end_y: end_y,
+                    color: fg_color,
+                    alpha: alpha,
+                    line_width: stroke_width
+                };
+
+                ctx.beginPath();
+                ctx.globalAlpha = alpha;
+                ctx.strokeStyle = fg_color;
+                ctx.lineWidth = stroke_width;
+                ctx.moveTo(line.start_x, line.start_y);
+                ctx.lineTo(line.end_x, line.end_y);
+                ctx.stroke();
+
+                send_thing('line', line);
+            },
+            rekt: function(end_x, end_y) {
+                var rekt = {
+                    start_x: pinned_x,
+                    start_y: pinned_y,
+                    color: fg_color,
+                    alpha: alpha,
+                    size: stroke_width,
+                    phil: phil
+                };
+
+                ctx.beginPath();
+                ctx.globalAlpha = alpha;
+                ctx.strokeStyle = fg_color;
+                ctx.rect(pinned_x, pinned_y, stroke_width, stroke_width);
+                ctx.stroke();
+
+                if (phil) {
+                    ctx.fillStyle = fg_color;
+                    ctx.fill();
+                }
+
+                send_thing('rekt', rekt);
+            },
+            circle: function(end_x, end_y) {
+                var circle = {
+                    start_x: pinned_x,
+                    start_y: pinned_y,
+                    color: fg_color,
+                    alpha: alpha,
+                    radius: stroke_width,
+                    phil: phil
+                };
+
+                ctx.beginPath();
+                ctx.globalAlpha = alpha;
+                ctx.arc(pinned_x, pinned_y, stroke_width, 0, 2 * Math.PI, false);
+
+                if (phil) {
+                    ctx.fillStyle = fg_color;
+                    ctx.fill();
+                }
+
+                ctx.strokeStyle = fg_color;
+                ctx.stroke();
+                send_thing('circle', circle);
+            }
+        };
 
         page.$("#overlay_canvas").on('mousemove', function(e) {
             var end_x = e.clientX - this.offsetLeft;
@@ -135,48 +227,29 @@ module.exports = function() {
             if (left_mouse_down) {
                 clearTimeout(hold_up);
 
-                var line = {
-                    start_x: pinned_x,
-                    start_y: pinned_y,
-                    end_x: end_x,
-                    end_y: end_y,
-                    color: fg_color,
-                    alpha: alpha,
-                    line_width: stroke_width
-                };
-
-                ctx.beginPath();
-                ctx.globalAlpha = alpha;
-                ctx.strokeStyle = fg_color;
-                ctx.lineWidth = stroke_width;
-                ctx.moveTo(line.start_x, line.start_y);
-                ctx.lineTo(line.end_x, line.end_y);
-                ctx.stroke();
+                draw_handlers[draw_style](end_x, end_y);
 
                 pinned_x = end_x;
                 pinned_y = end_y;
-
-                send_thing('line', line);
             }
         });
 
-        function invertColor(hexTripletColor) {
-            var color = hexTripletColor;
-            color = color.substring(1);           // remove #
-            color = parseInt(color, 16);          // convert to integer
-            color = 0xFFFFFF ^ color;             // invert three bytes
-            color = color.toString(16);           // convert to hex
-            color = ("000000" + color).slice(-6); // pad with leading zeros
-            color = "#" + color;                  // prepend #
-            return color;
-        }
-
+        var draw_queue = [];
         window.addEventListener('message', function(e) {
             var info = e.data;
             var data = info.data;
 
             if (info.type == 'colorful_clear') {
                 bg_color = data.color;
+            }
+
+            if (info.type == 'load') {
+                $wait_dialog && $wait_dialog.dialog('close');
+                $wait_dialog = null;
+
+                draw_queue.forEach(function(info) {
+                    ch.handle_thing(info);
+                });
             }
 
             if (info.type != 'load') {
@@ -204,6 +277,11 @@ module.exports = function() {
 
             if (info.type == 'load') {
                 bg_color = info.bg_color;
+            }
+
+            if ($wait_dialog) {
+                draw_queue.push(info);
+                return;
             }
 
             ch.handle_thing(info);
@@ -261,5 +339,15 @@ module.exports = function() {
         );
 
         window.opener.postMessage({action: 'load'}, app.domain);
+
+        page.$("#buttons button").on('click', function() {
+            $(this).siblings('button').removeClass('active');
+            $(this).addClass('active');
+            draw_style = $(this).attr('draw_style');
+        });
+
+        page.$("#phil").on('change', function() {
+            phil = $(this).prop('checked');
+        })
     });
 };
