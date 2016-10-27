@@ -49,7 +49,7 @@ module.exports = function() {
         ctx: ctx,
         bg_color: '#000000',
         handle_thing: function(info) {
-            if (info.type == 'colorful_clear') {
+            if (info.type == 'colorful_clear' && info.data.nuke) {
                 tent.bg_color = info.data.color;
             }
 
