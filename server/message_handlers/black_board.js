@@ -7,6 +7,7 @@ var wuptil = require('../util/wuptil');
 var positions = {};
 setInterval(function() {
     var at_least_one = false;
+    var has_delete = false;
 
     for (var key in positions) {
         var p = positions[key];
@@ -15,15 +16,16 @@ setInterval(function() {
             at_least_one = true;
         }
         else if (Date.now() - p.last_change >= (1000 * 10)) {
+            has_delete = true;
             delete positions[key];
         }
     }
 
-    if (Object.keys(positions).length <= 1) {
+    if (Object.keys(positions).length <= 1 && !has_delete) {
         return;
     }
 
-    if (at_least_one) {
+    if (at_least_one || has_delete) {
         var room_id = wiseau.get_lobby().id;
         sessionator.broadcast('black_board', 'draw', {type: 'positions', positions: positions, room_id: room_id});
     }

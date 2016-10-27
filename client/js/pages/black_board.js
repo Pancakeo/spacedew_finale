@@ -20,6 +20,9 @@ module.exports = function() {
         var draw_style = 'line';
         var phil = true;
 
+        var selecting = false;
+        var select_box = {};
+
         // Thanks, StarkOverflow.
         var rgb2hex = function(rgb) {
             rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
@@ -64,12 +67,7 @@ module.exports = function() {
             var menu_item = $(this).attr('menu_item');
             switch (menu_item) {
                 case 'great_clear':
-                    ctx.beginPath();
-                    ctx.globalAlpha = 1;
-                    ctx.fillStyle = bg_color;
-                    ctx.fillRect(0, 0, 1280, 720);
-                    ctx.stroke();
-                    send_thing('colorful_clear', {color: bg_color});
+                    send_thing('colorful_clear', {color: bg_color, nuke: true});
                     break;
 
                 default:
@@ -90,13 +88,7 @@ module.exports = function() {
         });
 
         page.$("#bg_color").on('change', function() {
-            ctx.beginPath();
-            ctx.fillStyle = this.value;
-            ctx.globalAlpha = 1;
-            ctx.fillRect(0, 0, 1280, 720);
-            ctx.stroke();
-
-            send_thing('colorful_clear', {color: this.value});
+            send_thing('colorful_clear', {color: this.value, nuke: true});
         });
 
         page.$("#black_board_canvas").on('mouseleave', function(e) {
@@ -152,9 +144,15 @@ module.exports = function() {
                 send_thing('line', line);
             },
             rekt: function(end_x, end_y) {
+                var start_x = pinned_x - (stroke_width / 2);
+                var start_y = pinned_y - (stroke_width / 2);
+
+                start_x = Math.floor(start_x);
+                start_y = Math.floor(start_y);
+
                 var rekt = {
-                    start_x: pinned_x,
-                    start_y: pinned_y,
+                    start_x: start_x,
+                    start_y: start_y,
                     color: fg_color,
                     alpha: alpha,
                     size: stroke_width,
@@ -172,7 +170,7 @@ module.exports = function() {
                     radius: stroke_width,
                     phil: phil
                 };
-                
+
                 send_thing('circle', circle);
             }
         };
@@ -198,10 +196,36 @@ module.exports = function() {
             if (left_mouse_down) {
                 clearTimeout(hold_up);
 
-                draw_handlers[draw_style](end_x, end_y);
+                if (selecting) {
+                    overlay_ctx.clearRect(0, 0, 1280, 720);
 
-                pinned_x = end_x;
-                pinned_y = end_y;
+                    var width = Math.abs(pinned_x - end_x);
+                    var height = Math.abs(pinned_y - end_y);
+
+                    var start_x = Math.min(pinned_x, end_x);
+                    var start_y = Math.min(pinned_y, end_y);
+
+                    overlay_ctx.beginPath();
+                    overlay_ctx.strokeStyle = fg_color;
+                    overlay_ctx.setLineDash([5, 5]);
+                    overlay_ctx.rect(start_x, start_y, width, height);
+                    overlay_ctx.lineWidth = 1;
+                    overlay_ctx.stroke();
+
+                    select_box = {
+                        start_x: start_x,
+                        start_y: start_y,
+                        width: width,
+                        height: height
+                    };
+                    // TODO - redraw overlays (positions).
+                }
+                else {
+                    draw_handlers[draw_style](end_x, end_y);
+                    pinned_x = end_x;
+                    pinned_y = end_y;
+                }
+
             }
         });
 
@@ -210,7 +234,7 @@ module.exports = function() {
             var info = e.data;
             var data = info.data;
 
-            if (info.type == 'colorful_clear') {
+            if (info.type == 'colorful_clear' && data.nuke) {
                 bg_color = data.color;
             }
 
@@ -319,6 +343,44 @@ module.exports = function() {
 
         page.$("#phil").on('change', function() {
             phil = $(this).prop('checked');
-        })
+        });
+
+        page.$("#rect_tool").on('click', function() {
+            $(this).toggleClass('active');
+
+            selecting = $(this).hasClass('active');
+        });
+
+        page.$("#overlay_canvas").on('keydown', function(e) {
+            if (selecting) {
+                var stop_selecting = function() {
+                    page.$("#rect_tool").removeClass('active');
+                    selecting = false;
+                    overlay_ctx.clearRect(0, 0, 1280, 720);
+                    // TODO redraw.
+                };
+
+                // Escape
+                if (e.keyCode == 27) {
+                    stop_selecting();
+                }
+                // 'f' = fill
+                else if (e.keyCode == 70) {
+                    var data = {color: fg_color};
+                    $.extend(data, select_box);
+
+                    send_thing('colorful_clear', data);
+                    stop_selecting();
+                }
+                // delete = erase
+                else if (e.keyCode == 46) {
+                    var data = $.extend({color: bg_color}, select_box);
+
+                    send_thing('colorful_clear', data);
+                    stop_selecting();
+                }
+            }
+
+        });
     });
 };

@@ -43,15 +43,6 @@ module.exports = function(ctx) {
                 }
                 break;
 
-            case 'colorful_clear':
-                ctx.beginPath();
-                ctx.globalAlpha = 1;
-                ctx.fillStyle = data.color;
-                ctx.clearRect(0, 0, 1280, 720);
-                ctx.fillRect(0, 0, 1280, 720);
-                ctx.stroke();
-                break;
-
             case 'circle':
                 ctx.beginPath();
                 ctx.globalAlpha = data.alpha;
@@ -67,9 +58,22 @@ module.exports = function(ctx) {
                 ctx.stroke();
                 break;
 
-            case 'great_clear':
+            case 'colorful_clear':
+                ctx.beginPath();
                 ctx.globalAlpha = 1;
-                ctx.clearRect(0, 0, 1280, 720);
+                ctx.strokeStyle = data.color;
+                ctx.fillStyle = data.color;
+
+                if (data.nuke) {
+                    ctx.clearRect(0, 0, 1280, 720);
+                    ctx.fillRect(0, 0, 1280, 720);
+                }
+                else {
+                    ctx.clearRect(data.start_x, data.start_y, data.width, data.height);
+                    ctx.fillRect(data.start_x, data.start_y, data.width, data.height);
+                }
+
+                ctx.stroke();
                 break;
 
             default:
