@@ -8,10 +8,6 @@ var positions = {};
 setInterval(function() {
     var at_least_one = false;
 
-    if (Object.keys(positions).length <= 1) {
-        return;
-    }
-
     for (var key in positions) {
         var p = positions[key];
 
@@ -21,6 +17,10 @@ setInterval(function() {
         else if (Date.now() - p.last_change >= (1000 * 10)) {
             delete positions[key];
         }
+    }
+
+    if (Object.keys(positions).length <= 1) {
+        return;
     }
 
     if (at_least_one) {
