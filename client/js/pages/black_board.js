@@ -386,8 +386,9 @@ module.exports = function() {
                         break;
                     // 't' = text
                     case 84:
+                        e.stopPropagation();
                         page.$("#textbook").click();
-                        break;
+                        return false;
                     // delete = erase
                     case 46:
                         var data = $.extend({color: bg_color}, select_box);
