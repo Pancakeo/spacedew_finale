@@ -335,7 +335,7 @@ module.exports = function() {
 
         window.opener.postMessage({action: 'load'}, app.domain);
 
-        page.$("#buttons button").on('click', function() {
+        page.$("#buttons button:not(#textbook)").on('click', function() {
             $(this).siblings('button').removeClass('active');
             $(this).addClass('active');
             draw_style = $(this).attr('draw_style');
@@ -345,10 +345,23 @@ module.exports = function() {
             phil = $(this).prop('checked');
         });
 
+        var stop_selecting = function() {
+            page.$("#rect_tool").removeClass('active');
+            selecting = false;
+            page.$("#textbook").prop('disabled', true);
+            overlay_ctx.clearRect(0, 0, 1280, 720);
+            select_box = {};
+            // TODO redraw.
+        };
+
         page.$("#rect_tool").on('click', function() {
             $(this).toggleClass('active');
-
             selecting = $(this).hasClass('active');
+
+            page.$("#textbook").prop('disabled', !selecting);
+            if (!selecting) {
+                stop_selecting();
+            }
         });
 
         page.$("#overlay_canvas").on('keydown', function(e) {
@@ -358,13 +371,6 @@ module.exports = function() {
                 }
             }
             else {
-                var stop_selecting = function() {
-                    page.$("#rect_tool").removeClass('active');
-                    selecting = false;
-                    overlay_ctx.clearRect(0, 0, 1280, 720);
-                    // TODO redraw.
-                };
-
                 switch (e.keyCode) {
                     // Escape
                     case 27:
@@ -377,6 +383,10 @@ module.exports = function() {
 
                         send_thing('colorful_clear', data);
                         stop_selecting();
+                        break;
+                    // 't' = text
+                    case 84:
+                        page.$("#textbook").click();
                         break;
                     // delete = erase
                     case 46:
@@ -394,6 +404,31 @@ module.exports = function() {
         setTimeout(function() {
             page.$("#overlay_canvas").focus();
         }, 100);
+
+        page.$("#textbook").prop('disabled', true).on('click', function() {
+            if (selecting && Object.keys(select_box).length > 0) {
+                page.prompt("Input Text", "Input some text!", function(res) {
+                    if (res && res.length > 0) {
+                        var font = page.$("#font").val();
+                        if (font.trim().length == 0) {
+                            font = "14px serif";
+                        }
+
+                        var text = {
+                            x: select_box.start_x,
+                            y: select_box.start_y,
+                            font: font,
+                            color: fg_color,
+                            alpha: alpha,
+                            text: res
+                        };
+
+                        send_thing('text', text);
+                    }
+                    stop_selecting();
+                });
+            }
+        });
 
     });
 };
