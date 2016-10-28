@@ -210,6 +210,8 @@ module.exports = function($parent, options) {
 
         event_bus.on('ws.disconnect', function() {
             if (localStorage.instance_id != app.instance_id) {
+                console.log('localStorage', localStorage.instance_id);
+                console.log('app', app.instance_id);
                 page.alert('Whew.', 'Disconnected. Another, more recent instance of yehrye exists. Did you open another tab, Canister?');
                 return;
             }

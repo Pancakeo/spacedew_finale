@@ -298,13 +298,9 @@ module.exports = function(options) {
                     }
                 },
                 {
-                    text: "Emagine",
+                    text: "Crabble",
                     action: function() {
-                        var blargh = window.open('index.html?wup=emagine', '_blank', 'width=800,height=600');
-
-                        if (blargh == null) {
-                            page.alert("Popup Blocked", "Disable your American Online popup blocker.");
-                        }
+                        app.crabble = window.open('index.html?wup=crabble', '_blank', 'width=1300,height=830');
                     }
                 }
             ];

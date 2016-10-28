@@ -64,8 +64,8 @@ module.exports = (function() {
     window.get_page = require('../app/page');
 
     switch (query_params.wup) {
-        case 'emagine':
-            require('../pages/emagine')();
+        case 'crabble':
+            require('../pages/crabble')();
             break;
 
         case 'black_board':
