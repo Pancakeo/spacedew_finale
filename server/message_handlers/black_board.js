@@ -70,7 +70,7 @@ exports.handle_message = function handle_message(session, message) {
 
             room.tent.handle_thing(data);
             data.username = session.profile.username;
-            sessionator.broadcast('black_board', sub_type, data);
+            sessionator.broadcast('black_board', sub_type, data, {strip_entities: false});
             break;
         default:
             break;

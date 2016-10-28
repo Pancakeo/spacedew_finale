@@ -22,6 +22,7 @@ module.exports = function() {
 
         var selecting = false;
         var select_box = {};
+        var positions = {};
 
         // Thanks, StarkOverflow.
         var rgb2hex = function(rgb) {
@@ -53,7 +54,6 @@ module.exports = function() {
         };
 
         var overlay_ctx = page.$("#overlay_canvas")[0].getContext('2d');
-        overlay_ctx.font = "14px serif";
 
         var ch = canvas_handler(ctx);
 
@@ -175,6 +175,35 @@ module.exports = function() {
             }
         };
 
+        var redraw_overlay = function() {
+            overlay_ctx.clearRect(0, 0, 1280, 720);
+
+            if (select_box && Object.keys(select_box).length > 0) {
+                overlay_ctx.beginPath();
+                overlay_ctx.globalAlpha = 1;
+                overlay_ctx.strokeStyle = fg_color;
+                overlay_ctx.setLineDash([5, 5]);
+                overlay_ctx.rect(select_box.start_x, select_box.start_y, select_box.width, select_box.height);
+                overlay_ctx.lineWidth = 1;
+                overlay_ctx.stroke();
+            }
+
+            var contrast_color = invertColor(bg_color);
+            overlay_ctx.beginPath();
+            ctx.globalAlpha = 0.5;
+            overlay_ctx.font = "14px serif";
+            overlay_ctx.fillStyle = contrast_color;
+
+            for (var key in positions) {
+                if (key != app.profile.username) {
+                    var p = positions[key];
+                    overlay_ctx.fillText(key, p.x, p.y);
+                }
+            }
+
+            overlay_ctx.stroke();
+        };
+
         page.$("#overlay_canvas").on('mousemove', function(e) {
             var end_x = e.clientX - this.offsetLeft;
             var end_y = e.clientY - this.offsetTop;
@@ -197,20 +226,10 @@ module.exports = function() {
                 clearTimeout(hold_up);
 
                 if (selecting) {
-                    overlay_ctx.clearRect(0, 0, 1280, 720);
-
                     var width = Math.abs(pinned_x - end_x);
                     var height = Math.abs(pinned_y - end_y);
-
                     var start_x = Math.min(pinned_x, end_x);
                     var start_y = Math.min(pinned_y, end_y);
-
-                    overlay_ctx.beginPath();
-                    overlay_ctx.strokeStyle = fg_color;
-                    overlay_ctx.setLineDash([5, 5]);
-                    overlay_ctx.rect(start_x, start_y, width, height);
-                    overlay_ctx.lineWidth = 1;
-                    overlay_ctx.stroke();
 
                     select_box = {
                         start_x: start_x,
@@ -218,7 +237,8 @@ module.exports = function() {
                         width: width,
                         height: height
                     };
-                    // TODO - redraw overlays (positions).
+
+                    redraw_overlay();
                 }
                 else {
                     draw_handlers[draw_style](end_x, end_y);
@@ -254,20 +274,8 @@ module.exports = function() {
             }
 
             if (info.type == 'positions') {
-                var contrast_color = invertColor(bg_color);
-                overlay_ctx.beginPath();
-                overlay_ctx.clearRect(0, 0, 1280, 720);
-                ctx.globalAlpha = 0.5;
-                overlay_ctx.fillStyle = contrast_color;
-
-                for (var key in info.positions) {
-                    if (key != app.profile.username) {
-                        var p = info.positions[key];
-                        overlay_ctx.fillText(key, p.x, p.y);
-                    }
-                }
-
-                overlay_ctx.stroke();
+                positions = info.positions;
+                redraw_overlay();
             }
 
             if (info.type == 'load') {
@@ -349,9 +357,8 @@ module.exports = function() {
             page.$("#rect_tool").removeClass('active');
             selecting = false;
             page.$("#textbook").prop('disabled', true);
-            overlay_ctx.clearRect(0, 0, 1280, 720);
             select_box = {};
-            // TODO redraw.
+            redraw_overlay();
         };
 
         page.$("#rect_tool").on('click', function() {

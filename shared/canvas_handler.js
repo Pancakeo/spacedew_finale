@@ -79,13 +79,14 @@ module.exports = function(ctx) {
                 ctx.fillStyle = data.color;
 
                 if (data.nuke) {
-                    ctx.clearRect(0, 0, 1280, 720);
-                    ctx.fillRect(0, 0, 1280, 720);
+                    ctx.rect(0, 0, 1280, 720);
                 }
                 else {
-                    ctx.clearRect(data.start_x, data.start_y, data.width, data.height);
-                    ctx.fillRect(data.start_x, data.start_y, data.width, data.height);
+                    ctx.rect(data.start_x, data.start_y, data.width, data.height);
                 }
+
+                ctx.fill();
+                ctx.stroke();
 
                 break;
 
