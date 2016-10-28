@@ -13,6 +13,7 @@ module.exports = function() {
             handle_thing: function() {
 
             },
+            dirty: false,
             mini: {
                 canvas: {
                     toDataURL: function() {
@@ -48,9 +49,14 @@ module.exports = function() {
         canvas: canvas,
         ctx: ctx,
         bg_color: '#000000',
+        dirty: false,
         handle_thing: function(info) {
             if (info.type == 'colorful_clear' && info.data.nuke) {
                 tent.bg_color = info.data.color;
+                tent.dirty = false;
+            }
+            else if (info.type != 'position') {
+                tent.dirty = true;
             }
 
             ch.handle_thing(info);

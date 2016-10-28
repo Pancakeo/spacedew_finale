@@ -61,7 +61,9 @@ exports.handle_message = function handle_message(session, message) {
 
         case 'draw':
             if (data.type == 'colorful_clear' && data.data.nuke) {
-                sessionator.broadcast('chatterbox', 'system', {message: session.profile.username + ' cleared the X-board.', room_id: data.room_id, color: 'green'});
+                if (room.tent.dirty) {
+                    sessionator.broadcast('chatterbox', 'system', {message: session.profile.username + ' cleared the X-board.', room_id: data.room_id, color: 'green'});
+                }
             }
 
             if (data.type == 'position') {
