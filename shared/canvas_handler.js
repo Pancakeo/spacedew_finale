@@ -69,7 +69,12 @@ module.exports = function(ctx) {
 
             case 'colorful_clear':
                 ctx.beginPath();
-                ctx.globalAlpha = 1;
+                var alpha = 1;
+                if (data.alpha != null) {
+                    alpha = data.alpha;
+                }
+
+                ctx.globalAlpha = alpha;
                 ctx.strokeStyle = data.color;
                 ctx.fillStyle = data.color;
 

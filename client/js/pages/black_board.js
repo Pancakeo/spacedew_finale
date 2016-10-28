@@ -378,7 +378,7 @@ module.exports = function() {
                         break;
                     // 'f' = fill
                     case 70:
-                        var data = {color: fg_color};
+                        var data = {color: fg_color, alpha: alpha};
                         $.extend(data, select_box);
 
                         send_thing('colorful_clear', data);
