@@ -190,7 +190,7 @@ module.exports = function($parent, options) {
         });
 
         event_bus.on('users.has_gone_to_a_better_place', function(event) {
-            append_system(event.username + " went to pickup a motorcycle.", {class_name: 'sad', room_id: event.room_id})
+            append_system(event.username + " went to pick up a motorcycle.", {class_name: 'sad', room_id: event.room_id})
         });
 
         event_bus.on('blargher.send', function(params) {
@@ -283,7 +283,7 @@ module.exports = function($parent, options) {
 
             localStorage.auth_key = data.auth_key;
             lobby = data.lobby;
-            page.ws.send('users', 'sync', {room_id: app.get_active_room(true)})
+            page.ws.send('users', 'sync', {room_id: app.get_active_room(true)});
 
             if (lobby.recent_messages.length > 0) {
                 var $blargh = $('<div class="blargh"/>');
