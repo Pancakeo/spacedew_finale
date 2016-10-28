@@ -433,7 +433,7 @@ module.exports = function() {
 
         page.$("#shortcuts").on('click', function() {
             var cuts = ['Make sure the Canvas is selected.', 'b = Create bounding box', 'f = Fill box with foreground color',
-                'del = Erase box', 't = Create text starting at top left corner.']
+                'del = Erase box', 't = Create text starting at top left corner.'];
             page.alert("Shortcuts", cuts.join('<br/>'));
 
         });
