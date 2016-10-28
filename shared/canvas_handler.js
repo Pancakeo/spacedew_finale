@@ -61,7 +61,7 @@ module.exports = function(ctx) {
             case 'text':
                 ctx.beginPath();
                 ctx.globalAlpha = data.alpha;
-                ctx.font = data.font;
+                // ctx.font = data.font;
                 ctx.fillStyle = data.color;
                 ctx.fillText(data.text, data.x, data.y);
                 ctx.stroke();
