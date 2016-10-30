@@ -188,7 +188,7 @@ module.exports = function() {
                     // Prevent event from reaching prompt
                     return false;
                 }
-                else {
+                else if (!board.using_tool()) {
                     if (board.style.draw_style != 'line') {
                         draw_handlers[board.style.draw_style](ui.pinned_x, ui.pinned_y);
                     }
