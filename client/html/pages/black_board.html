@@ -19,7 +19,7 @@
             <div id="alpha_thing_handle" class="ui-slider-handle custom_handle"></div>
         </div>
 
-        <div id="buttons">
+        <div id="buttons" style="position: relative;">
             <button class="active" draw_style="line">Line</button>
             <button draw_style="rekt">Rekt</button>
             <button draw_style="circle">Circle</button>
@@ -27,12 +27,11 @@
             Phil? <input type="checkbox" id="phil" style="vertical-align: middle" checked="checked"/>
 
             <div id="rect_tool" style="margin-left: 10px;" title="Creates a bounding box that could do something."></div>
-
-            <button id="textbook" title="First, select area with bounding box (b). Then click this!">Text</button>
-            Font: <input id="font" value="44px serif" style="width: 120px;"/>
-            <button id="shortcuts">Shortcuts</button>
+            <i class="fa fa-font" aria-hidden="true" menu_item="fonty"></i>
+            <input id="font" value="44px serif" style="width: 120px;"/>
             <i class="fa fa-eyedropper" aria-hidden="true" menu_item="eye_drop"></i>
             <div id="color_preview"></div>
+            <span id="shortcuts">Shortcuts</span>
         </div>
     </div>
 

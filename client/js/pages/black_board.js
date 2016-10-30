@@ -30,12 +30,15 @@ module.exports = function() {
         }
     }, 100);
 
-    var board = {
+    var ui = {
+        mouse: {x: 0, y: 0},
+        left_mouse_button_down: false,
         pinned_x: null,
         pinned_y: null,
-        left_mouse_down: false,
-        hold_up: null,
+        hold_up: null
+    };
 
+    var board = {
         style: {
             draw_style: 'line',
             phil: true,
@@ -47,13 +50,18 @@ module.exports = function() {
         tools: {
             selecting: false,
             eye_drop: false,
+            fonty: false,
             select_box: {}
         },
         my_position: {
             x: -500,
             y: -500
         },
-        user_positions: {}
+        user_positions: {},
+        using_tool: function() {
+            var tools = board.tools;
+            return tools.selecting || tools.eye_drop || tools.fonty;
+        }
     };
 
     get_page('black_board', function(page) {
@@ -84,9 +92,16 @@ module.exports = function() {
                     break;
 
                 case 'eye_drop':
+                    stop_tools();
                     page.$("#overlay_canvas").addClass('eye_drop');
-                    stop_selecting();
                     board.tools.eye_drop = true;
+                    $(this).addClass('active');
+                    break;
+
+                case 'fonty':
+                    stop_tools();
+                    page.$("#overlay_canvas").addClass('fonty');
+                    board.tools.fonty = true;
                     $(this).addClass('active');
                     break;
 
@@ -113,46 +128,69 @@ module.exports = function() {
         });
 
         page.$("#black_board_canvas").on('mouseleave', function(e) {
-            board.hold_up = setTimeout(function() {
-                board.left_mouse_down = false;
+            ui.hold_up = setTimeout(function() {
+                ui.left_mouse_button_down = false;
             }, 500);
 
         });
 
         setInterval(function() {
             if (!document.hasFocus()) {
-                board.left_mouse_down = false;
+                ui.left_mouse_button_down = false;
             }
         }, 250);
 
         page.$("#overlay_canvas").on('mouseup', function(e) {
             if (e.which == 1) {
-                board.left_mouse_down = false;
+                ui.left_mouse_button_down = false;
             }
         });
 
         page.$("#overlay_canvas").on('mousedown', function(e) {
 
             if (e.which == 1) {
-                board.left_mouse_down = true;
-                board.pinned_x = e.clientX - this.offsetLeft;
-                board.pinned_y = e.clientY - this.offsetTop;
+                ui.left_mouse_button_down = true;
+                ui.pinned_x = e.clientX - this.offsetLeft;
+                ui.pinned_y = e.clientY - this.offsetTop;
 
-                var end_x = board.pinned_x;
-                var end_y = board.pinned_y;
+                var end_x = ui.pinned_x;
+                var end_y = ui.pinned_y;
 
                 if (board.tools.eye_drop) {
                     var pixel = ctx.getImageData(end_x, end_y, 1, 1);
                     var rgb = 'rgb(' + pixel.data[0] + ',' + pixel.data[1] + ',' + pixel.data[2] + ')';
                     page.$("#fg_color").val(helpers.rgb2hex(rgb)).change();
-                    stop_eyedrop();
+                    stop_tools();
                 }
-                else if (board.tools.selecting) {
+                else if (board.tools.fonty) {
+                    ui.left_mouse_button_down = false;
+                    page.prompt("Input Text", "Input some text!", function(res) {
+                        if (res && res.length > 0) {
+                            var font = page.$("#font").val();
+                            if (font.trim().length == 0) {
+                                font = "14px serif";
+                            }
 
+                            var text = {
+                                x: ui.pinned_x,
+                                y: ui.pinned_y,
+                                font: font,
+                                color: board.style.fg_color,
+                                alpha: board.style.alpha,
+                                text: res
+                            };
+
+                            send_thing('text', text);
+                        }
+                        stop_tools();
+                    });
+
+                    // Prevent event from reaching prompt
+                    return false;
                 }
                 else {
                     if (board.style.draw_style != 'line') {
-                        draw_handlers[board.style.draw_style](board.pinned_x, board.pinned_y);
+                        draw_handlers[board.style.draw_style](ui.pinned_x, ui.pinned_y);
                     }
                 }
 
@@ -168,8 +206,8 @@ module.exports = function() {
         var draw_handlers = {
             line: function(end_x, end_y) {
                 var line = {
-                    start_x: board.pinned_x,
-                    start_y: board.pinned_y,
+                    start_x: ui.pinned_x,
+                    start_y: ui.pinned_y,
                     end_x: end_x,
                     end_y: end_y,
                     color: board.style.fg_color,
@@ -180,8 +218,8 @@ module.exports = function() {
                 send_thing('line', line);
             },
             rekt: function(end_x, end_y) {
-                var start_x = board.pinned_x - (board.style.stroke_width / 2);
-                var start_y = board.pinned_y - (board.style.stroke_width / 2);
+                var start_x = ui.pinned_x - (board.style.stroke_width / 2);
+                var start_y = ui.pinned_y - (board.style.stroke_width / 2);
 
                 start_x = Math.floor(start_x);
                 start_y = Math.floor(start_y);
@@ -199,8 +237,8 @@ module.exports = function() {
             },
             circle: function(end_x, end_y) {
                 var circle = {
-                    start_x: board.pinned_x,
-                    start_y: board.pinned_y,
+                    start_x: ui.pinned_x,
+                    start_y: ui.pinned_y,
                     color: board.style.fg_color,
                     alpha: board.style.alpha,
                     radius: board.style.stroke_width,
@@ -223,6 +261,13 @@ module.exports = function() {
                 overlay_ctx.rect(select_box.start_x, select_box.start_y, select_box.width, select_box.height);
                 overlay_ctx.lineWidth = 1;
                 overlay_ctx.stroke();
+
+                overlay_ctx.beginPath();
+                overlay_ctx.setLineDash([1, 1]);
+                overlay_ctx.lineWidth = 1;
+                overlay_ctx.strokeStyle = 'pink';
+                overlay_ctx.rect(select_box.start_x - 1, select_box.start_y - 1, select_box.width + 1, select_box.height + 1);
+                overlay_ctx.stroke();
             }
 
             var contrast_color = helpers.invertColor(board.style.bg_color);
@@ -237,8 +282,35 @@ module.exports = function() {
                     overlay_ctx.fillText(key, p.x, p.y);
                 }
             }
-
             overlay_ctx.stroke();
+
+            if (!ui.left_mouse_button_down && !board.using_tool()) {
+                switch (board.style.draw_style) {
+                    case 'rekt':
+                        var start_x = ui.mouse.x - (board.style.stroke_width / 2);
+                        var start_y = ui.mouse.y - (board.style.stroke_width / 2);
+
+                        start_x = Math.floor(start_x);
+                        start_y = Math.floor(start_y);
+
+                        overlay_ctx.globalAlpha = 1;
+                        overlay_ctx.beginPath();
+                        overlay_ctx.lineWidth = 1;
+                        overlay_ctx.strokeStyle = board.style.fg_color;
+                        overlay_ctx.rect(start_x, start_y, board.style.stroke_width, board.style.stroke_width);
+                        overlay_ctx.stroke();
+                        break;
+
+                    case 'circle':
+                        overlay_ctx.globalAlpha = 1;
+                        overlay_ctx.beginPath();
+                        overlay_ctx.lineWidth = 1;
+                        overlay_ctx.arc(ui.mouse.x, ui.mouse.y, board.style.stroke_width, 0, 2 * Math.PI, false);
+                        overlay_ctx.strokeStyle = board.style.fg_color;
+                        overlay_ctx.stroke();
+                        break;
+                }
+            }
         };
 
         page.$("#overlay_canvas").on('mousemove', function(e) {
@@ -255,6 +327,8 @@ module.exports = function() {
                 y: end_y
             };
 
+            ui.mouse = board.my_position;
+
             if (changed) {
                 board.my_position.last_change = Date.now();
             }
@@ -265,14 +339,14 @@ module.exports = function() {
                 page.$("#color_preview")[0].style.background = rgb;
             }
 
-            if (board.left_mouse_down) {
-                clearTimeout(board.hold_up);
+            if (ui.left_mouse_button_down) {
+                clearTimeout(ui.hold_up);
 
                 if (board.tools.selecting) {
-                    var width = Math.abs(board.pinned_x - end_x);
-                    var height = Math.abs(board.pinned_y - end_y);
-                    var start_x = Math.min(board.pinned_x, end_x);
-                    var start_y = Math.min(board.pinned_y, end_y);
+                    var width = Math.abs(ui.pinned_x - end_x);
+                    var height = Math.abs(ui.pinned_y - end_y);
+                    var start_x = Math.min(ui.pinned_x, end_x);
+                    var start_y = Math.min(ui.pinned_y, end_y);
 
                     board.tools.select_box = {
                         start_x: start_x,
@@ -280,15 +354,12 @@ module.exports = function() {
                         width: width,
                         height: height
                     };
-
-                    redraw_overlay();
                 }
                 else {
                     draw_handlers[board.style.draw_style](end_x, end_y);
-                    board.pinned_x = end_x;
-                    board.pinned_y = end_y;
+                    ui.pinned_x = end_x;
+                    ui.pinned_y = end_y;
                 }
-
             }
         });
 
@@ -318,7 +389,6 @@ module.exports = function() {
 
             if (info.type == 'positions') {
                 board.user_positions = info.positions;
-                redraw_overlay();
             }
 
             if (info.type == 'load') {
@@ -390,30 +460,25 @@ module.exports = function() {
             board.style.phil = $(this).prop('checked');
         });
 
-        var stop_eyedrop = function() {
+        var stop_tools = function() {
             board.tools.eye_drop = false;
-            page.$("#overlay_canvas").removeClass('eye_drop');
-            page.$("#controls [menu_item='eye_drop" + "']").removeClass('active');
-        };
-
-        var stop_selecting = function() {
-            page.$("#rect_tool").removeClass('active');
+            board.tools.fonty = false;
             board.tools.selecting = false;
-            page.$("#textbook").prop('disabled', true);
             board.tools.select_box = {};
-            redraw_overlay();
+
+            page.$("#overlay_canvas").removeClass('eye_drop fonty');
+            page.$("#controls [menu_item='eye_drop" + "']").removeClass('active');
+            page.$("#controls [menu_item='fonty" + "']").removeClass('active');
+
+            page.$("#rect_tool").removeClass('active');
         };
 
         page.$("#rect_tool").on('click', function() {
             $(this).toggleClass('active');
             board.tools.selecting = $(this).hasClass('active');
 
-            page.$("#textbook").prop('disabled', !board.tools.selecting);
             if (!board.tools.selecting) {
-                stop_selecting();
-            }
-            else {
-                stop_eyedrop();
+                stop_tools();
             }
         });
 
@@ -430,10 +495,15 @@ module.exports = function() {
                         page.$("[menu_item='eye_drop']").click();
                         break;
 
+                    // Escape
                     case 27:
-                        stop_selecting();
-                        stop_eyedrop();
+                        stop_tools();
                         break;
+
+                    // 't' = text
+                    case 84:
+                        page.$("[menu_item='fonty']").click();
+                        return false;
 
                     default:
                         break;
@@ -443,8 +513,7 @@ module.exports = function() {
                 switch (e.keyCode) {
                     // Escape
                     case 27:
-                        stop_selecting();
-                        stop_eyedrop();
+                        stop_tools();
                         break;
                     // 'f' = fill
                     case 70:
@@ -452,19 +521,14 @@ module.exports = function() {
                         $.extend(data, board.tools.select_box);
 
                         send_thing('colorful_clear', data);
-                        stop_selecting();
+                        stop_tools();
                         break;
-                    // 't' = text
-                    case 84:
-                        e.stopPropagation();
-                        page.$("#textbook").click();
-                        return false;
                     // delete = erase
                     case 46:
                         var data = $.extend({color: board.style.bg_color}, board.tools.select_box);
 
                         send_thing('colorful_clear', data);
-                        stop_selecting();
+                        stop_tools();
                         break;
                 }
 
@@ -476,32 +540,6 @@ module.exports = function() {
             page.$("#overlay_canvas").focus();
         }, 100);
 
-        page.$("#textbook").prop('disabled', true).on('click', function() {
-            var select_box = board.tools.select_box;
-
-            if (board.tools.selecting && Object.keys(select_box).length > 0) {
-                page.prompt("Input Text", "Input some text!", function(res) {
-                    if (res && res.length > 0) {
-                        var font = page.$("#font").val();
-                        if (font.trim().length == 0) {
-                            font = "14px serif";
-                        }
-
-                        var text = {
-                            x: select_box.start_x,
-                            y: select_box.start_y,
-                            font: font,
-                            color: board.style.fg_color,
-                            alpha: board.style.alpha,
-                            text: res
-                        };
-
-                        send_thing('text', text);
-                    }
-                    stop_selecting();
-                });
-            }
-        });
 
         page.$("#shortcuts").on('click', function() {
             var cuts = ['Make sure the Canvas is selected.', 'b = Create bounding box', 'f = Fill box with foreground color',
@@ -510,5 +548,11 @@ module.exports = function() {
 
         });
 
+        var render_wrapper = function render_wrapper() {
+            redraw_overlay();
+            requestAnimationFrame(render_wrapper);
+        };
+
+        render_wrapper();
     });
 };
