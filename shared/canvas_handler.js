@@ -20,6 +20,7 @@ module.exports = function(ctx) {
                 break;
 
             case 'line':
+                ctx.lineCap = "round";
                 ctx.beginPath();
                 ctx.moveTo(data.start_x, data.start_y);
                 ctx.strokeStyle = data.color;
