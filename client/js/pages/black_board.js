@@ -1,5 +1,60 @@
 module.exports = function() {
+    "use strict";
     var canvas_handler = require('../../../shared/canvas_handler');
+
+    var helpers = {
+        rgb2hex: function(rgb) {
+            rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+            function hex(x) {
+                return ("0" + parseInt(x).toString(16)).slice(-2);
+            }
+
+            return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+        },
+
+        invertColor: function(hexTripletColor) {
+            var color = hexTripletColor;
+            color = color.substring(1);           // remove #
+            color = parseInt(color, 16);          // convert to integer
+            color = 0xFFFFFF ^ color;             // invert three bytes
+            color = color.toString(16);           // convert to hex
+            color = ("000000" + color).slice(-6); // pad with leading zeros
+            color = "#" + color;                  // prepend #
+            return color;
+        }
+    };
+
+    setInterval(function() {
+        if (!window.opener || window.opener.closed) {
+            window.close();
+        }
+    }, 100);
+
+    var board = {
+        pinned_x: null,
+        pinned_y: null,
+        left_mouse_down: false,
+        hold_up: null,
+
+        style: {
+            draw_style: 'line',
+            phil: true,
+            fg_color: '#ffffff',
+            stroke_width: 1,
+            alpha: 1,
+            bg_color: '#000000',
+        },
+        tools: {
+            selecting: false,
+            eye_drop: false,
+            select_box: {}
+        },
+        my_position: {
+            x: -500,
+            y: -500
+        },
+        user_positions: {}
+    };
 
     get_page('black_board', function(page) {
         $('body').append(page.$container);
@@ -9,51 +64,9 @@ module.exports = function() {
             modal: true
         });
 
-        var pinned_x = null;
-        var pinned_y = null;
-        var left_mouse_down = false;
-        var hold_up = null;
-        var fg_color = '#ffffff';
-        var stroke_width = 1;
-        var alpha = 1;
-        var bg_color = '#000000';
-        var draw_style = 'line';
-        var phil = true;
-
-        var selecting = false;
-        var select_box = {};
-        var positions = {};
-
-        // Thanks, StarkOverflow.
-        var rgb2hex = function(rgb) {
-            rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
-            function hex(x) {
-                return ("0" + parseInt(x).toString(16)).slice(-2);
-            }
-
-            return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
-        };
-
-        var invertColor = function(hexTripletColor) {
-            var color = hexTripletColor;
-            color = color.substring(1);           // remove #
-            color = parseInt(color, 16);          // convert to integer
-            color = 0xFFFFFF ^ color;             // invert three bytes
-            color = color.toString(16);           // convert to hex
-            color = ("000000" + color).slice(-6); // pad with leading zeros
-            color = "#" + color;                  // prepend #
-            return color;
-        };
-
         var ctx = page.$("#black_board_canvas")[0].getContext('2d');
-        ctx.strokeStyle = fg_color;
-
-        var position = {
-            x: -500,
-            y: -500
-        };
-
         var overlay_ctx = page.$("#overlay_canvas")[0].getContext('2d');
+        ctx.strokeStyle = board.style.fg_color;
 
         var ch = canvas_handler(ctx);
 
@@ -67,7 +80,14 @@ module.exports = function() {
             var menu_item = $(this).attr('menu_item');
             switch (menu_item) {
                 case 'great_clear':
-                    send_thing('colorful_clear', {color: bg_color, nuke: true});
+                    send_thing('colorful_clear', {color: board.style.bg_color, nuke: true});
+                    break;
+
+                case 'eye_drop':
+                    page.$("#overlay_canvas").addClass('eye_drop');
+                    stop_selecting();
+                    board.tools.eye_drop = true;
+                    $(this).addClass('active');
                     break;
 
                 default:
@@ -76,15 +96,16 @@ module.exports = function() {
         });
 
         page.$("#fg_color").on('change', function() {
-            var $match = page.$("#color_wheel .color[rgb_val='" + fg_color + "']");
+            var $match = page.$("#color_wheel .color[rgb_val='" + board.style.fg_color + "']");
 
             if ($match.length == 0) {
                 var $last = page.$("#color_wheel .color:last").detach();
-                $last.css('background', fg_color);
+                $last.css('background', board.style.fg_color);
+                $last.attr('rgb_val', board.style.fg_color);
                 page.$("#color_wheel").prepend($last);
             }
 
-            fg_color = this.value;
+            board.style.fg_color = this.value;
         });
 
         page.$("#bg_color").on('change', function() {
@@ -92,60 +113,75 @@ module.exports = function() {
         });
 
         page.$("#black_board_canvas").on('mouseleave', function(e) {
-            hold_up = setTimeout(function() {
-                left_mouse_down = false;
+            board.hold_up = setTimeout(function() {
+                board.left_mouse_down = false;
             }, 500);
 
         });
 
         setInterval(function() {
             if (!document.hasFocus()) {
-                left_mouse_down = false;
+                board.left_mouse_down = false;
             }
         }, 250);
 
         page.$("#overlay_canvas").on('mouseup', function(e) {
             if (e.which == 1) {
-                left_mouse_down = false;
+                board.left_mouse_down = false;
             }
         });
 
         page.$("#overlay_canvas").on('mousedown', function(e) {
 
             if (e.which == 1) {
-                left_mouse_down = true;
-                pinned_x = e.clientX - this.offsetLeft;
-                pinned_y = e.clientY - this.offsetTop;
+                board.left_mouse_down = true;
+                board.pinned_x = e.clientX - this.offsetLeft;
+                board.pinned_y = e.clientY - this.offsetTop;
 
-                if (draw_style != 'line') {
-                    draw_handlers[draw_style](pinned_x, pinned_y);
+                var end_x = board.pinned_x;
+                var end_y = board.pinned_y;
+
+                if (board.tools.eye_drop) {
+                    var pixel = ctx.getImageData(end_x, end_y, 1, 1);
+                    var rgb = 'rgb(' + pixel.data[0] + ',' + pixel.data[1] + ',' + pixel.data[2] + ')';
+                    page.$("#fg_color").val(helpers.rgb2hex(rgb)).change();
+                    stop_eyedrop();
                 }
+                else if (board.tools.selecting) {
+
+                }
+                else {
+                    if (board.style.draw_style != 'line') {
+                        draw_handlers[board.style.draw_style](board.pinned_x, board.pinned_y);
+                    }
+                }
+
             }
         });
 
         setInterval(function() {
-            if (Date.now() - position.last_change <= 100) {
-                send_thing('position', position);
+            if (Date.now() - board.my_position.last_change <= 100) {
+                send_thing('position', board.my_position);
             }
         }, 100);
 
         var draw_handlers = {
             line: function(end_x, end_y) {
                 var line = {
-                    start_x: pinned_x,
-                    start_y: pinned_y,
+                    start_x: board.pinned_x,
+                    start_y: board.pinned_y,
                     end_x: end_x,
                     end_y: end_y,
-                    color: fg_color,
-                    alpha: alpha,
-                    line_width: stroke_width
+                    color: board.style.fg_color,
+                    alpha: board.style.alpha,
+                    line_width: board.style.stroke_width
                 };
 
                 send_thing('line', line);
             },
             rekt: function(end_x, end_y) {
-                var start_x = pinned_x - (stroke_width / 2);
-                var start_y = pinned_y - (stroke_width / 2);
+                var start_x = board.pinned_x - (board.style.stroke_width / 2);
+                var start_y = board.pinned_y - (board.style.stroke_width / 2);
 
                 start_x = Math.floor(start_x);
                 start_y = Math.floor(start_y);
@@ -153,22 +189,22 @@ module.exports = function() {
                 var rekt = {
                     start_x: start_x,
                     start_y: start_y,
-                    color: fg_color,
-                    alpha: alpha,
-                    size: stroke_width,
-                    phil: phil
+                    color: board.style.fg_color,
+                    alpha: board.style.alpha,
+                    size: board.style.stroke_width,
+                    phil: board.style.phil
                 };
 
                 send_thing('rekt', rekt);
             },
             circle: function(end_x, end_y) {
                 var circle = {
-                    start_x: pinned_x,
-                    start_y: pinned_y,
-                    color: fg_color,
-                    alpha: alpha,
-                    radius: stroke_width,
-                    phil: phil
+                    start_x: board.pinned_x,
+                    start_y: board.pinned_y,
+                    color: board.style.fg_color,
+                    alpha: board.style.alpha,
+                    radius: board.style.stroke_width,
+                    phil: board.style.phil
                 };
 
                 send_thing('circle', circle);
@@ -177,26 +213,27 @@ module.exports = function() {
 
         var redraw_overlay = function() {
             overlay_ctx.clearRect(0, 0, 1280, 720);
+            var select_box = board.tools.select_box;
 
             if (select_box && Object.keys(select_box).length > 0) {
                 overlay_ctx.beginPath();
                 overlay_ctx.globalAlpha = 1;
-                overlay_ctx.strokeStyle = fg_color;
+                overlay_ctx.strokeStyle = board.style.fg_color;
                 overlay_ctx.setLineDash([5, 5]);
                 overlay_ctx.rect(select_box.start_x, select_box.start_y, select_box.width, select_box.height);
                 overlay_ctx.lineWidth = 1;
                 overlay_ctx.stroke();
             }
 
-            var contrast_color = invertColor(bg_color);
+            var contrast_color = helpers.invertColor(board.style.bg_color);
             overlay_ctx.beginPath();
             ctx.globalAlpha = 0.5;
             overlay_ctx.font = "14px serif";
             overlay_ctx.fillStyle = contrast_color;
 
-            for (var key in positions) {
+            for (var key in board.user_positions) {
                 if (key != app.profile.username) {
-                    var p = positions[key];
+                    var p = board.user_positions[key];
                     overlay_ctx.fillText(key, p.x, p.y);
                 }
             }
@@ -209,29 +246,35 @@ module.exports = function() {
             var end_y = e.clientY - this.offsetTop;
 
             var changed = false;
-            if (position.x != end_x || position.y != end_y) {
+            if (board.my_position.x != end_x || board.my_position.y != end_y) {
                 changed = true;
             }
 
-            position = {
+            board.my_position = {
                 x: end_x,
                 y: end_y
             };
 
             if (changed) {
-                position.last_change = Date.now();
+                board.my_position.last_change = Date.now();
             }
 
-            if (left_mouse_down) {
-                clearTimeout(hold_up);
+            if (board.tools.eye_drop) {
+                var pixel = ctx.getImageData(end_x, end_y, 1, 1);
+                var rgb = 'rgb(' + pixel.data[0] + ',' + pixel.data[1] + ',' + pixel.data[2] + ')';
+                page.$("#color_preview")[0].style.background = rgb;
+            }
 
-                if (selecting) {
-                    var width = Math.abs(pinned_x - end_x);
-                    var height = Math.abs(pinned_y - end_y);
-                    var start_x = Math.min(pinned_x, end_x);
-                    var start_y = Math.min(pinned_y, end_y);
+            if (board.left_mouse_down) {
+                clearTimeout(board.hold_up);
 
-                    select_box = {
+                if (board.tools.selecting) {
+                    var width = Math.abs(board.pinned_x - end_x);
+                    var height = Math.abs(board.pinned_y - end_y);
+                    var start_x = Math.min(board.pinned_x, end_x);
+                    var start_y = Math.min(board.pinned_y, end_y);
+
+                    board.tools.select_box = {
                         start_x: start_x,
                         start_y: start_y,
                         width: width,
@@ -241,9 +284,9 @@ module.exports = function() {
                     redraw_overlay();
                 }
                 else {
-                    draw_handlers[draw_style](end_x, end_y);
-                    pinned_x = end_x;
-                    pinned_y = end_y;
+                    draw_handlers[board.style.draw_style](end_x, end_y);
+                    board.pinned_x = end_x;
+                    board.pinned_y = end_y;
                 }
 
             }
@@ -255,7 +298,7 @@ module.exports = function() {
             var data = info.data;
 
             if (info.type == 'colorful_clear' && data.nuke) {
-                bg_color = data.color;
+                board.style.bg_color = data.color;
             }
 
             if (info.type == 'load') {
@@ -274,12 +317,12 @@ module.exports = function() {
             }
 
             if (info.type == 'positions') {
-                positions = info.positions;
+                board.user_positions = info.positions;
                 redraw_overlay();
             }
 
             if (info.type == 'load') {
-                bg_color = info.bg_color;
+                board.style.bg_color = info.bg_color;
             }
 
             if ($wait_dialog) {
@@ -290,26 +333,20 @@ module.exports = function() {
             ch.handle_thing(info);
         });
 
-        setInterval(function() {
-            if (!window.opener || window.opener.closed) {
-                window.close();
-            }
-        }, 100);
-
         var colors = ['red', 'blue', 'orange', 'green', 'black', 'white'];
         colors.forEach(function(color) {
             var $color = $('<div class="color"></div>');
             $color.css('background', color);
             page.$("#color_wheel").append($color);
-            $color.attr('rgb_val', rgb2hex($color.css('backgroundColor')));
+            $color.attr('rgb_val', helpers.rgb2hex($color.css('backgroundColor')));
         });
 
         page.$("#color_wheel").on('click', '.color', function() {
             var bg_color = $(this).css('backgroundColor');
-            bg_color = rgb2hex(bg_color);
+            bg_color = helpers.rgb2hex(bg_color);
 
             page.$("#fg_color").val(bg_color);
-            fg_color = bg_color;
+            board.style.fg_color = bg_color;
         });
 
         var $size_thing_handle = $("#size_thing_handle");
@@ -321,7 +358,7 @@ module.exports = function() {
                 },
                 slide: function(event, ui) {
                     $size_thing_handle.text(ui.value);
-                    stroke_width = ui.value;
+                    board.style.stroke_width = ui.value;
                 }
             }
         );
@@ -336,45 +373,70 @@ module.exports = function() {
                 },
                 slide: function(event, ui) {
                     $alpha_thing_handle.text(ui.value);
-                    alpha = ui.value / 100;
+                    board.style.alpha = ui.value / 100;
                 }
             }
         );
 
         window.opener.postMessage({action: 'load'}, app.domain);
 
-        page.$("#buttons button:not(#textbook)").on('click', function() {
-            $(this).siblings('button').removeClass('active');
+        page.$("#buttons button[draw_style]").on('click', function() {
+            $(this).siblings('button[draw_style]').removeClass('active');
             $(this).addClass('active');
-            draw_style = $(this).attr('draw_style');
+            board.style.draw_style = $(this).attr('draw_style');
         });
 
         page.$("#phil").on('change', function() {
-            phil = $(this).prop('checked');
+            board.style.phil = $(this).prop('checked');
         });
+
+        var stop_eyedrop = function() {
+            board.tools.eye_drop = false;
+            page.$("#overlay_canvas").removeClass('eye_drop');
+            page.$("#controls [menu_item='eye_drop" + "']").removeClass('active');
+        };
 
         var stop_selecting = function() {
             page.$("#rect_tool").removeClass('active');
-            selecting = false;
+            board.tools.selecting = false;
             page.$("#textbook").prop('disabled', true);
-            select_box = {};
+            board.tools.select_box = {};
             redraw_overlay();
         };
 
         page.$("#rect_tool").on('click', function() {
             $(this).toggleClass('active');
-            selecting = $(this).hasClass('active');
+            board.tools.selecting = $(this).hasClass('active');
 
-            page.$("#textbook").prop('disabled', !selecting);
-            if (!selecting) {
+            page.$("#textbook").prop('disabled', !board.tools.selecting);
+            if (!board.tools.selecting) {
                 stop_selecting();
+            }
+            else {
+                stop_eyedrop();
             }
         });
 
         page.$("#overlay_canvas").on('keydown', function(e) {
-            if (!selecting) {
-                if (e.keyCode == 66) {
-                    page.$("#rect_tool").click();
+            if (!board.tools.selecting) {
+                switch (e.keyCode) {
+                    // 'b'
+                    case 66:
+                        page.$("#rect_tool").click();
+                        break;
+
+                    // 'c'
+                    case 67:
+                        page.$("[menu_item='eye_drop']").click();
+                        break;
+
+                    case 27:
+                        stop_selecting();
+                        stop_eyedrop();
+                        break;
+
+                    default:
+                        break;
                 }
             }
             else {
@@ -382,11 +444,12 @@ module.exports = function() {
                     // Escape
                     case 27:
                         stop_selecting();
+                        stop_eyedrop();
                         break;
                     // 'f' = fill
                     case 70:
-                        var data = {color: fg_color, alpha: alpha};
-                        $.extend(data, select_box);
+                        var data = {color: board.style.fg_color, alpha: board.style.alpha};
+                        $.extend(data, board.tools.select_box);
 
                         send_thing('colorful_clear', data);
                         stop_selecting();
@@ -398,7 +461,7 @@ module.exports = function() {
                         return false;
                     // delete = erase
                     case 46:
-                        var data = $.extend({color: bg_color}, select_box);
+                        var data = $.extend({color: board.style.bg_color}, board.tools.select_box);
 
                         send_thing('colorful_clear', data);
                         stop_selecting();
@@ -414,7 +477,9 @@ module.exports = function() {
         }, 100);
 
         page.$("#textbook").prop('disabled', true).on('click', function() {
-            if (selecting && Object.keys(select_box).length > 0) {
+            var select_box = board.tools.select_box;
+
+            if (board.tools.selecting && Object.keys(select_box).length > 0) {
                 page.prompt("Input Text", "Input some text!", function(res) {
                     if (res && res.length > 0) {
                         var font = page.$("#font").val();
@@ -426,8 +491,8 @@ module.exports = function() {
                             x: select_box.start_x,
                             y: select_box.start_y,
                             font: font,
-                            color: fg_color,
-                            alpha: alpha,
+                            color: board.style.fg_color,
+                            alpha: board.style.alpha,
                             text: res
                         };
 
@@ -440,9 +505,10 @@ module.exports = function() {
 
         page.$("#shortcuts").on('click', function() {
             var cuts = ['Make sure the Canvas is selected.', 'b = Create bounding box', 'f = Fill box with foreground color',
-                'del = Erase box', 't = Create text starting at top left corner.'];
+                'del = Erase box', 't = Create text starting at top left corner.', 'c = Eyedrop shortcut.'];
             page.alert("Shortcuts", cuts.join('<br/>'));
 
         });
+
     });
 };
