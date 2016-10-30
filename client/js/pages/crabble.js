@@ -321,6 +321,7 @@ module.exports = function() {
             // TODO - reduce to methods
             if (game.selected_tile && ui.left_mouse_down) {
                 ctx.beginPath();
+                ctx.lineWidth = 1;
                 ctx.globalAlpha = 0.5;
                 ctx.fillStyle = 'orange';
                 ctx.strokeStyle = 'black';
@@ -330,6 +331,7 @@ module.exports = function() {
                 ctx.rect(x, y, board.tile_size, board.tile_size);
                 ctx.fill();
 
+                letter = game.selected_tile;
                 var display_letter = letter;
                 if (letter == '_') {
                     display_letter = ' ';
