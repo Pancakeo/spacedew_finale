@@ -545,7 +545,22 @@ module.exports = function() {
             var cuts = ['Make sure the Canvas is selected.', 'b = Create bounding box', 'f = Fill box with foreground color',
                 'del = Erase box', 't = Create text starting at top left corner.', 'c = Eyedrop shortcut.'];
             page.alert("Shortcuts", cuts.join('<br/>'));
+        });
 
+        page.$("#save").on('click', function() {
+            page.$("#black_board_canvas")[0].toBlob(function(blob) {
+                if (page.blob_url) {
+                    URL.revokeObjectURL(page.blob_url);
+                }
+
+                // Taken from FileSaver.js
+                page.blob_url = URL.createObjectURL(blob);
+                var save_link = document.createElementNS("http://www.w3.org/1999/xhtml", "a");
+                save_link.href = page.blob_url;
+                save_link.download = 'canvas.png';
+                var event = new MouseEvent("click");
+                save_link.dispatchEvent(event);
+            });
         });
 
         var render_wrapper = function render_wrapper() {
