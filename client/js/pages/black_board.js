@@ -484,6 +484,7 @@ module.exports = function() {
 
         page.$("#overlay_canvas").on('keydown', function(e) {
             if (!board.tools.selecting) {
+
                 switch (e.keyCode) {
                     // 'b'
                     case 66:
@@ -498,6 +499,14 @@ module.exports = function() {
                     // Escape
                     case 27:
                         stop_tools();
+                        break;
+
+                    // 's' - save (if Ctrl)
+                    case 83:
+                        if (e.ctrlKey) {
+                            page.$("#save").click();
+                            return false;
+                        }
                         break;
 
                     // 't' = text
@@ -557,7 +566,7 @@ module.exports = function() {
                 page.blob_url = URL.createObjectURL(blob);
                 var save_link = document.createElementNS("http://www.w3.org/1999/xhtml", "a");
                 save_link.href = page.blob_url;
-                save_link.download = 'canvas.png';
+                save_link.download = 'canvas_' + page.toolio.generate_id() + '.png';
                 var event = new MouseEvent("click");
                 save_link.dispatchEvent(event);
             });
