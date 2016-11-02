@@ -194,7 +194,10 @@ module.exports = function() {
                             if ($emu_dropdown.val() == null) {
                                 var $destiny = $('<option>' + emu.text + '</option>');
                                 $emu_dropdown.append($destiny);
-                                $emu_dropdown.val(emu.text);
+
+                                var val_text = emu.text.replace(/&lt;/g, '<');
+                                val_text = val_text.replace(/&gt;/g, '>');
+                                $emu_dropdown.val(val_text);
                             }
 
                             var team_play = (emu.team_play == true);
