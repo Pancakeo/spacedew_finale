@@ -23,9 +23,30 @@ module.exports = function(options) {
         var last_emote_ts = null;
         var shown_flood = false;
         page.$("#composer").on('keydown', function(e) {
-            var normal_key_code = String.fromCharCode(e.keyCode - 48);
+            var key = e.keyCode - 48;
 
-            var emote = app.holy_cow[normal_key_code];
+            switch (e.keyCode) {
+                // '/'
+                case 111:
+                    key = '/';
+                    break;
+
+                // '*'
+                case 106:
+                    key = '*';
+                    break;
+
+                // '-'
+                case 109:
+                    key = '-';
+                    break;
+
+                default:
+                    key = String.fromCharCode(e.keyCode - 48);
+                    break;
+            }
+
+            var emote = app.holy_cow[key];
             if (emote) {
                 shown_flood = false;
                 last_emote_ts = Date.now();

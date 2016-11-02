@@ -102,31 +102,59 @@ module.exports = function() {
                 });
 
                 var $emus = page.$("#holy_cows #emu_things tbody");
-                var numpad_keys = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+                var numpad_keys = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, '/', '*', '-'];
 
                 var $emu_dropdown = $('<select class="emu_dropdown" id="emu_dropdown"/>');
                 app.emu_list.forEach(function(emu) {
                     $emu_dropdown.append('<option>' + emu + '</option>');
                 });
 
-                for (var key in numpad_keys) {
+                numpad_keys.forEach(function(key) {
                     var $choice = page.get_template('emu_row');
                     $choice.find('#key_code').text(key);
+                    $choice.prop('key', key);
                     $choice.find('select').replaceWith($emu_dropdown.clone());
                     $emus.append($choice);
-                }
+                });
 
-                page.$("#emu_things .emu_row").on('change', 'input, select', function() {
+                page.$("#emu_things .emu_row").on('click.wup', 'i[menu_item]', function() {
+                    var $emu_row = $(this).closest('.emu_row');
+
+                    page.prompt('You Some Kind Of Clever Guy?', 'Write your own destiny', function(user_destiny) {
+                        if (user_destiny && user_destiny.trim().length > 0) {
+                            var key = $emu_row.prop('key');
+                            user_outfit.holy_cow[key].text = user_destiny;
+
+                            var $dropdown = $emu_row.find('#emu_dropdown');
+                            var has_option = false;
+                            $dropdown.find('option').each(function() {
+                                var text = $(this).text();
+                                if (text.toLowerCase() == user_destiny.toLowerCase()) {
+                                    has_option = true;
+                                }
+                            });
+
+                            if (!has_option) {
+                                var $destiny = $('<option>' + user_destiny + '</option>');
+                                $dropdown.append($destiny);
+                            }
+
+                            $dropdown.val(user_destiny);
+                        }
+                    });
+                });
+
+                page.$("#emu_things .emu_row").on('change.heh', 'input, select', function() {
                     var control = $(this).attr('id');
-                    var row = $(this).closest('.emu_row').index();
+                    var key = $(this).closest('.emu_row').prop('key');
 
                     switch (control) {
                         case 'emu_dropdown':
-                            user_outfit.holy_cow[row].text = $(this).val();
+                            user_outfit.holy_cow[key].text = $(this).val();
                             break;
                         case 'team_play':
                             var checked = $(this).prop('checked');
-                            user_outfit.holy_cow[row].team_play = checked;
+                            user_outfit.holy_cow[key].team_play = checked;
                             break;
 
                         default:
@@ -154,11 +182,21 @@ module.exports = function() {
                         page.$("#user_list_style #" + key).val(user_outfit.user[key]);
                     }
 
-                    page.$("#emu_things .emu_row").each(function(idx) {
+                    page.$("#emu_things .emu_row").each(function() {
                         var $row = $(this);
-                        var emu = user_outfit.holy_cow[idx];
+                        var key = $row.prop('key');
+                        var emu = user_outfit.holy_cow[key];
+
                         if (emu) {
-                            $row.find('#emu_dropdown').val(emu.text);
+                            var $emu_dropdown = $row.find('#emu_dropdown');
+                            $emu_dropdown.val(emu.text);
+
+                            if ($emu_dropdown.val() == null) {
+                                var $destiny = $('<option>' + emu.text + '</option>');
+                                $emu_dropdown.append($destiny);
+                                $emu_dropdown.val(emu.text);
+                            }
+
                             var team_play = (emu.team_play == true);
                             $row.find('#team_play').prop('checked', team_play);
                         }

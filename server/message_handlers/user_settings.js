@@ -56,22 +56,7 @@ exports.handle_message = function handle_message(session, message) {
                 console.error("Server settings exceeded limit!");
                 return;
             }
-
-            if (data.outfit.holy_cow) {
-                for (var key in data.outfit.holy_cow) {
-                    var enum_val = data.outfit.holy_cow[key].text;
-
-                    if (!emu_list.contains(enum_val)) {
-                        console.log(enum_val + ' not found');
-                        data.outfit.holy_cow[key] = {
-                            text: 'Whew.',
-                            team_play: true
-                        }
-                    }
-                }
-
-            }
-
+            
             storage_thing.each_param_sql('SELECT * FROM user_settings WHERE user_id = ?', [user_id]).then(function(result) {
 
                 if (result.rows.length == 0) {

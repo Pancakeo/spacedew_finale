@@ -8,7 +8,10 @@ var emus = {
     6: {text: 'This is for you.'},
     7: {text: 'Incoming!'},
     8: {text: 'Siiiick!'},
-    9: {text: 'csaw'}
+    9: {text: 'csaw'},
+    '/': {text: '@_@'},
+    '*': {text: 'Wait.'},
+    '-': {text: 'Okay.'}
 };
 
 module.exports = emus;
