@@ -23,7 +23,7 @@ module.exports = function(options) {
         var last_emote_ts = null;
         var shown_flood = false;
         page.$("#composer").on('keydown', function(e) {
-            var key = e.keyCode - 48;
+            var key = null;
 
             switch (e.keyCode) {
                 // '/'
@@ -42,7 +42,11 @@ module.exports = function(options) {
                     break;
 
                 default:
-                    key = String.fromCharCode(e.keyCode - 48);
+                    // Only map numpad 0-9.
+                    if (e.keyCode >= 96 && e.keyCode <= 105) {
+                        key = String.fromCharCode(e.keyCode - 48);
+                    }
+
                     break;
             }
 
