@@ -32,6 +32,15 @@ module.exports = (function() {
                         wupsocket.send('connection', 'pong', {});
                     }, 7500);
 
+                    // Hook up the Prime Socket.
+                    prime_socket.postMessage({
+                        action: 'binary_connect',
+                        params: {
+                            server_ip: app.settings.binary_server,
+                            connection_info: wupsocket.connection_info
+                        }
+                    });
+
                     break;
                 default:
                     break;
@@ -48,6 +57,10 @@ module.exports = (function() {
                 wupsocket.reconnecting = false;
                 wupsocket.last_reconnect_attempt = 0;
                 connected = true;
+                break;
+
+            case 'binary_disconnect':
+                event_bus.emit('ws.binary_disconnect');
                 break;
 
             case 'disconnect':

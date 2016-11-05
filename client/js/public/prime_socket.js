@@ -1,23 +1,6 @@
 var ws;
+var binary_ws;
 var BUFFER_QUEUE_THRESHOLD = 1024 * 256;
-
-var prime_socket = {
-    queued_things: [],
-    queue: function(thing) {
-        prime_socket.queued_things.push(thing);
-    },
-    send_next: function() {
-        if (prime_socket.queued_things.length > 0 && ws.bufferedAmount < BUFFER_QUEUE_THRESHOLD) {
-            var thing = prime_socket.queued_things.shift();
-            ws.send(thing);
-        }
-    }
-};
-
-// Check queue and send
-prime_socket.queue_checker = setInterval(function() {
-    prime_socket.send_next();
-}, 33);
 
 var util = {};
 util.array_buffer_to_string = function(buf) {
@@ -49,23 +32,28 @@ addEventListener('message', function(e) {
 
     switch (e.data.action) {
 
-        case 'connect':
-            ws = new WebSocket(params.server_ip);
-            ws.binaryType = "arraybuffer";
+        case 'binary_connect':
+            binary_ws = new WebSocket(params.server_ip);
+            binary_ws.binaryType = "arraybuffer";
 
-            ws.onopen = function(event) {
-                postMessage({action: 'connect'});
+            binary_ws.onopen = function(event) {
+                var message = {
+                    type: 'link_binary',
+                    connection_id: params.connection_info.connection_id
+                };
+
+                binary_ws.send(JSON.stringify(message));
             };
 
-            ws.onerror = function(event) {
-                postMessage({action: 'error'});
+            binary_ws.onerror = function(event) {
+                postMessage({action: 'binary_error'});
             };
 
-            ws.onclose = function(event) {
-                postMessage({action: 'disconnect'});
+            binary_ws.onclose = function(event) {
+                postMessage({action: 'binary_disconnect'});
             };
 
-            ws.onmessage = function(event) {
+            binary_ws.onmessage = function(event) {
                 if (event.data instanceof ArrayBuffer) {
                     var dv = new DataView(event.data, 0, 4);
                     var header_length = dv.getUint32(0, true);
@@ -82,10 +70,27 @@ addEventListener('message', function(e) {
                             buffer: buffer
                         }
                     }, [buffer]);
-
-                    return;
                 }
+            };
+            break;
 
+        case 'connect':
+            ws = new WebSocket(params.server_ip);
+
+
+            ws.onopen = function(event) {
+                postMessage({action: 'connect'});
+            };
+
+            ws.onerror = function(event) {
+                postMessage({action: 'error'});
+            };
+
+            ws.onclose = function(event) {
+                postMessage({action: 'disconnect'});
+            };
+
+            ws.onmessage = function(event) {
                 var parsed_message = JSON.parse(event.data);
                 postMessage({
                     action: 'message',
@@ -94,13 +99,11 @@ addEventListener('message', function(e) {
                     }
                 });
             };
-
             break;
 
         case 'disconnect':
-            if (ws != null) {
-                ws.close();
-            }
+            ws && ws.close();
+            binary_ws && binary_ws.close();
             break;
 
         case 'send':
@@ -109,7 +112,7 @@ addEventListener('message', function(e) {
 
         case 'send_binary':
             var blob = util.blob_from_buffer(params.blob, params.meta);
-            prime_socket.queue(blob);
+            binary_ws.send(blob);
             break;
 
         default:

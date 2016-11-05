@@ -208,6 +208,10 @@ module.exports = function($parent, options) {
             page.ws.send('login', 'reconnect', {auth_key: localStorage.auth_key, username: app.profile.username});
         });
 
+        event_bus.on('ws.binary_disconnect', function() {
+            app.append_system('Binary disconnected. Hopefully it comes back!', {room_id: app.get_active_room(true), color: 'red'});
+        });
+
         event_bus.on('ws.disconnect', function() {
             if (localStorage.instance_id != app.instance_id) {
                 console.log('localStorage', localStorage.instance_id);

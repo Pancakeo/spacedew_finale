@@ -81,6 +81,7 @@ var chat_port = app.config.chat_port;
 var uuid = require('node-uuid');
 
 require('./servers/http_server');
+require('./servers/binary_server');
 var sessionator = require('./managers/sessionator');
 
 console.log("Listening for WebSocket requests (chat) on port " + chat_port);

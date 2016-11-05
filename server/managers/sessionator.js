@@ -28,6 +28,19 @@ exports.get_sessions = function() {
     return sessions;
 };
 
+exports.link_binary = function(binary_cid, binary_ws) {
+
+    for (var cid in sessions) {
+        if (cid == binary_cid) {
+            var s = sessions[cid];
+            s.binary_ws = binary_ws;
+            console.log('Linked ' + cid + ' to binary conneciton.');
+            return s;
+        }
+    }
+};
+
+
 exports.broadcast = function(type, sub_type, data, options) {
     options = Object.assign({
         require_logged_in: true,
@@ -114,6 +127,7 @@ exports.connect = function(connection_id, ws) {
     var session = {};
     session = {
         ws: ws,
+        binary_ws: null,
         connection_id: connection_id,
         ip_address: ws.upgradeReq && ws.upgradeReq.connection && ws.upgradeReq.connection.remoteAddress,
         logged_in: false,
@@ -149,7 +163,13 @@ exports.connect = function(connection_id, ws) {
         send_buffer: function(buffer, meta, send_options) {
             send_options = Object.assign({}, send_options);
 
-            if (ws.readyState == 1) {
+            if (!session.binary_ws) {
+                return;
+            }
+            
+            var binary_ws = session.binary_ws;
+
+            if (binary_ws.readyState == 1) {
                 var header_string = JSON.stringify(meta);
                 var header = new Buffer(header_string.length * 2);
 
@@ -168,7 +188,7 @@ exports.connect = function(connection_id, ws) {
                 }
 
                 try {
-                    ws.send(blob);
+                    binary_ws.send(blob);
                 }
                 catch (e) {
                     console.log('send_buffer - session not connected.');
@@ -225,7 +245,7 @@ exports.connect = function(connection_id, ws) {
     };
 
     // console.log("Connected.", session.get_debug_info());
-    session.send('connection', 'connection_info', {fancy: true});
+    session.send('connection', 'connection_info', {connection_id: connection_id});
     session.send('connection', 'heartbeat', {ping_sent_at: Date.now()});
 
     sessions[connection_id] = session;
