@@ -2,6 +2,8 @@ var ws;
 var binary_ws;
 var BUFFER_QUEUE_THRESHOLD = 1024 * 256;
 
+var binary_life = null;
+
 var util = {};
 util.array_buffer_to_string = function(buf) {
     return String.fromCharCode.apply(null, new Uint16Array(buf));
@@ -42,6 +44,17 @@ addEventListener('message', function(e) {
                     connection_id: params.connection_info.connection_id
                 };
 
+                // Heh heh
+                clearInterval(binary_life);
+                binary_life = setInterval(function() {
+                    var message = {
+                        type: 'heartbeat',
+                        timestamp: Date.now()
+                    };
+
+                    binary_ws.send(JSON.stringify(message));
+                }, 7500);
+
                 binary_ws.send(JSON.stringify(message));
             };
 
@@ -76,7 +89,6 @@ addEventListener('message', function(e) {
 
         case 'connect':
             ws = new WebSocket(params.server_ip);
-
 
             ws.onopen = function(event) {
                 postMessage({action: 'connect'});

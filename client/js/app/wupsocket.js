@@ -3,7 +3,7 @@ module.exports = (function() {
     var toolio = require('./toolio');
     var event_bus = require('../../../shared/event_bus');
 
-    var CHUNK_SIZE = 1024 * 128; // xx kb.
+    var CHUNK_SIZE = 1024 * 1024; // xx kb.
 
     var wupsocket = {
         binary_transfers: {}
