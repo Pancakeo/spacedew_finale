@@ -2,8 +2,16 @@ module.exports = (function() {
     "use strict";
     var toolio = require('./toolio');
     var event_bus = require('../../../shared/event_bus');
+    var DEFAULT_CHUNK_SIZE = 1024 * 1024;
+    var chunk_size = DEFAULT_CHUNK_SIZE;
 
-    var CHUNK_SIZE = 1024 * 1024; // xx kb.
+    if (localStorage.chunk_size) {
+        var user_chunk_size = Number(localStorage.chunk_size);
+
+        if (!isNaN(user_chunk_size) && user_chunk_size > 0) {
+            chunk_size = user_chunk_size;
+        }
+    }
 
     var wupsocket = {
         binary_transfers: {}
@@ -118,7 +126,7 @@ module.exports = (function() {
                     if (meta.no_data == true) {
                         var cur_chunk = wupsocket.binary_transfers[meta.transfer_id] && wupsocket.binary_transfers[meta.transfer_id].chunk;
                         cur_chunk = cur_chunk || 0;
-                        stored_size = cur_chunk * CHUNK_SIZE;
+                        stored_size = cur_chunk * chunk_size;
                     }
                     else {
                         var stored_size = wupsocket.binary_transfers[meta.transfer_id].data.reduce(function(prev, chunk) {
@@ -155,7 +163,7 @@ module.exports = (function() {
                 transfer_info.debut = true;
             }
 
-            if (start + CHUNK_SIZE >= buffer.byteLength) {
+            if (start + chunk_size >= buffer.byteLength) {
                 transfer_info.complete = true;
                 transfer_info.file_info = meta;
 
@@ -169,7 +177,7 @@ module.exports = (function() {
                 }, [chunk]);
             }
             else {
-                var chunk = buffer.slice(start, start + CHUNK_SIZE);
+                var chunk = buffer.slice(start, start + chunk_size);
                 prime_socket.postMessage({
                     action: 'send_binary',
                     params: {
@@ -179,7 +187,7 @@ module.exports = (function() {
                 }, [chunk]);
 
                 setTimeout(function() {
-                    send_chunk(buffer, meta, start + CHUNK_SIZE);
+                    send_chunk(buffer, meta, start + chunk_size);
                 }, 0);
             }
         };
