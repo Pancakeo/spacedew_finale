@@ -166,7 +166,7 @@ exports.connect = function(connection_id, ws) {
             if (!session.binary_ws) {
                 return;
             }
-            
+
             var binary_ws = session.binary_ws;
 
             if (binary_ws.readyState == 1) {

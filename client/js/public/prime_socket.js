@@ -32,7 +32,25 @@ util.blob_from_buffer = function(buffer, meta) {
 addEventListener('message', function(e) {
     var params = e.data.params;
 
+    var send_if_connected = function(ws_thing, message) {
+        var closing_states = [2, 3];
+
+        if (ws_thing.readyState == 1) {
+            ws_thing.send(message);
+        }
+        else {
+            if (closing_states.indexOf(ws_thing.readyState) >= 0) {
+                ws_thing.close();
+            }
+        }
+    };
+
     switch (e.data.action) {
+
+        case 'send_binary':
+            var blob = util.blob_from_buffer(params.blob, params.meta);
+            send_if_connected(binary_ws, blob);
+            break;
 
         case 'binary_connect':
             binary_ws = new WebSocket(params.server_ip);
@@ -44,6 +62,8 @@ addEventListener('message', function(e) {
                     connection_id: params.connection_info.connection_id
                 };
 
+                send_if_connected(binary_ws, JSON.stringify(message));
+
                 // Heh heh
                 clearInterval(binary_life);
                 binary_life = setInterval(function() {
@@ -52,10 +72,8 @@ addEventListener('message', function(e) {
                         timestamp: Date.now()
                     };
 
-                    binary_ws.send(JSON.stringify(message));
+                    send_if_connected(binary_ws, JSON.stringify(message));
                 }, 7500);
-
-                binary_ws.send(JSON.stringify(message));
             };
 
             binary_ws.onerror = function(event) {
@@ -83,6 +101,9 @@ addEventListener('message', function(e) {
                             buffer: buffer
                         }
                     }, [buffer]);
+                }
+                else {
+                    console.log(event.data);
                 }
             };
             break;
@@ -119,12 +140,7 @@ addEventListener('message', function(e) {
             break;
 
         case 'send':
-            ws.send(JSON.stringify(params.message));
-            break;
-
-        case 'send_binary':
-            var blob = util.blob_from_buffer(params.blob, params.meta);
-            binary_ws.send(blob);
+            send_if_connected(ws, JSON.stringify(params.message));
             break;
 
         default:

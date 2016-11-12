@@ -563,7 +563,7 @@ module.exports = function(options) {
         });
 
         window.onbeforeunload = function(e) {
-            if (app.force_logout != true) {
+            if (app.force_logout != true && localStorage.is_local_dev == null) {
                 return true;
             }
         };
