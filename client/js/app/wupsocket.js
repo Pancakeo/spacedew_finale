@@ -1,7 +1,7 @@
 module.exports = (function() {
     "use strict";
-    var toolio = require('./toolio');
-    var event_bus = require('../../../shared/event_bus');
+    var toolio = app.toolio;
+    var event_bus = app.event_bus;
     var DEFAULT_CHUNK_SIZE = 1024 * 1024;
     var chunk_size = DEFAULT_CHUNK_SIZE;
 

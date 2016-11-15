@@ -2,6 +2,7 @@
 
 var handlers = {};
 var normalized_path = require("path").join(__dirname, '../message_handlers');
+var sessionator = require('../managers/sessionator');
 
 require("fs").readdirSync(normalized_path).forEach(function(file) {
     var handler = require('../message_handlers/' + file);
@@ -17,7 +18,7 @@ require("fs").readdirSync(normalized_path).forEach(function(file) {
 
 exports.handle = function(session, mixed_message) {
     session.last_activity = Date.now();
-    
+
     if (mixed_message instanceof Buffer) {
         handlers.binary_dumptruck.handle_buffer(session, mixed_message);
         return;
@@ -25,7 +26,7 @@ exports.handle = function(session, mixed_message) {
 
     var parsed_message = JSON.parse(mixed_message);
     var type = parsed_message.type;
-    
+
     if (typeof(handlers[type]) == "object") {
         var handler = handlers[type];
 

@@ -1,5 +1,5 @@
 module.exports = function(page_name, callback) {
-    var event_bus = require('../../../shared/event_bus');
+    var event_bus = app.event_bus;
     var toolio = require('../app/toolio');
     var ws = require('../app/wupsocket');
 

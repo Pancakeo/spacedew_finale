@@ -1,5 +1,5 @@
 module.exports = function() {
-    var event_bus = require('../../../shared/event_bus');
+    var event_bus = app.event_bus;
     var ws = require('../app/wupsocket');
 
     get_page('create_account', function(page) {

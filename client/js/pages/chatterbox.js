@@ -1,11 +1,17 @@
 module.exports = function($parent, options) {
     get_page('chatterbox', function(page) {
-        var event_bus = require('../../../shared/event_bus');
+        var event_bus = app.event_bus;
         var linkomatic = require('../app/linkomatic')();
         $parent.append(page.$container);
 
         // Adopted from Diego's gist https://gist.github.com/dperini/729294
         var url_validator = /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$/i;
+
+        app.event_bus.on('window.resize', function() {
+            page.$("#chat_rooms .chat_thing").each(function() {
+                scroll_chat($(this));
+            });
+        });
 
         var scroll_chat = function($chat) {
             if (app.settings.scroll_lock == true) {

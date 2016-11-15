@@ -102,9 +102,6 @@ addEventListener('message', function(e) {
                         }
                     }, [buffer]);
                 }
-                else {
-                    console.log(event.data);
-                }
             };
             break;
 

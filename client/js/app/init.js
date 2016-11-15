@@ -29,6 +29,8 @@ module.exports = (function() {
     }
 
     window.app = {
+        event_bus: require('../../../shared/event_bus'),
+        toolio: require('../app/toolio'),
         instance_id: instance_id,
         domain: domain,
         settings: {},
@@ -36,6 +38,8 @@ module.exports = (function() {
         emu_list: [],
         world: {user_settings: {}} // Users and shit.
     };
+
+    app.ws = require('../app/wupsocket'); // for Lustmord
 
     // Dialog stuff.
     $.widget("yehrye.dialog", $.ui.dialog, {

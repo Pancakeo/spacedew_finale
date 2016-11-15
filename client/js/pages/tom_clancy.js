@@ -11,6 +11,7 @@ module.exports = function(options) {
 
         $(window).on('resize', function(e) {
             do_resize();
+            app.event_bus.emit('window.resize'); // Because fuck a jQuery listener that would do exactly the same thing
         });
 
         do_resize();
