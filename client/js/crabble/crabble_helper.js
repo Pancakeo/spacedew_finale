@@ -30,10 +30,10 @@ module.exports = function(page) {
 
                 if (mouse.x >= 800 && mouse.x <= 1136 && mouse.y >= 50 && mouse.y <= 98) {
                     var tile = Math.floor((mouse.x - 800) / 48);
-                    game.selected_tile = game.players['Pancakeo'].letters[tile];
+                    // ui.selected_tile = game.players['Pancakeo'].letters[tile];
                 }
                 else {
-                    game.selected_tile = null;
+                    ui.selected_tile = null;
                 }
             }
         });
@@ -65,19 +65,19 @@ module.exports = function(page) {
             if (mouse.x >= 0 && mouse.x <= 720 && mouse.y >= 0 && mouse.y <= 720) {
                 var col = Math.floor(mouse.x / 48);
                 var row = Math.floor(mouse.y / 48);
-                game.heh = {col: col, row: row};
+                ui.heh = {col: col, row: row};
             }
             else {
-                game.heh = null;
+                ui.heh = null;
             }
 
             if (mouse.x >= 800 && mouse.x <= 1136 && mouse.y >= 50 && mouse.y <= 98) {
                 var tile = Math.floor((mouse.x - 800) / 48);
-                game.highlighted_tile = tile;
+                ui.highlighted_tile = tile;
                 page.$("#board").addClass('woboy');
             }
             else {
-                game.highlighted_tile = null;
+                ui.highlighted_tile = null;
                 page.$("#board").removeClass('woboy');
             }
 
@@ -177,7 +177,9 @@ module.exports = function(page) {
             ctx.stroke();
         });
 
-        var letters = game.players['Pancakeo'].letters;
+        // TODO letters
+        // var letters = game.players['Pancakeo'].letters;
+        var letters = [];
 
         var x_offset = 800;
         var y_offset = 50;
@@ -185,7 +187,7 @@ module.exports = function(page) {
             ctx.beginPath();
             ctx.strokeStyle = 'black';
 
-            if (idx == game.highlighted_tile) {
+            if (idx == ui.highlighted_tile) {
                 ctx.fillStyle = 'lightblue';
             }
             else {
@@ -211,17 +213,17 @@ module.exports = function(page) {
             ctx.stroke();
         });
 
-        if (game.heh) {
+        if (ui.heh) {
             ctx.beginPath();
             ctx.lineWidth = 5;
             ctx.strokeStyle = 'gold';
             // ctx.globalAlpha = 0.5;
-            ctx.rect(game.heh.col * board.tile_size, game.heh.row * board.tile_size, board.tile_size, board.tile_size);
+            ctx.rect(ui.heh.col * board.tile_size, ui.heh.row * board.tile_size, board.tile_size, board.tile_size);
             ctx.stroke();
         }
 
         // TODO - reduce to methods
-        if (game.selected_tile && ui.left_mouse_down) {
+        if (ui.selected_tile && ui.left_mouse_down) {
             ctx.beginPath();
             ctx.lineWidth = 1;
             ctx.globalAlpha = 0.5;
@@ -233,7 +235,7 @@ module.exports = function(page) {
             ctx.rect(x, y, board.tile_size, board.tile_size);
             ctx.fill();
 
-            letter = game.selected_tile;
+            var letter = ui.selected_tile;
             var display_letter = letter;
             if (letter == '_') {
                 display_letter = ' ';

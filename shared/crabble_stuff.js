@@ -135,8 +135,17 @@ var board = {
         {row: 15, col: 8},
         {row: 15, col: 15}
     ],
-    draw_letters: function(board) {
+    get_sack: function() {
+        var letters = [];
 
+        for (var letter in board.letter_spread) {
+            var count = board.letter_spread[letter];
+            for (var i = 1; i <= count; i++) {
+                letters.push(letter);
+            }
+        }
+
+        return letters;
     }
 };
 

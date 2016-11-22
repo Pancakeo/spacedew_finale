@@ -102,7 +102,7 @@ module.exports = function() {
                 });
 
                 var $emus = page.$("#holy_cows #emu_things tbody");
-                var numpad_keys = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, '/', '*', '-'];
+                var numpad_keys = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, '/', '*', '-', '+'];
 
                 var $emu_dropdown = $('<select class="emu_dropdown" id="emu_dropdown"/>');
                 app.emu_list.forEach(function(emu) {
