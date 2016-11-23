@@ -215,7 +215,7 @@ module.exports = function($parent, options) {
         });
 
         event_bus.on('ws.binary_disconnect', function() {
-            app.append_system('Binary disconnected. Hopefully it comes back!', {room_id: app.get_active_room(true), color: 'red'});
+            app.append_system("Binary disconnected. Hopefully it comes back! (it doesn't)", {room_id: app.get_active_room(true), color: 'red'});
         });
 
         event_bus.on('ws.disconnect', function() {
