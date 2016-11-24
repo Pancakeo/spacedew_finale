@@ -140,7 +140,6 @@ module.exports = function(options) {
                                 };
 
                                 meta.room_id = app.get_active_room(true);
-                                page.ws.send('chatterbox', 'create_transfer_progress', meta);
                                 page.ws.send_binary(reader.result, meta);
                                 URL.revokeObjectURL(blob_url);
 
@@ -277,8 +276,6 @@ module.exports = function(options) {
 
                     meta.transfer_id = page.toolio.generate_id();
                     meta.room_id = room_id;
-
-                    page.ws.send('chatterbox', 'create_transfer_progress', meta);
                     page.ws.send_binary(reader.result, meta);
                 };
 
@@ -541,7 +538,6 @@ module.exports = function(options) {
                     };
 
                     meta.room_id = room_id;
-                    page.ws.send('chatterbox', 'create_transfer_progress', meta);
                     page.ws.send_binary(reader.result, meta);
                 };
 

@@ -17,7 +17,8 @@ module.exports = (function() {
         binary_transfers: {}
     };
 
-    var connected = false;
+    var ws_connected = false;
+    var binary_connected = false;
     var manually_closed = false;
     var key;
 
@@ -64,10 +65,16 @@ module.exports = (function() {
             case 'connect':
                 wupsocket.reconnecting = false;
                 wupsocket.last_reconnect_attempt = 0;
-                connected = true;
+                ws_connected = true;
+                break;
+
+            case 'binary_connect':
+                binary_connected = true;
+                event_bus.emit('ws.binary_connect');
                 break;
 
             case 'binary_disconnect':
+                binary_connected = false;
                 event_bus.emit('ws.binary_disconnect');
                 break;
 
@@ -76,7 +83,7 @@ module.exports = (function() {
                     event_bus.emit('ws.disconnect');
                 }
 
-                connected = false;
+                ws_connected = false;
                 break;
 
             case 'message':
@@ -150,7 +157,17 @@ module.exports = (function() {
 
 
     wupsocket.send_binary = function(blob, meta) {
+        if (!binary_connected) {
+            app.append_system('Unable to send: Binary not connected.', {color: 'red'});
+        }
         var transfer_id = meta.transfer_id;
+
+        prime_socket.postMessage({
+            action: 'create_transfer_progress',
+            params: {
+                meta: meta
+            }
+        });
 
         var send_chunk = function(buffer, meta, start) {
             var transfer_info = {
@@ -197,7 +214,7 @@ module.exports = (function() {
     };
 
     wupsocket.send = function(type, sub_type, data) {
-        if (connected === false) {
+        if (ws_connected === false) {
             console.error("Wupsocket is not connected");
             event_bus.emit('ws.error');
             return;
@@ -218,7 +235,7 @@ module.exports = (function() {
     };
 
     wupsocket.is_connected = function() {
-        return connected;
+        return ws_connected;
     };
 
     wupsocket.close = function() {
