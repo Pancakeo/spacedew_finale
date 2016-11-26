@@ -2,20 +2,16 @@ module.exports = function(page) {
     var canvas = page.$("#board")[0];
     var ctx = canvas.getContext('2d');
 
-    var board = require('../../../shared/crabble_stuff');
+    var board = require('../../../shared/crabble_stuff').board;
     var ui = {
         left_mouse_down: false,
         pinned_x: null,
         pinned_y: null
     };
 
-    var create_game = function() {
-        var game = {
-            letters: [],
-            players: {},
-            current_turn: null,
-            scores: {}
-        };
+    var setup_game = function(my_stuff, world) {
+        var game = my_stuff;
+        game.my_turn = false;
 
         page.$("#board").off('mousedown.crabble').on('mousedown.crabble', function(e) {
             var mouse = {
@@ -30,7 +26,7 @@ module.exports = function(page) {
 
                 if (mouse.x >= 800 && mouse.x <= 1136 && mouse.y >= 50 && mouse.y <= 98) {
                     var tile = Math.floor((mouse.x - 800) / 48);
-                    // ui.selected_tile = game.players['Pancakeo'].letters[tile];
+                    ui.selected_tile = game.letters[tile];
                 }
                 else {
                     ui.selected_tile = null;
@@ -111,6 +107,7 @@ module.exports = function(page) {
         ctx.beginPath();
         ctx.strokeStyle = 'black';
         ctx.fillStyle = 'pink';
+
         var x = (board.start_square.col - 1) * board.tile_size;
         var y = (board.start_square.row - 1) * board.tile_size;
         ctx.rect(x, y, board.tile_size, board.tile_size);
@@ -177,9 +174,7 @@ module.exports = function(page) {
             ctx.stroke();
         });
 
-        // TODO letters
-        // var letters = game.players['Pancakeo'].letters;
-        var letters = [];
+        var letters = game.letters;
 
         var x_offset = 800;
         var y_offset = 50;
@@ -269,7 +264,7 @@ module.exports = function(page) {
 
     var api = {
         setup_game: function() {
-            game = create_game();
+            game = setup_game.apply(this, arguments);
         }
     };
 
