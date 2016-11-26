@@ -1,3 +1,7 @@
+/*
+ Ideas: Replace drag and drop with sortable (for forming words) and then click + place for going to board.
+
+ */
 module.exports = function() {
 
     var ws = require('../app/wupsocket');
@@ -26,6 +30,16 @@ module.exports = function() {
         page.listen('setup', function(data) {
             my_stuff = data.my_stuff;
             world = data.world;
+
+            var $players = page.$("#players_list");
+            $players.empty();
+
+            for (var name in world) {
+                var p = world[name];
+                $players.append('<div class="player">' + p.name + ' (' + p.score + ')</div>');
+            }
+
+            $players.find('.player').first().addClass('active');
 
             page.$("#board").show();
             crabble_thing.setup_game(my_stuff, world);
