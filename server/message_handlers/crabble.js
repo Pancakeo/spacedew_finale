@@ -64,7 +64,7 @@ exports.handle_message = function handle_message(session, message) {
                 var game = games[game_id];
 
                 var game_players = game.sessions.map(function(s) {
-                   return s.profile.username;
+                    return s.profile.username;
                 });
 
                 if (Date.now() - game.last_activity <= (1000 * 60 * 15)) {
@@ -82,7 +82,32 @@ exports.handle_message = function handle_message(session, message) {
             break;
 
         case 'join_game':
-            // TODO
+            var game = games[data.game_id];
+
+            if (!game) {
+                session.send(page_key, 'join_game', {success: false});
+                return;
+            }
+
+            // Hack for testing.
+            if (!session.profile.username) {
+                session.profile.username = data.username;
+            }
+
+            game.sessions.push(session);
+
+            var game_players = game.sessions.map(function(s) {
+                return s.profile.username;
+            });
+
+            session.send(page_key, 'join_game', {
+                success: true,
+                game: {
+                    game_name: game.name,
+                    players: game_players,
+                    max_players: game.max_players
+                }
+            });
             break;
 
         case 'create_game':
@@ -131,6 +156,7 @@ exports.handle_message = function handle_message(session, message) {
             game.game_state = game_state;
 
             var bots = game.max_players - game.sessions.length;
+
             var create_player = function(name, session) {
                 var player = {
                     letters: [],
@@ -157,7 +183,7 @@ exports.handle_message = function handle_message(session, message) {
             };
 
             game.sessions.forEach(function(s, idx) {
-                var p = create_player(s.profile.username, session);
+                var p = create_player(s.profile.username, s);
 
                 if (idx == 0) {
                     game_state.hot_seat = p;

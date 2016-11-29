@@ -66,6 +66,31 @@ module.exports = function() {
             // console.log(data);
         });
 
+        page.listen('join_game', function(data) {
+            page.$wait_dialog && page.$wait_dialog.dialog('close');
+
+            if (!data.success) {
+                page.alert("Oops", "Failed to join game.");
+                return;
+            }
+
+            page.$("#pre_game").hide();
+
+            var game = data.game;
+
+            page.$("[field_name='game_name']").text(game.game_name);
+            page.$("[field_name='current_players']").text(game.players.length);
+            page.$("[field_name='max_players']").text(game.max_players);
+
+            page.$("#current_players").empty();
+
+            game.players.forEach(function(p) {
+                page.$("#current_players").append('<div>' + p + '</div>');
+            });
+
+            page.$("#game_lobby").show();
+        });
+
         page.listen('current_turn', function(data) {
             crabble_thing.hot_seat(data);
         });
@@ -86,7 +111,7 @@ module.exports = function() {
 
             page.$("#messages").append('<div>' + host_stuff.players[0] + ' created the game.</div>');
 
-            if (localStorage.is_local_dev && localStorage.rapid_crab) {
+            if (localStorage.is_local_dev && localStorage.fast_crab) {
                 start_game();
             }
         });
@@ -129,13 +154,13 @@ module.exports = function() {
                     $(this).val(2);
                 }
             }
-        }).val(3);
+        }).val(2);
 
         var on_ready = function() {
             $wait_dialog && $wait_dialog.dialog('close');
             page.$("#pre_game").show();
 
-            if (localStorage.is_local_dev && localStorage.rapid_crab) {
+            if (localStorage.is_local_dev && localStorage.fast_crab) {
                 create_game();
             }
 
@@ -196,6 +221,8 @@ module.exports = function() {
                 closeOnEscape: false,
                 title: "Waiting is"
             });
+
+            page.send('join_game', {game_id: game_id, username: app.profile.username});
         };
 
         page.$("#create_game_action").on('click', function() {
