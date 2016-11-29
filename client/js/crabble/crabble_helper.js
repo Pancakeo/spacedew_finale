@@ -1,258 +1,240 @@
-module.exports = function(page) {
-    var canvas = page.$("#board")[0];
-    var ctx = canvas.getContext('2d');
+// TODO - prevent stacking
+// TODO - blank letter assignment
 
+module.exports = function(page) {
     var board = require('../../../shared/crabble_stuff').board;
-    var ui = {
-        left_mouse_down: false,
-        pinned_x: null,
-        pinned_y: null
+    var dictionary = require('../../../shared/crabble_dictionary');
+
+    var game = {
+        my_turn: false
     };
 
-    var setup_game = function(my_stuff, world) {
-        var game = my_stuff;
+    var end_turn = function() {
         game.my_turn = false;
+        page.$("#letters .selected").removeClass('selected');
+        page.$("#board .woboy").removeClass('woboy');
+    };
 
-        page.$("#board").off('mousedown.crabble').on('mousedown.crabble', function(e) {
-            var mouse = {
-                x: e.clientX - this.offsetLeft,
-                y: e.clientY - this.offsetTop
-            };
-
-            if (e.which == 1) {
-                ui.left_mouse_down = true;
-                ui.pinned_x = mouse.x;
-                ui.pinned_y = mouse.y;
-
-                if (mouse.x >= 800 && mouse.x <= 1136 && mouse.y >= 50 && mouse.y <= 98) {
-                    var tile = Math.floor((mouse.x - 800) / 48);
-                    ui.selected_tile = game.letters[tile];
-                }
-                else {
-                    ui.selected_tile = null;
-                }
-            }
+    var place_letter = function($tile, $letter) {
+        $letter.css({
+            left: $tile[0].style.left,
+            top: $tile[0].style.top,
+            position: 'absolute'
         });
 
-        page.$("#board").off('mouseup.crabble').on('mouseup.crabble', function(e) {
-            if (e.which == 1) {
-                ui.left_mouse_down = false;
+        var col = $tile.attr('col');
+        var row = $tile.attr('row');
+
+        $letter.attr({col: col, row: row});
+
+        page.$("#board").append($letter);
+        page.$("#letters .letter").removeClass('selected');
+        $letter.removeClass('selected');
+    };
+
+    page.$("button").button();
+
+    page.$("#play_hand").on('click', function() {
+        var $in_play = page.$("#board .letter:not(.stone)");
+        var $board = page.$("#board");
+
+        if (!game.my_turn || $in_play.length == 0) {
+            return;
+        }
+
+        var stacked = false;
+        var $existing_tiles = $board.find(".letter.stone");
+
+        var $sorted = $in_play.sort(function(a, b) {
+            var $a = $(a);
+            var $b = $(b);
+
+            var pos_a = {row: $a.attr('row'), col: $a.attr('col')};
+            var pos_b = {row: $b.attr('row'), col: $b.attr('col')};
+
+            if (pos_a.row == pos_b.row && pos_a.col == pos_b.col) {
+                stacked = true;
+                return 0;
             }
-        });
 
-        page.$("#board").off('mouseleave.crabble').on('mouseleave.crabble', function(e) {
-            ui.left_mouse_down = false;
-        });
-
-        setInterval(function() {
-            if (!document.hasFocus()) {
-                ui.left_mouse_down = false;
+            if (pos_a.row < pos_b.row) {
+                return -1;
             }
-        }, 250);
-
-        page.$("#board").off('mousemove.crabble').on('mousemove.crabble', function(e) {
-            var mouse = {
-                x: e.clientX - this.offsetLeft,
-                y: e.clientY - this.offsetTop
-            };
-
-            ui.mouse = mouse;
-
-            if (mouse.x >= 0 && mouse.x <= 720 && mouse.y >= 0 && mouse.y <= 720) {
-                var col = Math.floor(mouse.x / 48);
-                var row = Math.floor(mouse.y / 48);
-                ui.heh = {col: col, row: row};
+            else if (pos_a.row > pos_b.row) {
+                return 1;
+            }
+            else if (pos_a.col < pos_b.col) {
+                return -1;
             }
             else {
-                ui.heh = null;
+                return 1;
             }
+        });
 
-            if (mouse.x >= 800 && mouse.x <= 1136 && mouse.y >= 50 && mouse.y <= 98) {
-                var tile = Math.floor((mouse.x - 800) / 48);
-                ui.highlighted_tile = tile;
-                page.$("#board").addClass('woboy');
+        // Must play start square.
+        if ($existing_tiles.length == 0) {
+            var start_square = board.start_square;
+
+            var $played_start_square = $board.find('div.letter[col="' + start_square.col + '"][row="' + start_square.row + '"]');
+            if ($played_start_square.length == 0) {
+                page.alert("Invalid Move", "Must play Start Square");
+            }
+        }
+
+        // All tiles must be connected, no diagonals or lone tiles.
+
+        // Go through rows/columns to form words.
+
+        // ... And remember to use existing stuff, too.
+
+        // Now for the harder part...
+
+        if (stacked) {
+            page.alert("Invalid Move", "Two or more tiles are stacked.");
+        }
+    });
+
+    page.$("#pass_turn").on('click', function() {
+        if (!game.my_turn) {
+            return;
+        }
+
+        page.send('end_turn', {game_id: game.game_id, action: 'pass'});
+        end_turn();
+    });
+
+    page.$("#reset_turn").on('click', function() {
+        if (!game.my_turn) {
+            return;
+        }
+
+        page.$("#board .letter:not(.stone)").remove();
+        crabble_helper.update_letters(game.my_stuff.letters);
+    });
+
+    page.$("#letters").on('click', '.letter', function() {
+        if (!game.my_turn) {
+            return;
+        }
+
+        $(this).siblings('.letter').removeClass('selected');
+        $(this).addClass('selected');
+    });
+
+    page.$("#board").on('click', '.tile.empty', function() {
+        if (!game.my_turn) {
+            return;
+        }
+
+        var $selected_letter = page.$("#letters .selected");
+        var $letter = $selected_letter.clone();
+        var $tile = $(this);
+
+        place_letter($tile, $letter);
+        $selected_letter.remove();
+    });
+
+    page.$("#board").on('mousemove', '.tile.empty', function() {
+        if (!game.my_turn || page.$("#letters .letter.selected").length == 0) {
+            return;
+        }
+
+        $(this).siblings('.woboy').removeClass('woboy');
+        $(this).addClass('woboy');
+    });
+
+    page.$("#board").on('mouseleave', function() {
+        $(this).find('.woboy').removeClass('woboy');
+    });
+
+    var setup_game = function(game_data) {
+        var $board = page.$("#board");
+        game = game_data;
+        var $fragment = $(document.createDocumentFragment());
+
+        var update_square = function(square, class_name) {
+            var col = square.col - 1;
+            var row = square.row - 1;
+
+            var create_tile = false;
+            var $tile = $fragment.find('div.tile[row="' + square.row + '"][col="' + square.col + '"]');
+
+            if ($tile.length == 0) {
+                create_tile = true;
+                $tile = $('<div class="tile"/>');
+                $tile.attr({row: square.row, col: square.col});
             }
             else {
-                ui.highlighted_tile = null;
-                page.$("#board").removeClass('woboy');
+                $tile.removeClass('blank');
             }
 
+            switch (class_name) {
+                case 'start_square':
+                    $tile.html('&#9749;');
+                    break;
+
+                case 'double_letter_square':
+                    $tile.text('Double Letter Score');
+                    break;
+
+                case 'triple_letter_square':
+                    $tile.text('Triple Letter Score');
+                    break;
+
+                case 'double_word_square':
+                    $tile.text('Double Word Score');
+                    break;
+
+                case 'triple_word_square':
+                    $tile.text('Triple Word Score');
+                    break;
+            }
+
+            $tile.css({left: col * 48, top: row * 48});
+            $tile.addClass(class_name);
+
+            if (create_tile) {
+                $fragment.append($tile);
+            }
+        };
+
+        var process_group = function(group, class_name) {
+            group.forEach(function(square) {
+                update_square(square, class_name);
+            });
+        };
+
+        for (var col = 1; col <= 15; col++) {
+            for (var row = 1; row <= 15; row++) {
+                update_square({col: col, row: row}, 'blank');
+            }
+        }
+
+        update_square(board.start_square, 'start_square');
+        process_group(board.double_letter_score, 'double_letter_square');
+        process_group(board.triple_letter_score, 'triple_letter_square');
+        process_group(board.double_word_score, 'double_word_square');
+        process_group(board.triple_word_score, 'triple_word_square');
+        $board.append($fragment);
+        page.$("#board").find(".tile").addClass('empty');
+
+        page.$("#board").find('.tile').droppable({
+            accept: '.letter',
+            hoverClass: 'woboy',
+            drop: function(event, ui) {
+                if (!game.my_turn) {
+                    return;
+                }
+
+                var $tile = $(this);
+                var $letter = ui.draggable;
+                place_letter($tile, $letter);
+                $letter.draggable({helper: 'clone', delay: 100});
+            }
         });
 
         return game;
     };
-    var game;
-
-    var render_board = function() {
-        if (!game) {
-            return;
-        }
-
-        ctx.globalAlpha = 1;
-        ctx.lineWidth = 1;
-        ctx.clearRect(0, 0, 1280, 720);
-        for (var row = 0; row < board.size; row++) {
-            for (var col = 0; col < board.size; col++) {
-                ctx.beginPath();
-                ctx.strokeStyle = 'black';
-                ctx.fillStyle = '#ddd';
-                var x = col * board.tile_size;
-                var y = row * board.tile_size;
-                ctx.rect(x, y, board.tile_size, board.tile_size);
-                ctx.fill();
-                ctx.stroke();
-            }
-        }
-
-        ctx.beginPath();
-        ctx.strokeStyle = 'black';
-        ctx.fillStyle = 'pink';
-
-        var x = (board.start_square.col - 1) * board.tile_size;
-        var y = (board.start_square.row - 1) * board.tile_size;
-        ctx.rect(x, y, board.tile_size, board.tile_size);
-        ctx.fill();
-
-        ctx.font = "10px sans-serif";
-        ctx.fillStyle = 'black';
-        ctx.fillText('Start', x + 10, y + 24);
-        ctx.stroke();
-
-        board.double_letter_score.forEach(function(tile) {
-            ctx.beginPath();
-            ctx.strokeStyle = 'black';
-            ctx.fillStyle = 'cyan';
-            var x = (tile.col - 1) * board.tile_size;
-            var y = (tile.row - 1) * board.tile_size;
-            ctx.rect(x, y, board.tile_size, board.tile_size);
-            ctx.fill();
-
-            ctx.fillStyle = 'black';
-            ctx.fillText('Double L', x + 2, y + 24);
-            ctx.stroke();
-        });
-
-        board.triple_letter_score.forEach(function(tile) {
-            ctx.beginPath();
-            ctx.strokeStyle = 'black';
-            ctx.fillStyle = 'blue';
-            var x = (tile.col - 1) * board.tile_size;
-            var y = (tile.row - 1) * board.tile_size;
-            ctx.rect(x, y, board.tile_size, board.tile_size);
-            ctx.fill();
-
-            ctx.fillStyle = 'white';
-            ctx.fillText('TLS', x + 10, y + 24);
-            ctx.stroke();
-        });
-
-        board.double_word_score.forEach(function(tile) {
-            ctx.beginPath();
-            ctx.strokeStyle = 'black';
-            ctx.fillStyle = 'pink';
-            var x = (tile.col - 1) * board.tile_size;
-            var y = (tile.row - 1) * board.tile_size;
-            ctx.rect(x, y, board.tile_size, board.tile_size);
-            ctx.fill();
-
-            ctx.fillStyle = 'black';
-            ctx.fillText('Double W', x + 2, y + 24);
-            ctx.stroke();
-        });
-
-        board.triple_word_score.forEach(function(tile) {
-            ctx.beginPath();
-            ctx.strokeStyle = 'black';
-            ctx.fillStyle = 'orange';
-            var x = (tile.col - 1) * board.tile_size;
-            var y = (tile.row - 1) * board.tile_size;
-            ctx.rect(x, y, board.tile_size, board.tile_size);
-            ctx.fill();
-
-            ctx.fillStyle = 'black';
-            ctx.fillText('Triple W', x + 2, y + 24);
-            ctx.stroke();
-        });
-
-        var letters = game.letters;
-
-        var x_offset = 800;
-        var y_offset = 50;
-        letters.forEach(function(letter, idx) {
-            ctx.beginPath();
-            ctx.strokeStyle = 'black';
-
-            if (idx == ui.highlighted_tile) {
-                ctx.fillStyle = 'lightblue';
-            }
-            else {
-                ctx.fillStyle = 'orange';
-            }
-
-            var x = x_offset + (idx * board.tile_size);
-            var y = y_offset;
-            ctx.rect(x, y, board.tile_size, board.tile_size);
-            ctx.fill();
-
-            var display_letter = letter;
-            if (letter == '_') {
-                display_letter = ' ';
-            }
-
-            ctx.font = "12px sans-serif";
-            ctx.strokeText(display_letter, x + 20, y + 26);
-
-            ctx.font = "8px sans-serif";
-            ctx.strokeText(board.get_point_value(letter), x + 36, y + 42);
-
-            ctx.stroke();
-        });
-
-        if (ui.heh) {
-            ctx.beginPath();
-            ctx.lineWidth = 5;
-            ctx.strokeStyle = 'gold';
-            // ctx.globalAlpha = 0.5;
-            ctx.rect(ui.heh.col * board.tile_size, ui.heh.row * board.tile_size, board.tile_size, board.tile_size);
-            ctx.stroke();
-        }
-
-        // TODO - reduce to methods
-        if (ui.selected_tile && ui.left_mouse_down) {
-            ctx.beginPath();
-            ctx.lineWidth = 1;
-            ctx.globalAlpha = 0.5;
-            ctx.fillStyle = 'orange';
-            ctx.strokeStyle = 'black';
-
-            var x = ui.mouse.x;
-            var y = ui.mouse.y;
-            ctx.rect(x, y, board.tile_size, board.tile_size);
-            ctx.fill();
-
-            var letter = ui.selected_tile;
-            var display_letter = letter;
-            if (letter == '_') {
-                display_letter = ' ';
-            }
-
-            ctx.font = "12px sans-serif";
-            ctx.strokeText(display_letter, x + 20, y + 26);
-
-            ctx.font = "8px sans-serif";
-            ctx.strokeText(board.get_point_value(letter), x + 36, y + 42);
-
-            ctx.stroke();
-        }
-
-    };
-
-    var render_wrapper = function render_wrapper() {
-        render_board();
-        requestAnimationFrame(render_wrapper);
-    };
-
-    requestAnimationFrame(render_wrapper);
 
     var close_window_check = setInterval(function() {
         if (!window.opener || window.opener.closed) {
@@ -262,11 +244,51 @@ module.exports = function(page) {
 
     }, 100);
 
-    var api = {
+    var crabble_helper = {
         setup_game: function() {
-            game = setup_game.apply(this, arguments);
+            setup_game.apply(this, arguments);
+        },
+        hot_seat: function(data) {
+            var username = app.profile.username;
+            page.$("#players_list tbody tr").removeClass('active');
+            page.$("#players_list tbody").find('tr[player_name="' + data.hot_seat + '"]').addClass('active');
+
+            game.my_turn = (username == data.hot_seat);
+            page.$("#gogogo").toggle(game.my_turn);
+            page.$("#turn_stuff").toggle(game.my_turn);
+            page.$("#not_yet").toggle(!game.my_turn);
+        },
+        update_letters: function(letters) {
+            var $letters = page.$("#letters").empty();
+            var $fragment = $(document.createDocumentFragment());
+
+            letters.forEach(function(letter) {
+                var $letter = $('<div class="letter"/>');
+                $letter.prop('letter', letter);
+                var $value = $('<div class="letter_value"/>');
+
+                $value.text(board.get_point_value(letter));
+                $letter.text(letter);
+                $letter.append($value);
+                $fragment.append($letter);
+            });
+
+            $letters.sortable({
+                items: '.letter',
+                delay: 100,
+                start: function() {
+                    $(this).find('.letter').removeClass('selected');
+                }
+            });
+
+            $letters.append($fragment);
+
+            $letters.find('.letter').draggable({
+                helper: 'clone',
+                delay: 100
+            });
         }
     };
 
-    return api;
+    return crabble_helper;
 };

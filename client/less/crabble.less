@@ -1,31 +1,225 @@
 #crabble {
 
-  canvas#board {
-    margin: 5px;
-    border: 1px #ccc solid;
-    cursor: default;
-  }
-
-  #board.woboy {
-    cursor: move;
-  }
-
-  #thing * {
+  * {
     vertical-align: middle;
   }
 
-  #wup {
+  #tabs {
+
+  }
+
+  #game_wrapper {
+    width: 1280px;
+    margin: 5px;
+    //border: 1px blue solid;
+
+    .letter:not(.stone) {
+      cursor: move;
+    }
+
+    .letter {
+      z-index: 1;
+      background: orange;
+      width: 48px;
+      height: 48px;
+      border: 1px black solid;
+      cursor: default;
+      user-select: none;
+      display: inline-block;
+
+      position: relative;
+      padding-top: 11px;
+      padding-left: 15px;
+
+      .letter_value {
+        position: absolute;
+        font-size: 11px;
+        right: 5px;
+        bottom: 0;
+      }
+    }
+    .letter.selected {
+      background: gold;
+    }
+
+    #board {
+      position: relative;
+      height: 720px;
+      width: 720px;
+      border: 1px #ccc solid;
+
+      .letter {
+
+      }
+
+      .tile {
+        position: absolute;
+        height: 48px;
+        width: 48px;
+        border: 1px black solid;
+        cursor: default;
+        user-select: none;
+      }
+
+      .tile.woboy {
+        background: gold !important;
+      }
+
+      .tile.blank {
+        background: wheat;
+      }
+
+      .tile.start_square {
+        font-size: 20px;
+        padding-left: 8px;
+        padding-top: 8px;
+        background: salmon;
+      }
+
+      .tile.double_letter_square {
+        background: deepskyblue;
+        font-size: 11px;
+        padding: 3px;
+      }
+
+      .tile.triple_letter_square {
+        background: dodgerblue;
+        font-size: 11px;
+        padding: 3px;
+      }
+
+      .tile.double_word_square {
+        font-size: 11px;
+        padding: 3px;
+        background: salmon;
+      }
+
+      .tile.triple_word_square {
+        font-size: 11px;
+        padding: 3px;
+        background: indianred;
+      }
+    }
+
+    #left, #right {
+      vertical-align: top;
+      display: inline-block;
+    }
+
+    #right {
+      padding-left: 10px;
+      width: 530px;
+    }
+
+    #chat {
+      border: 1px #ccc solid;
+      height: 200px;
+    }
+
+    #letters {
+      margin-top: 10px;
+      margin-bottom: 10px;
+      border: 1px black solid;
+      min-height: 48px;
+    }
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+
+    tr:nth-child(odd) {
+      background: #eee;
+    }
+
+    tr.active {
+      font-weight: bold;
+      background: orange;
+    }
+
+    th {
+      text-align: left;
+      background: deepskyblue;
+    }
+
+    th, td {
+      padding: 3px;
+      border: 1px black solid;
+    }
+  }
+
+  #pre_game {
+    margin-left: auto;
+    margin-right: auto;
+    width: 500px;
+    margin-top: 300px;
+
+    input {
+      padding: 3px;
+      border-radius: 6px;
+    }
+
+    #create_game > div > div {
+      margin-bottom: 5px;
+    }
+
+    label {
+      width: 150px;
+      display: inline-block;
+    }
+
+    input, label {
+      font-size: 14px;
+    }
+  }
+
+  #game_lobby {
     margin-left: auto;
     margin-right: auto;
     width: 400px;
     margin-top: 300px;
+
+    #current_players {
+      overflow-y: auto;
+      height: 70px;
+      border: 1px #ccc solid;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+
+    #messages {
+      height: 75px;
+      overflow-y: scroll;
+      border: 1px black solid;
+    }
   }
 
-  #players_list {
+  #not_yet, #gogogo {
     padding: 5px;
+    background: red;
+    color: white;
+    border: 1px black solid;
+  }
 
-    .active {
-      font-weight: bold;
+  #gogogo {
+    background: green;
+  }
+
+  #join_game_wrapper {
+    height: 400px;
+    overflow-y: scroll;
+  }
+
+  #join_game #games_list {
+    overflow-y: scroll;
+    margin-bottom: 10px;
+
+    tr:not(.help) {
+      cursor: pointer;
+    }
+
+    tr.selected {
+      background: orange;
     }
   }
 

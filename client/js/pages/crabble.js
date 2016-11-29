@@ -1,57 +1,127 @@
-/*
- Ideas: Replace drag and drop with sortable (for forming words) and then click + place for going to board.
-
- */
+// TODO - go through regular login path
 module.exports = function() {
-
     var ws = require('../app/wupsocket');
     var event_bus = require('../../../shared/event_bus');
+
+    // For testing:
+    if (app.profile.username == null) {
+        app.profile.username = localStorage.username || 'HEH';
+    }
 
     get_page('crabble', function(page) {
         var $parent = $('body');
         $parent.append(page.$container);
-
         var crabble_thing = require('../crabble/crabble_helper')(page);
+
         var host_stuff = {
-            game_id: null
+            game_id: null,
+            max_players: null,
+            game_name: null
         };
 
-        var my_stuff = {};
-        var world = {};
+        page.$("#games_list tbody").on('click', 'tr:not(.help)', function() {
+            $(this).siblings('tr.selected').removeClass('selected');
+            $(this).addClass('selected');
+        });
+
+        page.$("#join_game_action").on('click', function() {
+            var $selected = page.$("#games_list tbody tr.selected");
+            var game_id = $selected.attr('game_id');
+
+            if (game_id) {
+                join_game(game_id);
+            }
+
+        });
+
+        page.listen('games_list', function(data) {
+            var $selected_row = page.$("#games_list tbody tr.selected");
+
+            var $games_list = page.$("#games_list tbody");
+            $games_list.empty();
+
+            data.games_list.forEach(function(g) {
+                var $game_row = page.get_template('game_row');
+                $game_row.attr('game_id', g.game_id);
+                $game_row.find('[field_name="name"]').text(g.game_name);
+                $game_row.find('[field_name="host"]').text(g.host);
+                $game_row.find('[field_name="players"]').text(g.players.length + ' / ' + g.max_players);
+
+                $games_list.append($game_row);
+            });
+
+            if (data.games_list.length == 0) {
+                $games_list.append('<tr class="help"><td colspan="3">No games :(</td></tr>');
+            }
+            else {
+                var game_id = $selected_row.attr('game_id');
+                if (game_id) {
+                    $games_list.find('tr[game_id="' + game_id + '"]').click();
+                }
+            }
+
+        });
+
+        page.listen('end_turn', function(data) {
+            // console.log(data);
+        });
+
+        page.listen('current_turn', function(data) {
+            crabble_thing.hot_seat(data);
+        });
 
         page.listen('create_game', function(data) {
-            host_stuff = data;
+            page.$wait_dialog && page.$wait_dialog.dialog('close');
 
-            if (localStorage.is_local_dev) {
+            host_stuff = data;
+            page.$("[field_name='game_name']").text(host_stuff.game_name);
+            page.$("[field_name='current_players']").text(host_stuff.players.length);
+            page.$("[field_name='max_players']").text(host_stuff.max_players);
+
+            page.$("#current_players").empty();
+
+            host_stuff.players.forEach(function(p) {
+                page.$("#current_players").append('<div>' + p + '</div>');
+            });
+
+            page.$("#messages").append('<div>' + host_stuff.players[0] + ' created the game.</div>');
+
+            if (localStorage.is_local_dev && localStorage.rapid_crab) {
                 start_game();
             }
         });
 
         page.listen('setup', function(data) {
-            my_stuff = data.my_stuff;
-            world = data.world;
+            clearInterval(page.games_list_poller);
 
-            var $players = page.$("#players_list");
+            page.$("#game_lobby").hide();
+            var $players = page.$("#players_list tbody");
             $players.empty();
 
-            for (var name in world) {
-                var p = world[name];
-                $players.append('<div class="player">' + p.name + ' (' + p.score + ')</div>');
-            }
+            data.world.forEach(function(p) {
+                var $row = page.get_template('player_row');
+                $row.find('td[field_name="player_name"]').text(p.name);
+                $row.find('td[field_name="player_score"]').text(p.score);
+                $row.attr('player_name', p.name);
+                $players.append($row);
+            });
 
-            $players.find('.player').first().addClass('active');
-
-            page.$("#board").show();
-            crabble_thing.setup_game(my_stuff, world);
+            page.$("#game_wrapper").show();
+            crabble_thing.setup_game(data);
+            crabble_thing.update_letters(data.my_stuff.letters);
         });
 
-        page.$("#thing").tabs();
-        page.$("#board").hide();
-        page.$("#wup").hide();
+        page.$("#tabs").tabs();
+        page.$("#game_wrapper").hide();
+        page.$("#pre_game").hide();
 
-        page.$("#game_name").val("Sparky");
+        page.$("#game_name").val("Crabs! Crabs Everywhere!");
 
-        page.$("#players").spinner({
+        page.$("#start_game").on('click', function() {
+            start_game();
+        });
+
+        page.$("#max_players").spinner({
             min: 2,
             max: 4,
             change: function(event, ui) {
@@ -59,7 +129,22 @@ module.exports = function() {
                     $(this).val(2);
                 }
             }
-        }).val(2);
+        }).val(3);
+
+        var on_ready = function() {
+            $wait_dialog && $wait_dialog.dialog('close');
+            page.$("#pre_game").show();
+
+            if (localStorage.is_local_dev && localStorage.rapid_crab) {
+                create_game();
+            }
+
+            page.games_list_poller = setInterval(function() {
+                page.send('games_list', {});
+            }, 2500);
+
+            page.send('games_list', {});
+        };
 
         if (!ws.is_connected()) {
             var $wait_dialog = $("<div>Connecting to server...</div>").dialog({
@@ -70,23 +155,34 @@ module.exports = function() {
 
             ws.connect();
         }
+        else {
+            on_ready();
+        }
 
         event_bus.on('ws.connect', function() {
-            $wait_dialog && $wait_dialog.dialog('close');
-            page.$("#wup").show();
-
-            if (localStorage.is_local_dev) {
-                create_game();
-            }
+            on_ready();
         });
 
         var create_game = function() {
             var game_params = {
-                username: localStorage.username,
-                game_name: page.$("#game_name").val()
+                username: app.profile.username,
+                game_name: page.$("#game_name").val().trim(),
+                max_players: page.$("#max_players").val().trim()
             };
 
-            page.$("#wup").hide();
+            if (game_params.game_name.length == 0) {
+                page.alert('Oops', 'Must provide game name.');
+                return;
+            }
+
+            page.$wait_dialog = $("<div>Creating game...</div>").dialog({
+                modal: true,
+                closeOnEscape: false,
+                title: "Waiting is"
+            });
+
+            page.$("#pre_game").hide();
+            page.$("#game_lobby").show();
             page.send('create_game', game_params);
         };
 
@@ -94,8 +190,12 @@ module.exports = function() {
             page.send('start_game', host_stuff);
         };
 
-        var join_game = function() {
-
+        var join_game = function(game_id) {
+            page.$wait_dialog = $("<div>Joining game...</div>").dialog({
+                modal: true,
+                closeOnEscape: false,
+                title: "Waiting is"
+            });
         };
 
         page.$("#create_game_action").on('click', function() {

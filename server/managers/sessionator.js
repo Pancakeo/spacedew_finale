@@ -34,7 +34,7 @@ exports.link_binary = function(binary_cid, binary_ws) {
         if (cid == binary_cid) {
             var s = sessions[cid];
             s.binary_ws = binary_ws;
-            console.log('Linked ' + cid + ' to binary conneciton.');
+            // console.log('Linked ' + cid + ' to binary conneciton.');
             return s;
         }
     }
