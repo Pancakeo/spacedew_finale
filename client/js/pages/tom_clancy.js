@@ -42,6 +42,10 @@ module.exports = function(options) {
                     key = '-';
                     break;
 
+                case 110:
+                    key = '+';
+                    break;
+
                 default:
                     // Only map numpad 0-9.
                     if (e.keyCode >= 96 && e.keyCode <= 105) {
