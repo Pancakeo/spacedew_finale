@@ -11,7 +11,8 @@ var emus = {
     9: {text: 'csaw'},
     '/': {text: '@_@'},
     '*': {text: 'Wait.'},
-    '-': {text: 'Okay.'}
+    '-': {text: 'Okay.'},
+    '+': {text: 'HEH'}
 };
 
 module.exports = emus;

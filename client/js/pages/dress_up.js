@@ -185,6 +185,7 @@ module.exports = function() {
                     page.$("#emu_things .emu_row").each(function() {
                         var $row = $(this);
                         var key = $row.prop('key');
+
                         var emu = user_outfit.holy_cow[key];
 
                         if (emu) {

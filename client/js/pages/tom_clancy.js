@@ -42,7 +42,7 @@ module.exports = function(options) {
                     key = '-';
                     break;
 
-                case 110:
+                case 107:
                     key = '+';
                     break;
 
@@ -54,6 +54,8 @@ module.exports = function(options) {
 
                     break;
             }
+
+            console.log(app.holy_cow);
 
             var emote = app.holy_cow[key];
             if (emote) {
