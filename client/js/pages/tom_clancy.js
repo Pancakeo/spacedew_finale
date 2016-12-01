@@ -55,8 +55,6 @@ module.exports = function(options) {
                     break;
             }
 
-            console.log(app.holy_cow);
-
             var emote = app.holy_cow[key];
             if (emote) {
                 shown_flood = false;
