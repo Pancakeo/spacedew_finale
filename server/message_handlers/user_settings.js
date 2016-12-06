@@ -1,6 +1,5 @@
 "use strict";
 var sessionator = require('../managers/sessionator');
-var storage_thing = require('../managers/storage_thing');
 var crepto = require('../util/crepto');
 var crypto = require('crypto');
 var emu_list = require('../chat_commands/emu_list');

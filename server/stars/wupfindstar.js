@@ -3,7 +3,6 @@
 var request = require('request');
 var cheerio = require('cheerio');
 var sessionator = require('../managers/sessionator');
-var storage_thing = require('../managers/storage_thing');
 
 // Heh heh
 exports.update_user = function(user_id) {

@@ -1,12 +1,12 @@
 "use strict";
 
 var crepto = require('../util/crepto');
-var storage_thing = require('../managers/storage_thing');
 var sessionator = require('../managers/sessionator');
 var wiseau = require('../managers/wiseau');
 var crypto = require('crypto');
-var star_wars = require('../stars/wupfindstar');
+// var star_wars = require('../stars/wupfindstar');
 var emu_list = require('../chat_commands/emu_list').get();
+var mango = require('../managers/mango');
 
 exports.requires_auth = false;
 exports.handle_message = function handle_message(session, message) {
@@ -69,7 +69,7 @@ exports.handle_message = function handle_message(session, message) {
             });
 
             storage_thing.run_param_sql("UPDATE user set auth_key = ? WHERE user_id = ?", [auth_key, user_id]);
-            star_wars.update_user(user_id);
+            // star_wars.update_user(user_id);
         });
 
     };
@@ -90,23 +90,24 @@ exports.handle_message = function handle_message(session, message) {
             });
         },
         login: function() {
-            crepto.get_hashed_password(data.username, data.password).then(function(result) {
-
-                storage_thing.each_param_sql("SELECT * from user WHERE username = lower(?) AND password = ?", [data.username, result.hashed_password]).then(function(db_result) {
-                    if (db_result.rows.length > 0) {
-                        do_login(db_result.rows[0]);
-                    }
-                    else {
+            mango.get().then(function(db) {
+                var users = db.collection('users');
+                users.findOne({username: data.username}).then(function(user) {
+                    if (user == null) {
                         session.send('login', 'login', {success: false, reason: "Fuck you (bad login)."});
+                        return;
                     }
 
-                }, function() {
-                    session.send('login', 'login', {success: false, reason: "Fuck you (DB error)."});
+                    crepto.get_hashed_password(user, data).then(function(result) {
+                        if (user.password == result.hashed_password) {
+                            do_login(user);
+                        }
+                        else {
+                            session.send('login', 'login', {success: false, reason: "Fuck you (bad login)."});
+                        }
+                    });
                 });
-            }).catch(function(error) {
-                session.send('login', 'login', {success: false, reason: "Fuck you (bad login)."});
-                console.log(error);
-            })
+            });
         },
         login_with_auth_key: function() {
             storage_thing.each_param_sql("SELECT * from user WHERE auth_key = ? AND username = lower(?)", [data.auth_key, data.username]).then(function(result) {
