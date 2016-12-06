@@ -50,7 +50,7 @@ exports.update_all = function() {
                 });
             });
 
-            db.close();
+            // TODO close db after all updates complete...
         });
     });
 };
