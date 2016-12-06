@@ -1,6 +1,5 @@
 "use strict";
 var crypto = require('crypto');
-var storage_thing = require('../managers/storage_thing');
 
 var PBKDF2_ITERATIONS = 10000;
 var PBKDF2_KEY_LENGTH = 64;
@@ -28,27 +27,17 @@ exports.hash_password = function(password) {
 };
 
 // Query db for salt and then hash with given password. Return undefined if salt is missing or an error occurs.
-exports.get_hashed_password = function(username, password) {
+exports.get_hashed_password = function(user, password) {
     return new Promise(function(resolve, reject) {
+        var salt = user.salty;
 
-        var sql = 'select user_id, salty FROM user WHERE username = lower(?)';
-        storage_thing.each_param_sql(sql, [username]).then(function(result) {
-            if (result.rows.length === 1) {
-                var salt = result.rows[0].salty;
-                var user_id = result.rows[0].user_id;
-
-                crypto.pbkdf2(password, salt, PBKDF2_ITERATIONS, PBKDF2_KEY_LENGTH, function(error, hashed_password) {
-                    if (error == null) {
-                        hashed_password = hashed_password.toString('hex');
-                        resolve({user_id: user_id, hashed_password: hashed_password});
-                    }
-                    else {
-                        reject(Error(error));
-                    }
-                });
+        crypto.pbkdf2(password, salt, PBKDF2_ITERATIONS, PBKDF2_KEY_LENGTH, function(error, hashed_password) {
+            if (error == null) {
+                hashed_password = hashed_password.toString('hex');
+                resolve({hashed_password: hashed_password});
             }
             else {
-                reject(Error("Not found in DB."));
+                reject(Error(error));
             }
         });
     });

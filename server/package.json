@@ -5,16 +5,16 @@
   "main": "dewd.js",
   "dependencies": {
     "bluebird": "^3.4.0",
+    "canvas": "latest",
     "cheerio": "^0.22.0",
     "finalhandler": "^0.4.1",
     "lodash": "latest",
     "moment": "latest",
+    "mongodb": "^2.2.12",
     "node-uuid": "^1.4.7",
     "request": "latest",
     "serve-static": "^1.10.0",
-    "sqlite3": "^3.1.1",
-    "ws": "^1.0.1",
-    "canvas": "latest"
+    "ws": "^1.0.1"
   },
   "devDependencies": {},
   "scripts": {

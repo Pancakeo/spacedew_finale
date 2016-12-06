@@ -3,28 +3,27 @@
 var request = require('request');
 var cheerio = require('cheerio');
 var sessionator = require('../managers/sessionator');
-var storage_thing = require('../managers/storage_thing');
+var mango = require('../managers/mango');
 
-// Heh heh
-exports.update_user = function(user_id) {
+exports.update_user = function(user) {
     var sessions = sessionator.get_sessions();
 
-    storage_thing.each_param_sql("SELECT username, steam_id FROM user WHERE steam_id <> '' AND user_id = ?", [user_id]).then(function(result) {
-        if (result && result.rows.length > 0) {
-            result.rows.forEach(function(row) {
-                exports.get_max_rank(row.steam_id, function(max_rank) {
-                    if (max_rank != null) {
-                        storage_thing.run_param_sql('UPDATE user SET rl_max_rank = ? WHERE user_id = ?', [max_rank, row.user_id]);
+    exports.get_max_rank(user.steam_id, function(max_rank) {
+        if (max_rank != null) {
 
-                        for (var s in sessions) {
-                            var username = sessions[s].profile.username && sessions[s].profile.username.toLowerCase();
-                            if (username == row.username) {
-                                sessions[s].profile.rocket_league_rank = max_rank;
-                            }
-                        }
-                    }
+            mango.get().then(function(db) {
+                var users = db.collection('users');
+                users.updateOne({user_id: user.user_id}, {$set: {rl_max_rank: max_rank}}).then(function() {
+                    db.close();
                 });
             });
+
+            for (var s in sessions) {
+                var username = sessions[s].profile.username && sessions[s].profile.username.toLowerCase();
+                if (username == user.username) {
+                    sessions[s].profile.rocket_league_rank = max_rank;
+                }
+            }
         }
     });
 };
@@ -32,28 +31,35 @@ exports.update_user = function(user_id) {
 exports.update_all = function() {
     var sessions = sessionator.get_sessions();
 
-    storage_thing.each_param_sql("SELECT user_id, username, steam_id FROM user WHERE steam_id <> ''").then(function(result) {
-        if (result && result.rows.length > 0) {
-            result.rows.forEach(function(row) {
-                exports.get_max_rank(row.steam_id, function(max_rank) {
+    mango.get().then(function(db) {
+        var users_collection = db.collection('users');
+        users_collection.find({}).toArray(function(err, users) {
+
+            users.forEach(function(user) {
+                exports.get_max_rank(user.steam_id, function(max_rank) {
                     if (max_rank != null) {
-                        storage_thing.run_param_sql('UPDATE user SET rl_max_rank = ? WHERE user_id = ?', [max_rank, row.user_id]);
+                        users.updateOne({user_id: user.user_id}, {$set: {rl_max_rank: max_rank}});
 
                         for (var s in sessions) {
                             var username = sessions[s].profile.username && sessions[s].profile.username.toLowerCase();
-                            if (username == row.username) {
+                            if (username == user.username) {
                                 sessions[s].profile.rocket_league_rank = max_rank;
                             }
                         }
                     }
                 });
             });
-        }
-    });
 
+            db.close();
+        });
+    });
 };
 
 exports.get_max_rank = function(profile_id, callback) {
+    if (!profile_id) {
+        return;
+    }
+
     request('http://rocketleague.tracker.network/profile/steam/' + profile_id, function(error, response, body) {
         if (!error && response.statusCode == 200) {
             var $ = cheerio.load(body);

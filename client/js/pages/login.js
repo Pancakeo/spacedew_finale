@@ -52,7 +52,7 @@ module.exports = function() {
 
             if (data.success !== true) {
                 if (data.auto_login !== true) {
-                    page.alert('Uh oh', "Well that didn't work.");
+                    page.alert('Uh oh', "Well that didn't work. Reason: " + data.reason);
                     page.$("#status").text('Whoops, try again.');
                 }
                 else {

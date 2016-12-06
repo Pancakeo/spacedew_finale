@@ -1,5 +1,5 @@
 module.exports = function() {
-    
+
     get_page('change_password', function(page) {
         var $dialog = page.$container.dialog({
             title: 'Change Password',
@@ -16,20 +16,13 @@ module.exports = function() {
 
                     if (params.current_pw.length == 0 || params.new_pw.length == 0 || params.confirm_pw.length == 0) {
                         page.alert("Whoops", "All fields must be filled in loldawg.");
+                        return;
                     }
 
                     if (params.new_pw != params.confirm_pw) {
                         page.alert("Whoops", "New passwords don't match");
+                        return;
                     }
-
-                    page.event_bus.on('user_settings.change_password', function(data) {
-                        if (data.success == true) {
-                            $dialog.dialog('close');
-                        }
-                        else {
-                            page.alert("Uh oh", data.reason);
-                        }
-                    });
 
                     page.ws.send('user_settings', 'change_password', params);
                 },
@@ -45,6 +38,14 @@ module.exports = function() {
         });
 
         page.init = function() {
+            page.event_bus.on('user_settings.change_password', function(data) {
+                if (data.success == true) {
+                    $dialog.dialog('close');
+                }
+                else {
+                    page.alert("Uh oh", data.reason);
+                }
+            });
 
         };
 
