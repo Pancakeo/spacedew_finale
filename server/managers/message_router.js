@@ -24,8 +24,14 @@ exports.handle = function(session, mixed_message) {
         return;
     }
 
-    var parsed_message = JSON.parse(mixed_message);
-    var type = parsed_message.type;
+    try {
+        var parsed_message = JSON.parse(mixed_message);
+        var type = parsed_message.type;
+    }
+    catch (e) {
+        console.log("Failed to parse", mixed_message);
+        return;
+    }
 
     if (typeof(handlers[type]) == "object") {
         var handler = handlers[type];
