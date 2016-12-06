@@ -43,6 +43,18 @@ exports.handle_message = function handle_message(session, message) {
 
     switch (sub_type) {
         case 'sync':
+            if (room.tent.no_canvas) {
+                var data = {
+                    room_id: room.id,
+                    no_canvas: true,
+                    mini: false,
+                    bg_color: room.tent.bg_color
+                };
+
+                session.send('black_board', 'load', data);
+                return;
+            }
+
             room.tent.canvas.toDataURL('image/png', function(err, png) {
                 if (err != null) {
                     return;

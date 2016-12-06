@@ -5,6 +5,7 @@ module.exports = function() {
     }
     catch (e) {
         return {
+            no_canvas: true,
             canvas: {
                 toDataURL: function() {
 
