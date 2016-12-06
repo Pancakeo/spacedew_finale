@@ -38,7 +38,7 @@ exports.update_all = function() {
             users.forEach(function(user) {
                 exports.get_max_rank(user.steam_id, function(max_rank) {
                     if (max_rank != null) {
-                        users.updateOne({user_id: user.user_id}, {$set: {rl_max_rank: max_rank}});
+                        users_collection.updateOne({user_id: user.user_id}, {$set: {rl_max_rank: max_rank}});
 
                         for (var s in sessions) {
                             var username = sessions[s].profile.username && sessions[s].profile.username.toLowerCase();
