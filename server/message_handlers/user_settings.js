@@ -3,6 +3,7 @@ var sessionator = require('../managers/sessionator');
 var crepto = require('../util/crepto');
 var crypto = require('crypto');
 var emu_list = require('../chat_commands/emu_list');
+var mango = require('../managers/mango');
 
 exports.handle_message = function handle_message(session, message) {
     var sub_type = message.sub_type;
@@ -27,18 +28,34 @@ exports.handle_message = function handle_message(session, message) {
                 return;
             }
 
-            crepto.get_hashed_password(session.profile.username, data.current_pw).then(function(result) {
-                storage_thing.each_param_sql('SELECT * from user WHERE user_id = ? AND password = ?', [result.user_id, result.hashed_password]).then(function(res) {
-                    if (res.rows.length == 0) {
-                        session.send('user_settings', 'change_password', {success: false, reason: "Current password is incorrect."});
-                        return;
-                    }
+            mango.get().then(function(db) {
+                var users = db.collection('users');
 
-                    crepto.hash_password(data.new_pw).then(function(new_password) {
-                        storage_thing.run_param_sql('UPDATE user SET password = ?, salty = ? WHERE user_id = ?', [new_password.hashed_password, new_password.salt, session.profile.user_id]).then(function(heh) {
-                            session.send('user_settings', 'change_password', {success: true});
-                            console.log(session.profile.username + " changed her password.");
-                        })
+                users.findOne({user_id: session.profile.user_id}).then(function(user) {
+
+                    crepto.get_hashed_password(user, data.current_pw).then(function(result) {
+                        users.findOne({user_id: session.profile.user_id, password: result.hashed_password}).then(function(user_fishing) {
+                            if (user_fishing == null) {
+                                session.send('user_settings', 'change_password', {success: false, reason: "Current password is incorrect."});
+                                db.close();
+                                return;
+                            }
+
+                            crepto.hash_password(data.new_pw).then(function(new_password) {
+                                console.log(new_password);
+
+                                users.updateOne({user_id: session.profile.user_id}, {
+                                    $set: {
+                                        password: new_password.hashed_password,
+                                        salty: new_password.salt
+                                    }
+                                }).then(function() {
+                                    session.send('user_settings', 'change_password', {success: true});
+                                    console.log(session.profile.username + " changed her password.");
+                                    db.close();
+                                });
+                            });
+                        });
                     });
                 });
             });
@@ -55,41 +72,33 @@ exports.handle_message = function handle_message(session, message) {
                 console.error("Server settings exceeded limit!");
                 return;
             }
-            
-            storage_thing.each_param_sql('SELECT * FROM user_settings WHERE user_id = ?', [user_id]).then(function(result) {
 
-                if (result.rows.length == 0) {
-                    var user_settings = {
-                        outfit: data.outfit
-                    };
-                    storage_thing.run_param_sql('INSERT INTO user_settings (user_id, settings_json) VALUES (?, ?)', [user_id, JSON.stringify(user_settings)]);
-                }
-                else {
-                    var user_settings = JSON.parse(result.rows[0].settings_json);
-                    Object.assign(user_settings.outfit, data.outfit);
+            mango.get().then(function(db) {
+                var users = db.collection('users');
+                var user_settings = {
+                    outfit: data.outfit
+                };
 
-                    storage_thing.run_param_sql('UPDATE user_settings SET settings_json = ? WHERE user_id = ?', [JSON.stringify(user_settings), user_id]);
-                }
+                users.updateOne({user_id: user_id}, {$set: {user_settings: user_settings}}).then(function() {
+                    db.close();
+                    session.profile.user_settings = user_settings;
 
-                session.profile.user_settings = user_settings;
+                    var all_user_settings = {};
+                    var sessions = sessionator.get_sessions();
 
-                var all_user_settings = {};
-                var sessions = sessionator.get_sessions();
-
-                for (var key in sessions) {
-                    var s = sessions[key];
-                    if (s.logged_in) {
-                        all_user_settings[s.profile.username] = s.profile.user_settings;
+                    for (var key in sessions) {
+                        var s = sessions[key];
+                        if (s.logged_in) {
+                            all_user_settings[s.profile.username] = s.profile.user_settings;
+                        }
                     }
-                }
 
-                sessionator.broadcast('users', 'user_settings', {
-                    user_settings: all_user_settings
+                    sessionator.broadcast('users', 'user_settings', {
+                        user_settings: all_user_settings
+                    });
+
+                    console.log("user settings updated for " + session.profile.username);
                 });
-
-                console.log("user settings updated for " + session.profile.username);
-            }, function(err) {
-                console.log("whoops");
             });
         }
     };

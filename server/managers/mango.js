@@ -1,20 +1,16 @@
-var MongoClient = require('mongodb').MongoClient;
+var mongo_client = require('mongodb').MongoClient;
 const MONGO_URL = 'mongodb://localhost:27017/yehrye';
 
 exports.get = function() {
     return new Promise(function(resolve, reject) {
-        MongoClient.connect(MONGO_URL, function(err, db) {
-            if (err != null) {
-                reject(err);
-            }
-
+        mongo_client.connect(MONGO_URL).then(function(db) {
             resolve(db);
         });
     });
 
 };
 
-// MongoClient.connect(url, function(err, db) {
+// mongo_client.connect(url, function(err, db) {
 //     var collection = db.collection('documents');
 //
 //     // collection.insertMany([

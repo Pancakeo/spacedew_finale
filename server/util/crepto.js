@@ -27,21 +27,14 @@ exports.hash_password = function(password) {
 };
 
 // Query db for salt and then hash with given password. Return undefined if salt is missing or an error occurs.
-exports.get_hashed_password = function(user, params) {
+exports.get_hashed_password = function(user, password) {
     return new Promise(function(resolve, reject) {
-        var username = params.username;
-        var password = params.password;
-
-        console.log(user);
-        return;
-
-        var salt = result.rows[0].salty;
-        var user_id = result.rows[0].user_id;
+        var salt = user.salty;
 
         crypto.pbkdf2(password, salt, PBKDF2_ITERATIONS, PBKDF2_KEY_LENGTH, function(error, hashed_password) {
             if (error == null) {
                 hashed_password = hashed_password.toString('hex');
-                resolve({user_id: user_id, hashed_password: hashed_password});
+                resolve({hashed_password: hashed_password});
             }
             else {
                 reject(Error(error));
