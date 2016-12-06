@@ -59,7 +59,8 @@ exports.broadcast = function(type, sub_type, data, options) {
         if (options.require_logged_in && session.logged_in) {
             if (room != null) {
 
-                if (room.is_member(session.profile.username) >= 0) {
+                if (room.is_member(session.profile.username)) {
+                    console.log('send to', session.profile.username, options.room_id);
                     session.send(type, sub_type, data, {strip_entities: options.strip_entities});
                 }
             }
