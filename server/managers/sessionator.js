@@ -57,7 +57,7 @@ event_bus.on('steam_openid.verify', function(good_stuff) {
                 users.findOne({user_id: user_id}).then(function(user) {
                     user.steam_id = good_stuff.steam_id;
 
-                    users.updateOne({user_id: user_id}, {$set: {user_settings: user.user_settings}}).then(function() {
+                    users.updateOne({user_id: user_id}, {$set: {steam_id: good_stuff.steam_id}}).then(function() {
                         s.send('user_settings', 'steam_id', {steam_id: good_stuff.steam_id});
                         db.close();
 
