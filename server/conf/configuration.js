@@ -7,14 +7,26 @@
 "use strict";
 var fs = require('fs');
 var _ = require('lodash');
-const SERVER_CONFIG_PATH = './conf/server_config.json';
+const SERVER_CONFIG_PATH = './conf/server_config2.json';
+const DEFAULT_CONFIG_PATH = './conf/default_config.json';
 
 exports.load = function() {
-    var server_config = JSON.parse(fs.readFileSync(SERVER_CONFIG_PATH, 'utf8'));
+    var default_config = JSON.parse(fs.readFileSync(DEFAULT_CONFIG_PATH, 'utf8'));
+
+    var server_config = {};
+
+    try {
+        server_config = JSON.parse(fs.readFileSync(SERVER_CONFIG_PATH, 'utf8'));
+    }
+    catch (e) {
+        console.warn("Custom config not found. Defaults will be used, but may be wonky. Custom config path:", SERVER_CONFIG_PATH);
+    }
+
     var shared_config = require(app.shared_root + '/shared_config');
 
-    var merged_config = _.assign(server_config, shared_config);
+    var merged_config = _.assign(default_config, server_config, shared_config);
     console.log('Server configuration', merged_config);
+
     return merged_config;
 };
 

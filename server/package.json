@@ -11,10 +11,11 @@
     "lodash": "latest",
     "moment": "latest",
     "mongodb": "^2.2.12",
-    "node-uuid": "^1.4.7",
+    "openid": "^2.0.6",
     "request": "latest",
     "serve-static": "^1.10.0",
-    "ws": "^1.0.1"
+    "ws": "^1.0.1",
+    "node-uuid": "latest"
   },
   "devDependencies": {},
   "scripts": {

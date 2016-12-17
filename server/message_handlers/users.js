@@ -125,7 +125,14 @@ exports.handle_message = function handle_message(session, message) {
                 return;
             }
 
-            var warning_increment = wuptil.random(1, 31, true);
+            var action = 'warned';
+            if (data.super_warn) {
+                action = 'really warned';
+                var warning_increment = wuptil.random(1, 100, true);
+            }
+            else {
+                var warning_increment = wuptil.random(1, 31, true);
+            }
 
             if (warning_levels[evil_session.profile.username] == null) {
                 warning_levels[evil_session.profile.username] = 0
@@ -134,11 +141,12 @@ exports.handle_message = function handle_message(session, message) {
             warning_levels[evil_session.profile.username] += warning_increment;
             var current_warning = Math.min(100, warning_levels[evil_session.profile.username]);
 
+
             if (session.profile.username == data.username) {
-                var message = evil_session.profile.username + ' warned xemself.';
+                var message = evil_session.profile.username + ' ' + action + ' xemself.';
             }
             else {
-                var message = session.profile.username + ' warned ' + data.username + '.';
+                var message = session.profile.username + ' ' + action + ' ' + data.username + '.';
             }
 
             message += " " + data.username + "'s warning level has been increased to " + current_warning + '%.';

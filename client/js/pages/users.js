@@ -141,6 +141,7 @@ module.exports = function($target) {
                 selector: '.user',
                 build: function($trigger, e) {
                     var username = $trigger.find('.username').text();
+                    var user = $trigger.prop('user');
 
                     return {
                         callback: function(key, options) {
@@ -150,13 +151,29 @@ module.exports = function($target) {
                                     page.send('warn', {username: username, room_id: room_id});
                                     break;
 
+                                case 'super_warn':
+                                    var room_id = app.get_active_room(true);
+                                    page.send('warn', {username: username, room_id: room_id, super_warn: true});
+                                    break;
+
+                                case 'view_rl_page':
+                                    window.open('https://rocketleague.tracker.network/profile/steam/' + user.steam_id, '_blank');
+                                    break;
+
                                 default:
                                     break;
                             }
 
                         },
                         items: {
-                            warn: {name: "Warn " + username, icon: "fa-exclamation-triangle"}
+                            warn: {name: "Warn " + username, icon: "fa-exclamation-triangle"},
+                            super_warn: {name: "Really Warn " + username, icon: "fa-bomb"},
+                            view_rl_page: {
+                                name: 'View Rocket League Tracker', icon: 'fa-rocket',
+                                disabled: function() {
+                                    return user.steam_id == null;
+                                }
+                            }
                         }
                     };
                 }

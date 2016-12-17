@@ -1,5 +1,5 @@
 var mongo_client = require('mongodb').MongoClient;
-const MONGO_URL = 'mongodb://localhost:27017/yehrye';
+const MONGO_URL = 'mongodb://localhost:' + app.config.db_port + '/yehrye';
 
 exports.get = function() {
     return new Promise(function(resolve, reject) {
