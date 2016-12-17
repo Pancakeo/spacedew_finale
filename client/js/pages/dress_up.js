@@ -163,6 +163,39 @@ module.exports = function() {
                 });
 
                 apply_settings(true);
+
+                $dialog.find('button').button();
+                $dialog.find('#clear_steam_id').on('click', function() {
+                    toolio.confirm("Really?", "Do you really want to clear your Steam ID?", function() {
+                        ws.send('user_settings', 'clear_steam_id', {});
+                    });
+                });
+
+                $dialog.find('#set_steam_id').on('click', function() {
+                    var auth_key = localStorage.auth_key;
+
+                    toolio.confirm("Hey Man", "This will open a new window, where you can login to Steam. That all right?", function() {
+                        var popup = window.open('/steam_auth?auth_key=' + auth_key, '_blank');
+
+                        var wait_for_verification = setInterval(function() {
+                            var allowed_access = Object.keys(popup.location);
+
+                            // Avoids access restriction notification, while we're in Steam land.
+                            if (allowed_access.indexOf('pathname') >= 0 && popup.location.pathname == '/steam_verify') {
+                                clearInterval(wait_for_verification);
+                                popup.close();
+                            }
+                        }, 1000);
+
+                    });
+
+                });
+
+                page.peepy('user_settings.steam_id', function(params) {
+                    page.$("#steam_id").val(params.steam_id);
+                });
+
+                ws.send('user_settings', 'get_steam_id', {});
             };
 
             var apply_settings = function(load, load_from) {

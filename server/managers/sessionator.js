@@ -2,6 +2,8 @@
 var sessions = {};
 var event_bus = require(app.shared_root + '/event_bus');
 var wiseau = require('./wiseau');
+var mango = require('../managers/mango');
+var star_wars = require('../stars/wupfindstar');
 
 // Various tasks to do every so often.
 setInterval(function() {
@@ -40,6 +42,34 @@ exports.link_binary = function(binary_cid, binary_ws) {
     }
 };
 
+event_bus.on('steam_openid.verify', function(good_stuff) {
+    for (var cid in sessions) {
+        var s = sessions[cid];
+        if (s.auth_key == good_stuff.auth_key) {
+            s.profile.steam_id = good_stuff.steam_id;
+            event_bus.emit('update_userlist', {});
+
+            // Update steam_id in db:
+            var user_id = s.profile.user_id;
+            mango.get().then(function(db) {
+                var users = db.collection('users');
+
+                users.findOne({user_id: user_id}).then(function(user) {
+                    user.steam_id = good_stuff.steam_id;
+
+                    users.updateOne({user_id: user_id}, {$set: {user_settings: user.user_settings}}).then(function() {
+                        s.send('user_settings', 'steam_id', {steam_id: good_stuff.steam_id});
+                        db.close();
+
+                        star_wars.update_user(user);
+                    });
+                });
+
+            });
+            break;
+        }
+    }
+});
 
 exports.broadcast = function(type, sub_type, data, options) {
     options = Object.assign({

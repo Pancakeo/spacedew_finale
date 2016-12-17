@@ -7,7 +7,7 @@
 "use strict";
 var fs = require('fs');
 var _ = require('lodash');
-const SERVER_CONFIG_PATH = './conf/server_config2.json';
+const SERVER_CONFIG_PATH = './conf/server_config.json';
 const DEFAULT_CONFIG_PATH = './conf/default_config.json';
 
 exports.load = function() {

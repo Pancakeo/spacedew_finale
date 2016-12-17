@@ -78,6 +78,10 @@ module.exports = (function() {
                 event_bus.emit('ws.binary_disconnect');
                 break;
 
+            case 'binary_reconnect_attempt':
+                app.append_system("Attempting to reconnect binary...", {color: 'green'});
+                break;
+
             case 'disconnect':
                 if (manually_closed === false) {
                     event_bus.emit('ws.disconnect');

@@ -72,7 +72,7 @@ addEventListener('message', function(e) {
                 };
 
                 if (binary_ws && binary_ws.readyState > 1) {
-                    app.append_system("Attempting to reconnect binary...", {color: 'green'});
+                    postMessage({action: 'binary_reconnect_attempt'});
                     connect_binary();
                 }
 

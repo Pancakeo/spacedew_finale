@@ -54,13 +54,13 @@ var send_users_list = function(room, session) {
         if (idx >= 0) {
             nice_users[idx].idle = (s.idle == true);
             nice_users[idx].ping = s.ping;
+            nice_users[idx].steam_id = s.profile.steam_id;
             nice_users[idx].rocket_league_rank = s.profile.rocket_league_rank;
             nice_users[idx].warning_level = warning_levels[s.profile.username] || 0;
 
             if (s.idle == true && s.idle_start) {
                 nice_users[idx].idle_duration = Date.now() - s.idle_start;
             }
-
         }
     }
 
@@ -181,6 +181,10 @@ event_bus.on('login', function(params) {
 
     var lobby = wiseau.get_lobby();
     lobby.join_room(username);
+    send_users_list();
+});
+
+event_bus.on('update_userlist', function(params) {
     send_users_list();
 });
 

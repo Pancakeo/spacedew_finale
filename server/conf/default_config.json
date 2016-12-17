@@ -3,5 +3,5 @@
   "http_port": 1991,
   "connection_timeout": 120,
   "lobby_room_name": "Welcome to Yehrye",
-  "server_url": "http://localhost:1991"
+  "server_url": "http://yehrye.com"
 }

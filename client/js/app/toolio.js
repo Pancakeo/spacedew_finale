@@ -9,6 +9,40 @@ module.exports = (function() {
         });
     };
 
+    toolio.confirm = function(title, message, on_success, on_fail) {
+        if (typeof(on_success) != "function") {
+            on_success = function() {
+
+            };
+        }
+
+        if (typeof(on_fail) != "function") {
+            on_fail = function() {
+
+            };
+        }
+
+        $('<div>' + message + '</div>').dialog({
+            title: title,
+            modal: true,
+            buttons: {
+                'Ok': function() {
+                    $(this).prop('success', true);
+                    $(this).dialog('close');
+                    on_success();
+                },
+                'Cancel': function() {
+                    $(this).dialog('close');
+                }
+            },
+            close: function() {
+                if (!$(this).prop('success')) {
+                    on_fail();
+                }
+            }
+        });
+    };
+
     toolio.nice_size = function(size) {
         var units = ['kb', 'mb', 'gb'];
         var unit = 'b';

@@ -2,6 +2,7 @@
 var openid = require('openid');
 var url = require('url');
 var querystring = require('querystring');
+var event_bus = require(app.shared_root + '/event_bus');
 const STEAM_OPENID_URL = "http://steamcommunity.com/openid";
 
 if (!app.config.server_url) {
@@ -74,6 +75,7 @@ exports.verify = function(req, res) {
                 auth_key: auth_key
             };
 
+            event_bus.emit('steam_openid.verify', good_stuff);
             res.end(JSON.stringify(good_stuff));
         }
         else {

@@ -115,7 +115,7 @@ module.exports = function($target) {
                     $star.find('img').attr('src', 'images/rl_ranks/' + user.rocket_league_rank + '.png');
                 }
                 else {
-                    $star.find('img').attr('src', 'images/rl_ranks/0.png');
+                    $star.find('img').css({visibility: 'hidden'});
                 }
 
                 $user.prepend($star);

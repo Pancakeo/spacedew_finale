@@ -100,6 +100,22 @@ exports.handle_message = function handle_message(session, message) {
                     console.log("user settings updated for " + session.profile.username);
                 });
             });
+        },
+        get_steam_id: function() {
+            session.send('user_settings', 'steam_id', {steam_id: session.profile.steam_id});
+        },
+        clear_steam_id: function() {
+            var user_id = session.profile.user_id;
+            mango.get().then(function(db) {
+                var users = db.collection('users');
+
+                users.updateOne({user_id: user_id}, {$set: {steam_id: null, rl_max_rank: null}}).then(function() {
+                    session.profile.rocket_league_rank = null;
+                    session.profile.steam_id = null;
+                    session.send('user_settings', 'steam_id', {steam_id: null});
+                    db.close();
+                });
+            });
         }
     };
 

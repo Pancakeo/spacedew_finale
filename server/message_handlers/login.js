@@ -28,6 +28,8 @@ exports.handle_message = function handle_message(session, message) {
         var auth_key = crypto.randomBytes(16).toString('hex');
         var user_id = user.user_id;
 
+        session.auth_key = auth_key;
+
         var room = wiseau.get_lobby();
         room.join_room(session.profile.username);
 
