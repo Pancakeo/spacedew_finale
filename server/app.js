@@ -1,6 +1,14 @@
 "use strict";
 global.Promise = require("bluebird");
 
+require("console-stamp")(console, {
+    colors: {
+        stamp: "yellow",
+        label: "white",
+        metadata: "green"
+    }
+});
+
 global.app = {};
 app.shared_root = require('path').join(__dirname, '..', 'shared');
 app.config = require('./conf/configuration').load();
