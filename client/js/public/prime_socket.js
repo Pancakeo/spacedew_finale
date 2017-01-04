@@ -71,7 +71,7 @@ addEventListener('message', function(e) {
                     timestamp: Date.now()
                 };
 
-                if (binary_ws && binary_ws.readyState > 1) {
+                if ((binary_ws && binary_ws.readyState > 1) && (ws && ws.readyState == 1)) {
                     postMessage({action: 'binary_reconnect_attempt'});
                     connect_binary();
                 }
