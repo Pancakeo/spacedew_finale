@@ -569,5 +569,10 @@ module.exports = function(options) {
             }
         };
 
+
+        if (app.is_mobile) {
+            $("#footer [menu_item]").removeClass('fa-2x').addClass('fa-4x');
+        }
+
     });
 };

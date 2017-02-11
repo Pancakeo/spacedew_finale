@@ -28,6 +28,10 @@ module.exports = (function() {
         domain += ":" + window.location.port
     }
 
+    var user_agent = navigator.userAgent.toLowerCase();
+    var is_android = user_agent.indexOf("android") > -1;
+    var is_iphone = user_agent.indexOf("iphone") > -1;
+
     window.app = {
         event_bus: require('../../../shared/event_bus'),
         toolio: require('../app/toolio'),
@@ -36,6 +40,7 @@ module.exports = (function() {
         settings: {},
         profile: {},
         emu_list: [],
+        is_mobile: is_android || is_iphone,
         world: {user_settings: {}} // Users and shit.
     };
 
