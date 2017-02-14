@@ -1,5 +1,6 @@
 module.exports = function($target) {
     var known_users = {};
+    var displayed_users_once = false; // for mobile
     var default_emus = require('../app/default_emus');
 
     get_page('users', function(page) {
@@ -178,6 +179,15 @@ module.exports = function($target) {
                     };
                 }
             });
+
+            if (app.is_mobile && !displayed_users_once) {
+                displayed_users_once = true;
+                var woboy_users = data.users.map(function(user) {
+                    return user.username;
+                }).join(', ');
+
+                app.append_system("Users logged in: " + woboy_users, {color: 'green'});
+            }
         });
 
         $(document).idle({

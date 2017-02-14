@@ -569,10 +569,12 @@ module.exports = function(options) {
             }
         };
 
-
-        if (app.is_mobile) {
-            $("#footer [menu_item]").removeClass('fa-2x').addClass('fa-4x');
-        }
+        page.$("#slash_users").on('click', function() {
+            page.$("#users").clone().dialog({
+                title: "Users Logged In",
+                modal: true
+            });
+        });
 
     });
 };
