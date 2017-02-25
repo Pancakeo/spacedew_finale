@@ -219,7 +219,7 @@ module.exports = function($parent, options) {
         });
 
         event_bus.on('ws.disconnect', function() {
-            if (localStorage.instance_id != app.instance_id) {
+            if (localStorage.instance_id != null && localStorage.instance_id != app.instance_id) {
                 console.log('localStorage', localStorage.instance_id);
                 console.log('app', app.instance_id);
                 page.alert('Whew.', 'Disconnected. Another, more recent instance of yehrye exists. Did you open another tab, Canister?');
@@ -406,6 +406,10 @@ module.exports = function($parent, options) {
 
             append_custom($blargh, {room_id: lobby.id});
         }
+
+        var instance_id = app.toolio.generate_id();
+        localStorage.instance_id = instance_id;
+        app.instance_id = instance_id;
     });
 
     return {};

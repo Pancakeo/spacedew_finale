@@ -18,7 +18,8 @@ exports.handle_message = function handle_message(session, message) {
 
     var do_login = function(user, options) {
         options = Object.assign({
-            reconnect: false
+            reconnect: false,
+            password_change_required: false
         }, options);
 
         session.login(data.username, user.user_id);
@@ -47,7 +48,8 @@ exports.handle_message = function handle_message(session, message) {
                 username: data.username,
                 auth_key: auth_key,
                 lobby: wiseau.get_lobby(),
-                emu_list: emu_list
+                emu_list: emu_list,
+                password_change_required: options.password_change_required
             }
         );
 
@@ -104,9 +106,16 @@ exports.handle_message = function handle_message(session, message) {
                         return;
                     }
 
-                    crepto.get_hashed_password(user, data.password).then(function(result) {
+                    let password_hasher = crepto.get_hashed_password;
+                    let password_change_required = false;
+                    if (user.last_password_change_date == null) {
+                        password_hasher = crepto.get_legacy_hashed_password;
+                        password_change_required = true;
+                    }
+
+                    password_hasher(user, data.password).then(function(result) {
                         if (user.password == result.hashed_password) {
-                            do_login(user);
+                            do_login(user, {password_change_required: password_change_required});
                         }
                         else {
                             session.send('login', 'login', {success: false, reason: "Fuck you (bad login)."});

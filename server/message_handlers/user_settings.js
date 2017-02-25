@@ -32,8 +32,15 @@ exports.handle_message = function handle_message(session, message) {
                 var users = db.collection('users');
 
                 users.findOne({user_id: session.profile.user_id}).then(function(user) {
+                    let password_hasher = crepto.get_hashed_password;
+                    let password_change_required = false;
 
-                    crepto.get_hashed_password(user, data.current_pw).then(function(result) {
+                    if (user.last_password_change_date == null) {
+                        password_hasher = crepto.get_legacy_hashed_password;
+                        password_change_required = true;
+                    }
+
+                    password_hasher(user, data.current_pw).then(function(result) {
                         users.findOne({user_id: session.profile.user_id, password: result.hashed_password}).then(function(user_fishing) {
                             if (user_fishing == null) {
                                 session.send('user_settings', 'change_password', {success: false, reason: "Current password is incorrect."});
@@ -42,10 +49,9 @@ exports.handle_message = function handle_message(session, message) {
                             }
 
                             crepto.hash_password(data.new_pw).then(function(new_password) {
-                                console.log(new_password);
-
                                 users.updateOne({user_id: session.profile.user_id}, {
                                     $set: {
+                                        last_password_change_date: new Date(),
                                         password: new_password.hashed_password,
                                         salty: new_password.salt
                                     }

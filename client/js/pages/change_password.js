@@ -1,4 +1,12 @@
-module.exports = function() {
+module.exports = function(options) {
+    options = $.extend({
+        banner: null,
+        on_success: function() {
+
+        },
+        on_cancel: function() {
+        }
+    }, options);
 
     get_page('change_password', function(page) {
         var $dialog = page.$container.dialog({
@@ -27,6 +35,7 @@ module.exports = function() {
                     page.ws.send('user_settings', 'change_password', params);
                 },
                 'Cancel': function() {
+                    options.on_cancel();
                     $(this).dialog('close');
                 }
             },
@@ -38,8 +47,10 @@ module.exports = function() {
         });
 
         page.init = function() {
+            page.$("#banner").text(options.banner);
             page.event_bus.on('user_settings.change_password', function(data) {
                 if (data.success == true) {
+                    options.on_success();
                     $dialog.dialog('close');
                 }
                 else {

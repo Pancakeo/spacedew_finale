@@ -63,6 +63,19 @@ module.exports = function() {
                 return;
             }
 
+            if (data.password_change_required) {
+                require('./change_password')({
+                    banner: "We informations password SHA-1 insecure. Please ship password in provided packaging, and fedes, California.",
+                    on_success: function() {
+                        page.alert("Password changed", "Password changed. Please refresh and try logging in now.");
+                    },
+                    on_cancel: function() {
+                        window.location = '/';
+                    }
+                });
+                return;
+            }
+
             localStorage.auth_key = data.auth_key;
             localStorage.username = data.username;
 

@@ -14,16 +14,7 @@ module.exports = (function() {
         query_params[parts[0]] = parts[1];
     });
 
-    if (!query_params.wup) {
-        var instance_id = toolio.generate_id();
-        localStorage.instance_id = instance_id;
-    }
-    else {
-        // popup
-        instance_id = localStorage.instance_id;
-    }
-
-    var domain = window.location.protocol + '//' + window.location.hostname;
+        var domain = window.location.protocol + '//' + window.location.hostname;
     if (window.location.port != 80) {
         domain += ":" + window.location.port
     }
@@ -35,7 +26,6 @@ module.exports = (function() {
     window.app = {
         event_bus: require('../../../shared/event_bus'),
         toolio: require('../app/toolio'),
-        instance_id: instance_id,
         domain: domain,
         settings: {},
         profile: {},
