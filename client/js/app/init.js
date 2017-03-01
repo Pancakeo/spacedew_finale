@@ -50,12 +50,12 @@ module.exports = (function() {
     var shared_config = require('../../../shared/shared_config'); // TODO - consider copying shared/* to a more relative folder.
 
     var server_settings = {
-        server: 'wss://localhost:' + shared_config.chat_port,
-        binary_server: 'wss://localhost:' + shared_config.binary_port
+        server: 'ws://localhost:' + shared_config.chat_port,
+        binary_server: 'ws://localhost:' + shared_config.binary_port
     };
 
     for (var server in server_settings) {
-        if (server_settings[server].match('wss://localhost') !== null) {
+        if (server_settings[server].match('ws://localhost') !== null) {
             server_settings[server] = server_settings[server].replace('localhost', window.location.hostname);
         }
     }
