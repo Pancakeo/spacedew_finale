@@ -128,10 +128,10 @@ exports.handle_message = function handle_message(session, message) {
             var action = 'warned';
             if (data.super_warn) {
                 action = 'really warned';
-                var warning_increment = wuptil.random(1, 100, true);
+                var warning_increment = wuptil.random(67, 99, true);
             }
             else {
-                var warning_increment = wuptil.random(1, 31, true);
+                var warning_increment = wuptil.random(1, 33, true);
             }
 
             if (warning_levels[evil_session.profile.username] == null) {
