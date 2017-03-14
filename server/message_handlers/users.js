@@ -15,24 +15,7 @@ setInterval(function() {
     send_users_list();
 }, 15000);
 
-var send_mini_wb = function(room, session) {
-    room.tent.mini.canvas.toDataURL('image/png', function(err, png) {
-        if (err != null) {
-            return;
-        }
-
-        var data = {
-            room_id: room.id,
-            data_src: png,
-            mini: true
-        };
-
-        session.send('black_board', 'load', data)
-    });
-
-};
-
-var send_users_list = function(room, session) {
+let send_users_list = function(room, session) {
     if (room == null) {
         room = wiseau.get_lobby();
     }
@@ -72,6 +55,15 @@ var send_users_list = function(room, session) {
     }
 };
 
+let send_ross = function(room, session) {
+    session.send('black_board', 'load', {
+        room_id: room.id,
+        data: room.bob_ross.compress(),
+        bg_color: room.bob_ross.bg_color
+    });
+};
+
+
 exports.handle_message = function handle_message(session, message) {
     var sub_type = message.sub_type;
     var data = message.data;
@@ -107,7 +99,7 @@ exports.handle_message = function handle_message(session, message) {
 
             send_user_settings();
             send_users_list(room, session);
-            send_mini_wb(room, session);
+            send_ross(room, session);
         },
         warn: function() {
             var sessions = sessionator.get_sessions();

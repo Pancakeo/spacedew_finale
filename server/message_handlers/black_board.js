@@ -43,37 +43,16 @@ exports.handle_message = function handle_message(session, message) {
 
     switch (sub_type) {
         case 'sync':
-            if (room.tent.no_canvas) {
-                var data = {
-                    room_id: room.id,
-                    no_canvas: true,
-                    mini: false,
-                    bg_color: room.tent.bg_color
-                };
-
-                session.send('black_board', 'load', data);
-                return;
-            }
-
-            room.tent.canvas.toDataURL('image/png', function(err, png) {
-                if (err != null) {
-                    return;
-                }
-
-                var data = {
-                    room_id: room.id,
-                    data_src: png,
-                    mini: false,
-                    bg_color: room.tent.bg_color
-                };
-
-                session.send('black_board', 'load', data);
+            session.send('black_board', 'load', {
+                room_id: room.id,
+                data: room.bob_ross.compress(),
+                bg_color: room.bob_ross.bg_color
             });
             break;
 
         case 'draw':
             if (data.type == 'colorful_clear' && data.data.nuke) {
-                if (room.tent.dirty) {
+                if (room.bob_ross.dirty) {
                     sessionator.broadcast('chatterbox', 'system', {message: session.profile.username + ' cleared the X-board.', room_id: data.room_id, color: 'green'});
                 }
             }
@@ -82,7 +61,7 @@ exports.handle_message = function handle_message(session, message) {
                 positions[session.profile.username] = data.data;
             }
 
-            room.tent.handle_thing(data);
+            room.bob_ross.handle_thing(data);
             data.username = session.profile.username;
             sessionator.broadcast('black_board', sub_type, data, {strip_entities: false});
             break;
