@@ -107,9 +107,8 @@ module.exports = (function() {
                 var meta = params.meta;
 
                 if (meta.type == 'blackboard') {
-                    var inflated_response = pako.inflate(params.buffer);
-                    var response_as_string = String.fromCharCode.apply(null, new Uint16Array(inflated_response));
-                    var response_as_json = JSON.parse(response_as_string);
+                    var inflated_response = pako.inflate(params.buffer, {to: 'string'});
+                    var response_as_json = JSON.parse(inflated_response);
                     var useful_response = {
                         bg_color: meta.bg_color,
                         room_id: meta.room_id,
