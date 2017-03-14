@@ -52,6 +52,7 @@ exports.handle_message = function handle_message(session, message) {
 
         case 'draw':
             if (data.type == 'colorful_clear' && data.data.nuke) {
+                room.bob_ross.clear(data.data.color);
                 if (room.bob_ross.dirty) {
                     sessionator.broadcast('chatterbox', 'system', {message: session.profile.username + ' cleared the X-board.', room_id: data.room_id, color: 'green'});
                 }
