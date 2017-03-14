@@ -393,6 +393,11 @@ module.exports = function() {
 
             if (info.type == 'load') {
                 board.style.bg_color = info.bg_color;
+                ch.handle_thing({type: 'colorful_clear', data: {color: info.bg_color, nuke: true}});
+
+                info.data.forEach(function(thing) {
+                    ch.handle_thing(thing);
+                })
             }
 
             if ($wait_dialog) {

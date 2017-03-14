@@ -21,24 +21,15 @@ module.exports = function($target) {
         };
 
         page.peepy('black_board.load', function(data) {
+            data.type = 'load';
+            pass_it_up(data);
 
-            if (!data.mini) {
-                data.type = 'load';
-                pass_it_up(data);
-            }
-            else {
-                ctx.clearRect(0, 0, 1280, 720);
+            ch.handle_thing({type: 'colorful_clear', data: {color: data.bg_color, nuke: true}});
 
-                var image = new Image();
-                image.onload = function() {
-                    ctx.scale(5, 5);
-                    ctx.globalAlpha = 1;
-                    ctx.drawImage(image, 0, 0);
-                    ctx.scale(0.2, 0.2);
-                };
+            data.data.forEach(function(thing) {
+                ch.handle_thing(thing);
+            });
 
-                image.src = data.data_src;
-            }
         });
 
         page.peepy('black_board.draw', function(info) {

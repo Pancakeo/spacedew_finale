@@ -106,6 +106,20 @@ module.exports = (function() {
             case 'message_buffer':
                 var meta = params.meta;
 
+                if (meta.type == 'blackboard') {
+                    var inflated_response = pako.inflate(params.buffer);
+                    var response_as_string = String.fromCharCode.apply(null, new Uint16Array(inflated_response));
+                    var response_as_json = JSON.parse(response_as_string);
+                    var useful_response = {
+                        bg_color: meta.bg_color,
+                        room_id: meta.room_id,
+                        data: response_as_json
+                    };
+
+                    event_bus.emit('black_board.load', useful_response);
+                    return;
+                }
+
                 // I'm sure it's fine.
                 if (meta.debut === true && wupsocket.binary_transfers[meta.transfer_id] == null) {
                     wupsocket.binary_transfers[meta.transfer_id] = {data: []};

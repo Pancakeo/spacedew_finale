@@ -7,25 +7,13 @@ module.exports = function(ctx) {
         var data = info.data;
 
         switch (info.type) {
-            case 'load':
-                ctx.clearRect(0, 0, 1280, 720);
-
-                var image = new Image();
-                image.onload = function() {
-                    ctx.globalAlpha = 1;
-                    ctx.drawImage(image, 0, 0);
-                };
-
-                image.src = info.data_src;
-                break;
-
             case 'line':
-                ctx.lineCap = "round";
                 ctx.beginPath();
-                ctx.moveTo(data.start_x, data.start_y);
+                ctx.lineCap = "round";
                 ctx.strokeStyle = data.color;
                 ctx.globalAlpha = data.alpha;
                 ctx.lineWidth = data.line_width;
+                ctx.moveTo(data.start_x, data.start_y);
                 ctx.lineTo(data.end_x, data.end_y);
                 ctx.stroke();
                 break;

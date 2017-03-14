@@ -36,6 +36,11 @@ exports.link_binary = function(binary_cid, binary_ws) {
         if (cid == binary_cid) {
             var s = sessions[cid];
             s.binary_ws = binary_ws;
+
+            s.queued_binary.forEach(function(transfer) {
+                s.send_buffer(transfer.buffer, transfer.meta, transfer.send_options);
+            });
+
             // console.log('Linked ' + cid + ' to binary conneciton.');
             return s;
         }
@@ -165,6 +170,7 @@ exports.connect = function(connection_id, ws) {
         profile: {},
         idle: false,
         last_activity: Date.now(),
+        queued_binary: [],
 
         send: function(type, sub_type, data, send_options) {
             send_options = Object.assign({
@@ -194,6 +200,7 @@ exports.connect = function(connection_id, ws) {
             send_options = Object.assign({}, send_options);
 
             if (!session.binary_ws) {
+                session.queued_binary.push({buffer: buffer, meta: meta, send_options: send_options});
                 return;
             }
 
