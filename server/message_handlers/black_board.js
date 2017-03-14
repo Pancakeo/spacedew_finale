@@ -43,11 +43,7 @@ exports.handle_message = function handle_message(session, message) {
 
     switch (sub_type) {
         case 'sync':
-            session.send('black_board', 'load', {
-                room_id: room.id,
-                data: room.bob_ross.compress(),
-                bg_color: room.bob_ross.bg_color
-            });
+            room.bob_ross.sync(session);
             break;
 
         case 'draw':

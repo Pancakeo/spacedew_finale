@@ -56,13 +56,8 @@ let send_users_list = function(room, session) {
 };
 
 let send_ross = function(room, session) {
-    session.send('black_board', 'load', {
-        room_id: room.id,
-        data: room.bob_ross.compress(),
-        bg_color: room.bob_ross.bg_color
-    });
+    room.bob_ross.sync(session);
 };
-
 
 exports.handle_message = function handle_message(session, message) {
     var sub_type = message.sub_type;

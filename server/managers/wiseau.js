@@ -59,7 +59,7 @@ exports.create_room = function(room_name, room_id) {
     };
 
 
-    room.bob_ross = require('../whew/bob_ross')();
+    room.bob_ross = require('../whew/bob_ross')(room);
 
     rooms[room_id] = room;
     return room;
