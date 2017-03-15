@@ -176,9 +176,5 @@ event_bus.on('update_userlist', function(params) {
 });
 
 event_bus.on('logout', function(params) {
-    var username = params.username;
-
-    var lobby = wiseau.get_lobby();
-    lobby.leave_room(username);
     send_users_list();
 });

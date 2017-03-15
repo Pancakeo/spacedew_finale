@@ -83,6 +83,10 @@ exports.broadcast = function(type, sub_type, data, options) {
         strip_entities: true
     }, options);
 
+    if (options.room_id == null && data.room_id != null) {
+        options.room_id = data.room_id;
+    }
+
     if (options.room_id != null) {
         data.room_id = options.room_id;
         var room = wiseau.get_room(options.room_id);
@@ -253,6 +257,7 @@ exports.connect = function(connection_id, ws) {
         logout: function() {
             if (session.logged_in) {
                 console.log(session.profile.username + " logged out.");
+                wiseau.logout_user(session.profile.username);
                 event_bus.emit('logout', session.profile);
             }
 

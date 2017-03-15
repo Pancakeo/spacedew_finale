@@ -19,7 +19,6 @@ module.exports = function(options) {
         var chatterbox = require('./chatterbox')(page.$('#left_pane'), options);
 
         require('./users')(page.$('#users_placeholder'));
-        require('./mini_black_board')(page.$('#mini_black_board_placeholder'));
 
         var last_emote_ts = null;
         var shown_flood = false;
@@ -245,12 +244,28 @@ module.exports = function(options) {
         page.$("#room_names").on('click', '.room_tab', function() {
             var $active = page.$("#room_names .room_tab.active");
             if ($active.length == 1 && $active.attr('room_id') != $(this).attr('room_id')) {
-                $active.prop('room_box').hide();
+                var $room_box = $active.prop('room_box');
+                $room_box.hide();
+                var whewboard = $room_box.prop('whewboard');
+
+                if (whewboard) {
+                    whewboard.hide();
+                }
             }
+
+            var $selected_tab = $(this);
+            var room = $selected_tab.prop('room');
+            page.$("#room_name").html(room.name).attr('title', room.name);
 
             page.$("#room_names .room_tab").removeClass('active');
             $(this).addClass('active');
-            $(this).prop('room_box').show();
+            var $room_box = $(this).prop('room_box');
+            $room_box.show();
+            
+            var whewboard = $room_box.prop('whewboard');
+            if (whewboard) {
+                whewboard.show();
+            }
         });
 
         page.$("#room_names").on('dblclick', '.room_tab', function() {
@@ -355,6 +370,15 @@ module.exports = function(options) {
 
         app.rename_room_tab = function(room_id, room_name) {
             page.$('#room_names [room_id="' + room_id + '"]').html(room_name).attr('title', room_name);
+            page.$("#room_name").html(room_name).attr('title', room_name);
+        };
+
+        app.users_pane_loaded = function() {
+            var $active = page.$("#room_names .room_tab.active");
+            if ($active.length == 1) {
+                var room = $active.prop('room');
+                page.$("#room_name").html(room.name).attr('title', room.name);
+            }
         };
 
         app.add_room_tab = function(room, add_options) {
@@ -364,9 +388,12 @@ module.exports = function(options) {
 
             var $room_tab = $('<div class="room_tab" room_id="' + room.id + '"/>');
             $room_tab.attr('title', room.name).html(room.name);
+            $room_tab.prop('room', room);
 
             var $room_box = $('<div class="chat_thing" room_id="' + room.id + '"></div>');
-            $room_tab.prop('room', room);
+            $room_box.prop('room', room);
+
+            require('./mini_black_board')(page.$('#mini_black_board_placeholder'), room, $room_box);
 
             $room_box.on('click', '.blargh .close', function() {
                 $(this).closest('.blargh').remove();
@@ -382,7 +409,6 @@ module.exports = function(options) {
                 $(this).closest('.file_transfer').remove();
             });
 
-            // May actually not need these:
             $room_box.prop('room_tab', $room_tab);
             $room_tab.prop('room_box', $room_box);
 

@@ -1,8 +1,11 @@
-module.exports = function($target) {
+module.exports = function($target, room, $room_box) {
     var canvas_handler = require('../../../shared/canvas_handler');
 
     get_page('mini_black_board', function(page) {
-        $target.replaceWith(page.$container);
+        $target.append(page.$container);
+        page.$container.attr('room_id', room.id);
+
+        $room_box.prop('whewboard', page.$container);
 
         var canvas = page.$("#mini_black_board_canvas")[0];
         var ctx = canvas.getContext('2d');

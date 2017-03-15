@@ -206,6 +206,7 @@ module.exports = function($target) {
             if (app.ready) {
                 page.send('sync', {room_id: app.get_active_room(true)});
                 clearInterval(wait_for_app);
+                app.users_pane_loaded();
             }
         }, 50);
     });

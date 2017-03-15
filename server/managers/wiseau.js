@@ -6,7 +6,7 @@ var moment = require('moment');
 var rooms = {};
 var lobby_room;
 
-var MAX_MESSAGES = 15;
+var MAX_MESSAGES = 45;
 
 exports.create_room = function(room_name, room_id) {
     room_id = room_id || uuid.v4();
@@ -85,6 +85,15 @@ exports.get_room_by_name = function(room_name) {
 
 exports.get_lobby = function() {
     return lobby_room;
+};
+
+exports.logout_user = function(username) {
+    for (var room_id in rooms) {
+        var room = rooms[room_id];
+        if (room.is_member(username)) {
+            room.leave_room(username);
+        }
+    }
 };
 
 // Create lobby
