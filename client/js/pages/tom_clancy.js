@@ -23,6 +23,10 @@ module.exports = function(options) {
         var last_emote_ts = null;
         var shown_flood = false;
         page.$("#composer").on('keydown', function(e) {
+            if (e.altKey == true) {
+                return;
+            }
+
             var key = null;
 
             switch (e.keyCode) {
@@ -261,7 +265,7 @@ module.exports = function(options) {
             $(this).addClass('active');
             var $room_box = $(this).prop('room_box');
             $room_box.show();
-            
+
             var whewboard = $room_box.prop('whewboard');
             if (whewboard) {
                 whewboard.show();

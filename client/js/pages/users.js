@@ -168,7 +168,7 @@ module.exports = function($target) {
                         },
                         items: {
                             warn: {name: "Warn " + username, icon: "fa-exclamation-triangle"},
-                            super_warn: {name: "Really Warn " + username, icon: "fa-bomb"},
+                            super_warn: {name: "REALLY warn " + username, icon: "fa-bomb"},
                             view_rl_page: {
                                 name: 'View Rocket League Tracker', icon: 'fa-rocket',
                                 disabled: function() {
