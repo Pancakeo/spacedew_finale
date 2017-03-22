@@ -176,7 +176,8 @@ exports.handle_message = function handle_message(session, message) {
                             user_id: uuid.v4(),
                             password: result.hashed_password,
                             salty: result.salt,
-                            user_settings: {}
+                            user_settings: {},
+                            last_password_change_date: new Date()
                         };
 
                         users.insertOne(new_user).then(function(result) {
