@@ -113,7 +113,7 @@ module.exports = function($target) {
                 var $star = $('<div class="woah_star"><img/></div>');
 
                 if (user.rocket_league_rank != null) {
-                    $star.find('img').attr('src', 'images/rl_ranks/' + user.rocket_league_rank + '.png');
+                    $star.find('img').attr('src', 'images/rl_ranks/s4-' + user.rocket_league_rank + '.png');
                 }
                 else {
                     $star.find('img').css({visibility: 'hidden'});
