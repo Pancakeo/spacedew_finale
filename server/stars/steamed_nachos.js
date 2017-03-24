@@ -64,7 +64,6 @@ exports.verify = function(req, res) {
             res.end('Uh oh');
         }
 
-        res.writeHead(200);
         var user_id_regex = new RegExp('.*/openid/id/(.*)');
         var matches = user_id_regex.exec(result.claimedIdentifier);
 

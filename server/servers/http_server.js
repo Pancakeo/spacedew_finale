@@ -29,6 +29,16 @@ express_app.use(compress());
 //     var server = http.createServer(express_app);
 // }
 
+const steamed_nachos = require('../stars/steamed_nachos');
+
+express_app.get('/steam_auth', function(req, res) {
+    steamed_nachos.auth(req, res);
+});
+
+express_app.get('/steam_verify', function(req, res) {
+    steamed_nachos.verify(req, res);
+});
+
 var http = require('http');
 var server = http.createServer(express_app);
 
