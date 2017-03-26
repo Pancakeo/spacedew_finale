@@ -27,7 +27,7 @@ module.exports = function($target, room, $room_box) {
             if (data.room_id == room.id) {
                 data.type = 'load';
                 pass_it_up(data);
-                
+
                 ch.handle_thing({type: 'colorful_clear', data: {color: data.bg_color, nuke: true}});
 
                 data.data.forEach(function(thing) {
@@ -37,7 +37,6 @@ module.exports = function($target, room, $room_box) {
         });
 
         page.peepy('black_board.draw', function(info) {
-            console.log(info);
             if (info.room_id == room.id) {
                 pass_it_up(info);
                 ch.handle_thing(info);
