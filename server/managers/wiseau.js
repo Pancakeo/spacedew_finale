@@ -87,6 +87,10 @@ exports.get_lobby = function() {
     return lobby_room;
 };
 
+exports.get_room_ids = function() {
+    return Object.keys(rooms);
+};
+
 exports.logout_user = function(username) {
     for (var room_id in rooms) {
         var room = rooms[room_id];

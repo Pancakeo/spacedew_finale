@@ -2,11 +2,14 @@
   height: ~"calc(100% - 150px)";
 
   #room_name {
-    border-bottom: 1px black solid;
+    background: orange;
+    color: black;
+    border: 2px black solid;
+    border-right: none;
     padding: 5px;
-    text-overflow: ellipsis;
-    overflow-x: hidden;
-    white-space: nowrap;
+    max-height: 106px;
+    user-select: none;
+    overflow-y: hidden;
   }
 
   #users_list {

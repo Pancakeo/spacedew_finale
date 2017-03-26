@@ -71,6 +71,7 @@ exports.handle_message = function handle_message(session, message) {
             if (room == null) {
                 room = wiseau.create_room(data.name);
                 room.join_room(session.profile.username);
+                event_bus.emit('update_userlist', {});
                 session.send('chatterbox', 'join_room', room, {});
             }
             else {
@@ -78,6 +79,7 @@ exports.handle_message = function handle_message(session, message) {
 
                 if (!room.is_member(session.profile.username)) {
                     room.join_room(session.profile.username);
+                    event_bus.emit('update_userlist', {});
                     session.send('chatterbox', 'join_room', room, {});
                 }
             }

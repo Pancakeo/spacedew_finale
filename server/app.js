@@ -12,6 +12,7 @@ require("console-stamp")(console, {
 global.app = {};
 app.shared_root = require('path').join(__dirname, '..', 'shared');
 app.config = require('./conf/configuration').load();
+global.event_bus = require(app.shared_root + '/event_bus');
 
 var WebSocketServer = require('ws').Server;
 var chat_port = app.config.chat_port;

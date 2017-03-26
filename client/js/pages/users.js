@@ -42,25 +42,49 @@ module.exports = function($target) {
             update_user_list_style();
         });
 
-        page.listen('users_list', function(data) {
-            var room_id = data.room_id;
+        page.user_list_data = null;
+        app.render_users_list = function(data) {
+            if (data != null) {
+                page.user_list_data = data;
+            }
+            else if (page.user_list_data == null) {
+                return;
+            }
+            else {
+                data = page.user_list_data;
+            }
+
             var $users = page.$("#users_list").empty();
 
             var logging_in = Object.keys(known_users).length == 0;
             var gone_to_a_better_place = Object.keys(known_users);
 
-            data.users.sort(function(a, b) {
+            var users = data.users_and_rooms.users;
+
+            users.sort(function(a, b) {
                 var rank_a = a.rocket_league_rank || 0;
                 var rank_b = b.rocket_league_rank || 0;
 
                 return rank_b - rank_a;
             });
 
-            data.users.map(function(user) {
+            var rooms = data.users_and_rooms.rooms;
+
+            users.filter(function(user) {
+                var room_id = app.get_active_room(true);
+
+                var in_room = rooms[room_id] && rooms[room_id].users.some(function(room_user) {
+                        return room_user.username == user.username;
+                    });
+
+
+
+                return in_room;
+            }).map(function(user) {
                 var nice_username = user.username.toLowerCase();
 
                 if (!logging_in && known_users[nice_username] == null) {
-                    page.emit('roams_the_earth', {username: user.username, room_id: room_id});
+                    page.emit('roams_the_earth', {username: user.username});
                 }
 
                 var idx = gone_to_a_better_place.indexOf(nice_username);
@@ -93,14 +117,12 @@ module.exports = function($target) {
                     $user.append($away);
                 }
 
-                if (user.ping == null) {
-                    user.ping = '';
-                }
-                else {
-                    user.ping += " ms";
+                var ping = '';
+                if (user.ping != null) {
+                    ping = user.ping + ' ms';
                 }
 
-                var $ping = $('<div class="ping">' + user.ping + '</div>');
+                var $ping = $('<div class="ping">' + ping + '</div>');
                 $user.append($ping);
 
                 $user.prop('user', user);
@@ -131,7 +153,7 @@ module.exports = function($target) {
             });
 
             gone_to_a_better_place.forEach(function(user) {
-                page.emit('has_gone_to_a_better_place', {username: known_users[user], room_id: room_id});
+                page.emit('has_gone_to_a_better_place', {username: known_users[user]});
                 delete known_users[user.toLowerCase()];
             });
 
@@ -148,13 +170,11 @@ module.exports = function($target) {
                         callback: function(key, options) {
                             switch (key) {
                                 case 'warn':
-                                    var room_id = app.get_active_room(true);
-                                    page.send('warn', {username: username, room_id: room_id});
+                                    page.send('warn', {username: username});
                                     break;
 
                                 case 'super_warn':
-                                    var room_id = app.get_active_room(true);
-                                    page.send('warn', {username: username, room_id: room_id, super_warn: true});
+                                    page.send('warn', {username: username, super_warn: true});
                                     break;
 
                                 case 'view_rl_page':
@@ -188,6 +208,10 @@ module.exports = function($target) {
 
                 app.append_system("Users logged in: " + woboy_users, {color: 'green'});
             }
+        };
+
+        page.listen('users_list', function(data) {
+            app.render_users_list(data);
         });
 
         $(document).idle({

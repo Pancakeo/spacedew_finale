@@ -70,14 +70,16 @@ module.exports = function($parent, options) {
                 }
 
                 // Do the favicon thing.
-                if (app.new_message_alert !== true) {
-                    $('#favicon').attr('href', '/images/favicon-alert.png');
-                    app.new_message_alert = true;
+                if (localStorage.local_dev == null) {
+                    if (app.new_message_alert !== true) {
+                        $('#favicon').attr('href', '/images/favicon-alert.png');
+                        app.new_message_alert = true;
 
-                    $(window).one('focus', function() {
-                        app.new_message_alert = false;
-                        $('#favicon').attr('href', '/images/favicon-normal.png');
-                    });
+                        $(window).one('focus', function() {
+                            app.new_message_alert = false;
+                            $('#favicon').attr('href', '/images/favicon-normal.png');
+                        });
+                    }
                 }
             }
 
@@ -252,6 +254,7 @@ module.exports = function($parent, options) {
 
         page.listen('join_room', function(room) {
             app.add_room_tab(room, {focus: true});
+            app.render_users_list();
         });
 
         page.listen('blargh', function(data) {
@@ -296,7 +299,7 @@ module.exports = function($parent, options) {
             page.ws.send('users', 'sync', {room_id: app.get_active_room(true)});
 
             if (lobby.recent_messages.length > 0) {
-                var $blargh = $('<div class="blargh"/>');
+                var $blargh = $('<div class="blargh recent_messages"/>');
                 $blargh.append('<div class="header">Recent Messages <span class="close">x</span></div>');
                 $blargh.append('<div class="body"/>');
                 var $body = $blargh.find('.body');
@@ -394,7 +397,7 @@ module.exports = function($parent, options) {
         };
 
         if (lobby.recent_messages.length > 0) {
-            var $blargh = $('<div class="blargh"/>');
+            var $blargh = $('<div class="blargh recent_messages"/>');
             $blargh.append('<div class="header">Recent Messages <span class="close">x</span></div>');
             $blargh.append('<div class="body"/>');
             var $body = $blargh.find('.body');

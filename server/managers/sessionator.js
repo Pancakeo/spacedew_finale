@@ -26,8 +26,26 @@ setInterval(function() {
     exports.broadcast('connection', 'heartbeat', {ping_sent_at: Date.now()}, {require_logged_in: false});
 }, 7500);
 
-exports.get_sessions = function() {
-    return sessions;
+exports.get_sessions = function(options) {
+    options = Object.assign({
+        whew: false,
+        warning_levels: {}  // probably terrible to have this in usrs.js
+    }, options);
+
+    if (options.whew) {
+        let ez_sessions = Object.keys(sessions).filter(function(id) {
+            let s = sessions[id];
+            return s.logged_in;
+        }).map(function(id) {
+            let whew = sessions[id].whew();
+            whew.warning_level = options.warning_levels[whew.username] || 0;
+            return whew;
+        });
+        return ez_sessions;
+    }
+    else {
+        return sessions;
+    }
 };
 
 exports.link_binary = function(binary_cid, binary_ws) {
@@ -175,6 +193,30 @@ exports.connect = function(connection_id, ws) {
         idle: false,
         last_activity: Date.now(),
         queued_binary: [],
+
+        whew: function() {
+            let s = session;
+
+            let whewy = {
+                // ip_address: s.ip_address,
+                username: s.profile.username,
+                idle: (s.idle == true),
+                steam_id: s.profile.steam_id,
+                ping: s.ping,
+                rocket_league_rank: s.profile.rocket_league_rank,
+            };
+
+            if (s.idle == true && s.idle_start) {
+                whewy.idle_duration = Date.now() - s.idle_start;
+            }
+
+            Object.defineProperty(whewy, 'send', {
+                enumerable: false,
+                value: session.send
+            });
+
+            return whewy;
+        },
 
         send: function(type, sub_type, data, send_options) {
             send_options = Object.assign({

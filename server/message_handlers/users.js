@@ -15,44 +15,30 @@ setInterval(function() {
     send_users_list();
 }, 15000);
 
-let send_users_list = function(room, session) {
-    if (room == null) {
-        room = wiseau.get_lobby();
-    }
+const send_users_list = function() {
+    let users = sessionator.get_sessions({whew: true, warning_levels: warning_levels});
 
-    var nice_users = wuptil.copy_object(room.users);
-    var sessions = sessionator.get_sessions();
+    users.forEach(function(s) {
+        let users_and_rooms = {
+            users: users,
+            rooms: {}
+        };
 
-    for (var key in sessions) {
-        var s = sessions[key];
-        var idx = -1;
+        wiseau.get_room_ids().forEach(function(room_id) {
+            let room = wiseau.get_room(room_id);
 
-        for (var i = 0; i < nice_users.length; i++) {
-            if (nice_users[i].username == s.profile.username) {
-                idx = i;
-                break;
+            if (room.is_member(s.username)) {
+
+                users_and_rooms.rooms[room_id] = {
+                    users: room.users
+                };
             }
-        }
 
-        if (idx >= 0) {
-            nice_users[idx].idle = (s.idle == true);
-            nice_users[idx].ping = s.ping;
-            nice_users[idx].steam_id = s.profile.steam_id;
-            nice_users[idx].rocket_league_rank = s.profile.rocket_league_rank;
-            nice_users[idx].warning_level = warning_levels[s.profile.username] || 0;
+        });
 
-            if (s.idle == true && s.idle_start) {
-                nice_users[idx].idle_duration = Date.now() - s.idle_start;
-            }
-        }
-    }
+        s.send('users', 'users_list', {users_and_rooms: users_and_rooms});
+    });
 
-    if (session == null) {
-        sessionator.broadcast('users', 'users_list', {users: nice_users, room_id: room.id});
-    }
-    else {
-        session.send('users', 'users_list', {users: nice_users, room_id: room.id});
-    }
 };
 
 let send_ross = function(room, session) {
@@ -93,12 +79,13 @@ exports.handle_message = function handle_message(session, message) {
             }
 
             send_user_settings();
-            send_users_list(room, session);
+            send_users_list();
             send_ross(room, session);
         },
         warn: function() {
             var sessions = sessionator.get_sessions();
             var evil_session = null;
+            var room_id = wiseau.get_lobby().id;
 
             for (var cid in sessions) {
                 var s = sessions[cid];
@@ -137,7 +124,7 @@ exports.handle_message = function handle_message(session, message) {
             }
 
             message += " " + data.username + "'s warning level has been increased to " + current_warning + '%.';
-            sessionator.broadcast('chatterbox', 'system', {message: message, color: 'darkblue'}, {room_id: data.room_id});
+            sessionator.broadcast('chatterbox', 'system', {message: message, color: 'darkblue'}, {room_id: room_id});
 
             if (current_warning >= WARNING_MAX) {
                 evil_session.is_silenced = true;
@@ -146,7 +133,7 @@ exports.handle_message = function handle_message(session, message) {
                     evil_session.is_silenced = false;
                 }, 30 * 1000);
 
-                sessionator.broadcast('chatterbox', 'system', {message: evil_session.profile.username + " has been silenced for 30 seconds.", color: 'red'}, {room_id: data.room_id});
+                sessionator.broadcast('chatterbox', 'system', {message: evil_session.profile.username + " has been silenced for 30 seconds.", color: 'red'}, {room_id: room_id});
             }
 
             send_users_list();

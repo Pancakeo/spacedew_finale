@@ -17,7 +17,6 @@ module.exports = function(options) {
         do_resize();
 
         var chatterbox = require('./chatterbox')(page.$('#left_pane'), options);
-
         require('./users')(page.$('#users_placeholder'));
 
         var last_emote_ts = null;
@@ -245,6 +244,13 @@ module.exports = function(options) {
             }
         });
 
+        page.update_room = function(room) {
+            page.$("#room_name").html(room.name).attr('title', room.name);
+            if (typeof(app.render_users_list) == "function") {
+                app.render_users_list();
+            }
+        };
+
         page.$("#room_names").on('click', '.room_tab', function() {
             var $active = page.$("#room_names .room_tab.active");
             if ($active.length == 1 && $active.attr('room_id') != $(this).attr('room_id')) {
@@ -259,17 +265,30 @@ module.exports = function(options) {
 
             var $selected_tab = $(this);
             var room = $selected_tab.prop('room');
-            page.$("#room_name").html(room.name).attr('title', room.name);
-
             page.$("#room_names .room_tab").removeClass('active');
             $(this).addClass('active');
             var $room_box = $(this).prop('room_box');
             $room_box.show();
 
+            page.update_room(room);
+
             var whewboard = $room_box.prop('whewboard');
             if (whewboard) {
                 whewboard.show();
             }
+        });
+
+        page.$("#content").on('dblclick', '#room_name', function() {
+            var room_id = app.get_active_room(true);
+
+            page.prompt("Room Name", "Maybe input a room name here:", $(this).text(), function(val) {
+                if (val != null) {
+                    val = val.trim();
+                    if (val.length > 0) {
+                        page.emit('change_room_name', {name: val, room_id: room_id});
+                    }
+                }
+            });
         });
 
         page.$("#room_names").on('dblclick', '.room_tab', function() {
@@ -374,14 +393,14 @@ module.exports = function(options) {
 
         app.rename_room_tab = function(room_id, room_name) {
             page.$('#room_names [room_id="' + room_id + '"]').html(room_name).attr('title', room_name);
-            page.$("#room_name").html(room_name).attr('title', room_name);
+            page.update_room({name: room_name});
         };
 
         app.users_pane_loaded = function() {
             var $active = page.$("#room_names .room_tab.active");
             if ($active.length == 1) {
                 var room = $active.prop('room');
-                page.$("#room_name").html(room.name).attr('title', room.name);
+                page.update_room(room);
             }
         };
 
@@ -598,6 +617,10 @@ module.exports = function(options) {
                 return true;
             }
         };
+
+        if (localStorage.is_local_dev != null) {
+            $('#favicon').attr('href', '/images/whew2.jpg');
+        }
 
         page.$("#slash_users").on('click', function() {
             page.$("#users").clone().dialog({
