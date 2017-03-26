@@ -4,7 +4,6 @@ module.exports = function(room) {
     let bob_ross = {
         paths: [],
         bg_color: '#000000',
-        dirty: false,
 
         // return a compressed version of paths
         sync: function(session) {
