@@ -24,20 +24,24 @@ module.exports = function($target, room, $room_box) {
         };
 
         page.peepy('black_board.load', function(data) {
-            data.type = 'load';
-            pass_it_up(data);
+            if (data.room_id == room.id) {
+                data.type = 'load';
+                pass_it_up(data);
+                
+                ch.handle_thing({type: 'colorful_clear', data: {color: data.bg_color, nuke: true}});
 
-            ch.handle_thing({type: 'colorful_clear', data: {color: data.bg_color, nuke: true}});
-
-            data.data.forEach(function(thing) {
-                ch.handle_thing(thing);
-            });
-
+                data.data.forEach(function(thing) {
+                    ch.handle_thing(thing);
+                });
+            }
         });
 
         page.peepy('black_board.draw', function(info) {
-            pass_it_up(info);
-            ch.handle_thing(info);
+            console.log(info);
+            if (info.room_id == room.id) {
+                pass_it_up(info);
+                ch.handle_thing(info);
+            }
         });
 
         // Not hacky at all.
