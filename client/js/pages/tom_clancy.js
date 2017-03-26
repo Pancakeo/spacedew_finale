@@ -367,6 +367,12 @@ module.exports = function(options) {
                     action: function() {
                         app.crabble = window.open('index.html?wup=crabble', '_blank', 'width=1300,height=830');
                     }
+                },
+                {
+                    text: "Tick Tack",
+                    action: function() {
+                        app.tick_tack = window.open('index.html?wup=tick_tack', '_blank', 'width=1300,height=830');
+                    }
                 }
             ];
 

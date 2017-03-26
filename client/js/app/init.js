@@ -68,6 +68,10 @@ module.exports = (function() {
             require('../pages/crabble')();
             break;
 
+        case 'tick_tack':
+            require('../pages/tick_tack')();
+            break;
+
         case 'black_board':
             if (window.opener && window.opener.app) {
                 window.app = window.opener.app;
