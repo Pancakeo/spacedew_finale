@@ -102,14 +102,14 @@ module.exports = function($parent, options) {
                 scroll_chat($chat);
             };
 
-            if (options.room_id == null) {
+            if (append_options.room_id == null) {
                 page.$(".chat_thing").each(function() {
                     let room_id = $(this).attr('room_id');
                     do_append(room_id);
                 });
             }
             else {
-                do_append(options.room_id);
+                do_append(append_options.room_id);
             }
 
         };
@@ -145,7 +145,7 @@ module.exports = function($parent, options) {
                 });
             }
             else {
-                do_append(options.room_id);
+                do_append(append_options.room_id);
             }
         };
 
