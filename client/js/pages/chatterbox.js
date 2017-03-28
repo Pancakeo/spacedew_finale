@@ -94,11 +94,24 @@ module.exports = function($parent, options) {
                 $blargh = $('<div>' + $blargh + '</div>');
             }
 
-            var $chat = page.$("div[room_id='" + append_options.room_id + "']");
-            $chat.append($blargh);
+            let do_append = function(room_id) {
+                var $chat = page.$("div[room_id='" + room_id + "']");
+                $chat.append($blargh);
 
-            show_notification($blargh.text());
-            scroll_chat($chat);
+                show_notification($blargh.text());
+                scroll_chat($chat);
+            };
+
+            if (options.room_id == null) {
+                page.$(".chat_thing").each(function() {
+                    let room_id = $(this).attr('room_id');
+                    do_append(room_id);
+                });
+            }
+            else {
+                do_append(options.room_id);
+            }
+
         };
 
         var append_system = function(message, append_options) {
@@ -108,97 +121,113 @@ module.exports = function($parent, options) {
                 color: null
             }, append_options);
 
+            let do_append = function(room_id) {
+                var $chat = page.$("div[room_id='" + room_id + "']");
+                var $message = $('<div class="message"><span class="timestamp">[' + moment().format("h:mm:ss A") + ']</span>' +
+                    '<span class="message_text">' + message + '</span></div>');
+
+                $message.addClass(append_options.class_name);
+
+                if (append_options.color != null) {
+                    $message.css('color', append_options.color);
+                }
+
+                $chat.append($message);
+
+                show_notification(message);
+                scroll_chat($chat);
+            };
+
             if (append_options.room_id == null) {
-                return;
+                page.$(".chat_thing").each(function() {
+                    let room_id = $(this).attr('room_id');
+                    do_append(room_id);
+                });
             }
-
-            var $chat = page.$("div[room_id='" + append_options.room_id + "']");
-            var $message = $('<div class="message"><span class="timestamp">[' + moment().format("h:mm:ss A") + ']</span>' +
-                '<span class="message_text">' + message + '</span></div>');
-
-            $message.addClass(append_options.class_name);
-
-            if (append_options.color != null) {
-                $message.css('color', append_options.color);
+            else {
+                do_append(options.room_id);
             }
-
-            $chat.append($message);
-
-            show_notification(message);
-            scroll_chat($chat);
         };
 
         var append_chat = function(data) {
-            if (data.room_id == null) {
-                return;
-            }
+            let do_append = function(room_id) {
+                var $chat = page.$("div[room_id='" + room_id + "']");
+                var message = data.message;
 
-            var $chat = page.$("div[room_id='" + data.room_id + "']");
-            var message = data.message;
+                var message_parts = get_links_from_message(message);
+                message = message_parts.message;
+                var maybe_something = message_parts.maybe_something;
+                var $link_box = linkomatic(maybe_something);
 
-            var message_parts = get_links_from_message(message);
-            message = message_parts.message;
-            var maybe_something = message_parts.maybe_something;
-            var $link_box = linkomatic(maybe_something);
-
-            var this_fucking_guy = app.world.user_settings[data.username];
-            this_fucking_guy = $.extend(true, {
-                outfit: {
-                    chat: {
-                        bg_color: 'white',
-                        fg_color: 'black',
-                        font_family: 'Verdana',
-                        font_size: 14,
-                        username_color: 'blue'
+                var this_fucking_guy = app.world.user_settings[data.username];
+                this_fucking_guy = $.extend(true, {
+                    outfit: {
+                        chat: {
+                            bg_color: 'white',
+                            fg_color: 'black',
+                            font_family: 'Verdana',
+                            font_size: 14,
+                            username_color: 'blue'
+                        }
                     }
+                }, this_fucking_guy);
+
+                var outfit = this_fucking_guy.outfit.chat;
+                var username_thing = data.username;
+                if (data.team == true) {
+                    username_thing = '[TEAM] ' + data.username;
                 }
-            }, this_fucking_guy);
 
-            var outfit = this_fucking_guy.outfit.chat;
-            var username_thing = data.username;
-            if (data.team == true) {
-                username_thing = '[TEAM] ' + data.username;
-            }
+                var $message = $('<div class="message"><span class="timestamp">[' + moment().format("h:mm:ss A") + ']</span><span class="username">' + username_thing + ': </span>'
+                    + '<span class="message_text">' + message + '</span></div>');
+                $message.css({background: outfit.bg_color, color: outfit.fg_color, fontFamily: outfit.font_family, fontSize: outfit.font_size + 'px'});
+                $message.find('.username').css({color: outfit.username_color});
+                $message.find('a').css({color: outfit.fg_color});
 
-            var $message = $('<div class="message"><span class="timestamp">[' + moment().format("h:mm:ss A") + ']</span><span class="username">' + username_thing + ': </span>'
-                + '<span class="message_text">' + message + '</span></div>');
-            $message.css({background: outfit.bg_color, color: outfit.fg_color, fontFamily: outfit.font_family, fontSize: outfit.font_size + 'px'});
-            $message.find('.username').css({color: outfit.username_color});
-            $message.find('a').css({color: outfit.fg_color});
+                $chat.append($message);
+                show_notification(data.username + ": " + data.message);
 
-            $chat.append($message);
-            show_notification(data.username + ": " + data.message);
-
-            if ($link_box != null) {
-                $link_box.find('img, iframe').each(function() {
-                    $(this).on('load', function() {
-                        scroll_chat($chat);
+                if ($link_box != null) {
+                    $link_box.find('img, iframe').each(function() {
+                        $(this).on('load', function() {
+                            scroll_chat($chat);
+                        });
                     });
+
+                    $link_box.find('video').each(function() {
+                        var $video = $(this);
+
+                        var scroll_of_doom = function() {
+                            $video[0].removeEventListener('canplay', scroll_of_doom);
+                            scroll_chat($chat);
+                        };
+
+                        $video[0].addEventListener('canplay', scroll_of_doom);
+                    });
+
+                    $message.after($link_box);
+                }
+
+                scroll_chat($chat);
+            };
+
+            if (data.room_id == null) {
+                page.$(".chat_thing").each(function() {
+                    let room_id = $(this).attr('room_id');
+                    do_append(room_id);
                 });
-
-                $link_box.find('video').each(function() {
-                    var $video = $(this);
-
-                    var scroll_of_doom = function() {
-                        $video[0].removeEventListener('canplay', scroll_of_doom);
-                        scroll_chat($chat);
-                    };
-
-                    $video[0].addEventListener('canplay', scroll_of_doom);
-                });
-
-                $message.after($link_box);
             }
-
-            scroll_chat($chat);
+            else {
+                do_append(data.room_id);
+            }
         };
 
-        event_bus.on('users.roams_the_earth', function(event) {
-            append_system(event.username + " roams the earth.", {class_name: 'happy', room_id: event.room_id})
+        page.peepy('users.roams_the_earth', function(event) {
+            append_system(event.username + " roams the earth.", {class_name: 'happy'})
         });
 
-        event_bus.on('users.has_gone_to_a_better_place', function(event) {
-            append_system(event.username + " went to pick up a motorcycle.", {class_name: 'sad', room_id: event.room_id})
+        page.peepy('users.has_gone_to_a_better_place', function(event) {
+            append_system(event.username + " went to pick up a motorcycle.", {class_name: 'sad'})
         });
 
         event_bus.on('blargher.send', function(params) {

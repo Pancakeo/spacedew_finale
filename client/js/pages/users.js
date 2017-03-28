@@ -1,5 +1,4 @@
 module.exports = function($target) {
-    var known_users = {};
     var displayed_users_once = false; // for mobile
     var default_emus = require('../app/default_emus');
 
@@ -55,10 +54,6 @@ module.exports = function($target) {
             }
 
             var $users = page.$("#users_list").empty();
-
-            var logging_in = Object.keys(known_users).length == 0;
-            var gone_to_a_better_place = Object.keys(known_users);
-
             var users = data.users_and_rooms.users;
 
             users.sort(function(a, b) {
@@ -78,21 +73,9 @@ module.exports = function($target) {
                     });
 
 
-
                 return in_room;
             }).map(function(user) {
                 var nice_username = user.username.toLowerCase();
-
-                if (!logging_in && known_users[nice_username] == null) {
-                    page.emit('roams_the_earth', {username: user.username});
-                }
-
-                var idx = gone_to_a_better_place.indexOf(nice_username);
-                if (idx >= 0) {
-                    gone_to_a_better_place.splice(idx, 1);
-                }
-
-                known_users[nice_username] = user.username;
                 // var display_name = user.username;
                 var display_name = user.username;
                 var $user = $('<div class="user"><span class="username">' + display_name + '</span></div>');
@@ -150,11 +133,6 @@ module.exports = function($target) {
                 }
 
                 $users.append($user);
-            });
-
-            gone_to_a_better_place.forEach(function(user) {
-                page.emit('has_gone_to_a_better_place', {username: known_users[user]});
-                delete known_users[user.toLowerCase()];
             });
 
             update_user_list_style();

@@ -294,11 +294,14 @@ exports.connect = function(connection_id, ws) {
             console.log(username + " logged in.");
             session.authenticated = true;
             event_bus.emit('login', session.profile);
+            exports.broadcast('users', 'roams_the_earth', {username: username});
         },
         // Also closes connection.
         logout: function() {
             if (session.logged_in) {
                 console.log(session.profile.username + " logged out.");
+
+                exports.broadcast('users', 'has_gone_to_a_better_place', {username: session.profile.username});
                 wiseau.logout_user(session.profile.username);
                 event_bus.emit('logout', session.profile);
             }
