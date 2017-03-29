@@ -95,6 +95,8 @@ module.exports = function($parent, options) {
             }
 
             let do_append = function(room_id) {
+                $blargh = $blargh.clone();
+
                 var $chat = page.$("div[room_id='" + room_id + "']");
                 $chat.append($blargh);
 

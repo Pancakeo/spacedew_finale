@@ -246,9 +246,18 @@ module.exports = function(options) {
 
         page.update_room = function(room) {
             page.$("#room_name").html(room.name).attr('title', room.name);
+
             if (typeof(app.render_users_list) == "function") {
                 app.render_users_list();
             }
+
+            if (app.get_lobby() == room) {
+                page.$("#leave_room").button('disable');
+            }
+            else {
+                page.$("#leave_room").button('enable');
+            }
+
         };
 
         page.$("#room_names").on('click', '.room_tab', function() {
@@ -466,6 +475,7 @@ module.exports = function(options) {
             }, 100);
 
             app.black_board = window.open('index.html?wup=black_board', '_blank', 'width=1300,height=830');
+            app.black_board.room_id = app.get_active_room(true);
         };
 
         window.addEventListener('message', function(e) {
@@ -517,6 +527,32 @@ module.exports = function(options) {
                 return $active.prop('room');
             }
         };
+
+        page.peepy('users.leave_room', function(data) {
+            if (data.success) {
+                let $room_tab = $('.room_tab[room_id="' + data.room_id + '"]');
+                let $room_box = $('.chat_thing[room_id="' + data.room_id + '"]');
+                let $canvas = $('.chat_thing[room_id="' + data.room_id + '"]');
+
+                let whewboard = $room_box.prop('whewboard');
+                if (whewboard) {
+                    whewboard.remove();
+                }
+
+                if (app.black_board && app.black_board.closed != true) {
+                    if (app.black_board.room_id == data.room_id) {
+                        app.black_board.close();
+                    }
+                }
+
+                $room_tab.remove();
+                $room_box.remove();
+
+                let lobby_room = app.get_lobby();
+                $room_tab = $('.room_tab[room_id="' + lobby_room.id + '"]');
+                $room_tab.click();
+            }
+        });
 
         page.peepy('chatterbox.reconnect', function(data) {
             if (!data.success) {

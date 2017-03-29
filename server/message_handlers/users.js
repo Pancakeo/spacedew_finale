@@ -72,6 +72,16 @@ exports.handle_message = function handle_message(session, message) {
             session.idle = data.idle;
             send_users_list();
         },
+        leave_room: function() {
+            var room = wiseau.get_room(data.room_id);
+
+            if (room && room  != wiseau.get_lobby()) {
+               session.send('users', 'leave_room', {success: true, room_id: data.room_id})
+            }
+            else {
+                session.send('users', 'leave_room', {success: false, reason: 'Bad room or Lobby'})
+            }
+        },
         sync: function() {
             var room = wiseau.get_room(data.room_id);
             if (room == null) {
