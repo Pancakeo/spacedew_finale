@@ -1,0 +1,91 @@
+* {
+  vertical-align: middle;
+}
+
+#pre_game {
+  margin-left: auto;
+  margin-right: auto;
+  width: 500px;
+  margin-top: 300px;
+
+  input {
+    padding: 3px;
+    border-radius: 6px;
+  }
+
+  #create_game > div > div {
+    margin-bottom: 5px;
+  }
+
+  label {
+    width: 150px;
+    display: inline-block;
+  }
+
+  input, label {
+    font-size: 14px;
+  }
+}
+
+#game_lobby {
+  margin-left: auto;
+  margin-right: auto;
+  width: 400px;
+  margin-top: 300px;
+
+  #current_players {
+    overflow-y: auto;
+    height: 70px;
+    border: 1px #ccc solid;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+
+  #messages {
+    height: 75px;
+    overflow-y: scroll;
+    border: 1px black solid;
+  }
+}
+
+#join_game_wrapper {
+  height: 400px;
+  overflow-y: scroll;
+}
+
+#join_game #games_list {
+  overflow-y: scroll;
+  margin-bottom: 10px;
+
+  tr:not(.help) {
+    cursor: pointer;
+  }
+
+  tr.selected {
+    background: orange;
+  }
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+
+  tr:nth-child(odd) {
+    background: #eee;
+  }
+
+  tr.active {
+    font-weight: bold;
+    background: orange;
+  }
+
+  th {
+    text-align: left;
+    background: deepskyblue;
+  }
+
+  th, td {
+    padding: 3px;
+    border: 1px black solid;
+  }
+}

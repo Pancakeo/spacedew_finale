@@ -1,0 +1,62 @@
+<div>
+    <div id="pre_game">
+        <div id="tabs" style="width: 100%">
+            <ul>
+                <li><a href="#create_game">Create Game</a></li>
+                <li><a href="#join_game">Join Game</a></li>
+            </ul>
+
+            <div id="create_game">
+                <div>
+                    <div>
+                        <label>Game Name</label><input id="game_name" style="width: 280px;"/>
+                    </div>
+
+                    <div>
+                        <label>Players</label><input id="max_players" style="width: 60px;"/>
+                    </div>
+                </div>
+                <button id="create_game_action">Create</button>
+            </div>
+
+            <div id="join_game">
+                <div>
+                    <table id="games_list">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Host</th>
+                            <th>Players</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        <tr template="game_row">
+                            <td field_name="name"></td>
+                            <td field_name="host"></td>
+                            <td field_name="players"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <button id="join_game_action">Join</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="game_lobby" style="display: none;">
+        <div field_name="game_name" style="font-weight: bold;"></div>
+        <div><span>Players:</span> <span field_name="current_players"></span> <span>of</span> <span field_name="max_players"></span></div>
+
+        <div id="current_players"></div>
+        <div id="messages"></div>
+
+        <div>
+            <button id="start_game">Start Game</button>
+
+            <div style="margin-top: 10px">
+                (Missing players are replaced by bots)
+            </div>
+        </div>
+    </div>
+</div>
