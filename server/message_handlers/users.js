@@ -75,8 +75,9 @@ exports.handle_message = function handle_message(session, message) {
         leave_room: function() {
             var room = wiseau.get_room(data.room_id);
 
-            if (room && room  != wiseau.get_lobby()) {
-               session.send('users', 'leave_room', {success: true, room_id: data.room_id})
+            if (room && room != wiseau.get_lobby()) {
+                room.leave_room(session.profile.username);
+                session.send('users', 'leave_room', {success: true, room_id: data.room_id})
             }
             else {
                 session.send('users', 'leave_room', {success: false, reason: 'Bad room or Lobby'})
