@@ -77,7 +77,8 @@ exports.handle_message = function handle_message(session, message) {
 
             if (room && room != wiseau.get_lobby()) {
                 room.leave_room(session.profile.username);
-                session.send('users', 'leave_room', {success: true, room_id: data.room_id})
+                session.send('users', 'leave_room', {success: true, room_id: data.room_id});
+                sessionator.broadcast('chatterbox', 'system', {message: session.profile.username + ' left the room.', color: 'red'}, {room_id: room_id});
             }
             else {
                 session.send('users', 'leave_room', {success: false, reason: 'Bad room or Lobby'})
