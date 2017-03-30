@@ -95,8 +95,6 @@ module.exports = function($parent, options) {
             }
 
             let do_append = function(room_id) {
-                $blargh = $blargh.clone();
-
                 var $chat = page.$("div[room_id='" + room_id + "']");
                 $chat.append($blargh);
 
@@ -108,6 +106,7 @@ module.exports = function($parent, options) {
                 page.$(".chat_thing").each(function() {
                     let room_id = $(this).attr('room_id');
                     do_append(room_id);
+                    $blargh = $blargh.clone(); // this doesn't entirely work for some $blarghs.
                 });
             }
             else {
