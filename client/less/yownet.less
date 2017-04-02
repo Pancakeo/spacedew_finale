@@ -41,10 +41,26 @@
     margin-bottom: 10px;
   }
 
+  #composer {
+    height: 24px;
+    border: 1px black solid;
+  }
+
   #messages {
-    height: 75px;
+    height: 405px;
     overflow-y: scroll;
     border: 1px black solid;
+
+    .username, .message {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .username {
+      font-weight: bold;
+      color: blue;
+      margin-right: 3px;
+    }
   }
 }
 

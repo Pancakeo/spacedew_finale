@@ -1,5 +1,6 @@
 <div>
     <div id="pre_game">
+        <h1>Yownet</h1>
         <div id="tabs" style="width: 100%">
             <ul>
                 <li><a href="#create_game">Create Game</a></li>
@@ -8,6 +9,9 @@
 
             <div id="create_game">
                 <div>
+                    <div>
+                        <label>Game Type</label><input id="game_type" readonly="readonly" style="width: 280px;"/>
+                    </div>
                     <div>
                         <label>Game Name</label><input id="game_name" style="width: 280px;"/>
                     </div>
@@ -24,6 +28,7 @@
                     <table id="games_list">
                         <thead>
                         <tr>
+                            <th>Type</th>
                             <th>Name</th>
                             <th>Host</th>
                             <th>Players</th>
@@ -32,6 +37,7 @@
 
                         <tbody>
                         <tr template="game_row">
+                            <td field_name="type"></td>
                             <td field_name="name"></td>
                             <td field_name="host"></td>
                             <td field_name="players"></td>
@@ -45,18 +51,23 @@
     </div>
 
     <div id="game_lobby" style="display: none;">
+        <h1>Yownet</h1>
         <div field_name="game_name" style="font-weight: bold;"></div>
         <div><span>Players:</span> <span field_name="current_players"></span> <span>of</span> <span field_name="max_players"></span></div>
 
+        <div style="margin-top: 10px">
+            (Missing players are replaced by bots)
+        </div>
+
         <div id="current_players"></div>
-        <div id="messages"></div>
+
+        <div id="messages">
+        </div>
+        <div contenteditable="true" id="composer">
+        </div>
 
         <div>
             <button id="start_game">Start Game</button>
-
-            <div style="margin-top: 10px">
-                (Missing players are replaced by bots)
-            </div>
         </div>
     </div>
 </div>

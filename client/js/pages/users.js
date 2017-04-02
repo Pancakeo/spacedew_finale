@@ -212,7 +212,7 @@ module.exports = function($target) {
             }
         }, 50);
 
-        page.$("#leave_room").button({disabled: true}).on('click.leave_room', function() {
+        page.$("#leave_room").button().on('click.leave_room', function() {
             page.send('leave_room', {room_id: app.get_active_room(true)})
         });
 

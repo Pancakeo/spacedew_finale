@@ -40,6 +40,7 @@ exports.handle_message = function handle_message(session, message) {
                     games_list.push({
                         game_id: game_id,
                         game_name: game.name,
+                        game_type: game.type,
                         max_players: game.max_players,
                         players: game_players,
                         host: game.host.profile.username
@@ -92,6 +93,7 @@ exports.handle_message = function handle_message(session, message) {
 
             var game = {
                 name: data.game_name,
+                type: data.game_type,
                 max_players: data.max_players || 2,
                 game_id: game_id,
                 sessions: [session],
@@ -107,6 +109,10 @@ exports.handle_message = function handle_message(session, message) {
                 game_name: game.name,
                 players: [session.profile.username]
             });
+            break;
+
+        case 'chat':
+            broadcast(data.game_id, 'chat', {username: session.profile.username, message: data.message});
             break;
 
         default:

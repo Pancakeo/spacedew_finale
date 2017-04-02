@@ -252,10 +252,10 @@ module.exports = function(options) {
             }
 
             if (app.get_lobby() == room) {
-                page.$("#leave_room").button('disable');
+                page.$("#leave_room_wrapper").hide();
             }
             else {
-                page.$("#leave_room").button('enable');
+                page.$("#leave_room_wrapper").show();
             }
 
         };
@@ -564,6 +564,7 @@ module.exports = function(options) {
 
             page.$('#room_names [room_id="' + lobby.id + '"]').attr('room_id', data.lobby.id).prop('room', data.lobby);
             page.$('#chat_rooms [room_id="' + lobby.id + '"]').attr('room_id', data.lobby.id);
+            page.update_room(data.lobby);
         });
 
         page.peepy('ws.transfer_complete', function(params) {

@@ -3,13 +3,11 @@ module.exports = function() {
     var ws = require('../app/wupsocket');
     var event_bus = require('../../../shared/event_bus');
 
-    // For testing:
-    if (app.profile.username == null) {
-        app.profile.username = localStorage.username || 'HEH';
-    }
-
     get_page('crabble', function(page) {
         var yownet = require('./yownet')({
+            max_players: 4,
+            game_name: 'Crabo',
+            game_type: 'Crabble',
             on_start: function(host_stuff) {
                 page.send('start_game', host_stuff);
             }
