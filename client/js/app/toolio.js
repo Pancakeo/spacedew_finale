@@ -3,7 +3,7 @@ module.exports = (function() {
     var toolio = {};
 
     toolio.alert = function(title, message) {
-        $('<div>' + message + '</div>').dialog({
+        $('<div/>').text(message).dialog({
             title: title,
             modal: true
         });

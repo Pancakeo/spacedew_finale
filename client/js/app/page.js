@@ -6,6 +6,7 @@ module.exports = function(page_name, callback) {
     $.get('html/pages/' + page_name + '.html', function(res) {
         var page = {
             $container: $(res),
+            always_send: {},    // Keys that should go out with every message (e.g. game_id)
             $: function(selector) {
                 return jQuery(selector, this.$container);
             },
@@ -24,6 +25,7 @@ module.exports = function(page_name, callback) {
                     page_name: page_name
                 }, send_options);
 
+                data = $.extend(data, page.always_send);
                 ws.send(send_options.page_name, sub_type, data);
             },
             alert: function(title, message) {
