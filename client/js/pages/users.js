@@ -162,6 +162,22 @@ module.exports = function($target) {
                                     window.open('https://rocketleague.tracker.network/profile/steam/' + user.steam_id, '_blank');
                                     break;
 
+                                case 'boom_boom':
+                                    page.prompt("New Room", "With name", "cowsmoke", function(room_name) {
+                                        if (room_name) {
+                                            room_name = room_name.trim();
+
+                                            // Maybe do that.
+                                            if (room_name.length > 0) {
+                                                page.send('create_room', {name: room_name, invite: username}, {page_name: 'chatterbox'});
+                                            }
+                                        }
+                                    });
+                                    break;
+
+                                case 'mario_party':
+                                    break;
+
                                 default:
                                     break;
                             }
@@ -175,6 +191,15 @@ module.exports = function($target) {
                                 disabled: function() {
                                     return user.steam_id == null;
                                 }
+                            },
+                            boom_boom: {
+                                name: "Boom boom " + username, icon: "fa-user-plus",
+                                disabled: function() {
+                                    return user.username == app.profile.username;
+                                }
+                            },
+                            mario_party: {
+                                name: "Sorry, Jimmy", icon: "fa-beer"
                             }
                         }
                     };
@@ -217,6 +242,43 @@ module.exports = function($target) {
 
         page.$("#leave_room").button().on('click.leave_room', function() {
             page.send('leave_room', {room_id: app.get_active_room(true)})
+        });
+
+        page.$("#invite").button().on('click.invite', function() {
+            let $users = $('<div style="padding: 10px;">Invite users:</div>');
+            let $user = $('<div style="padding: 10px;"><span id="username"></span><button style="margin-left: 10px;">Invite!</button></div>');
+
+            $users.on('click', 'button', function() {
+                let username = $(this).prev('span').text();
+                $(this).button('disable');
+
+                page.send('invite_to_room', {username: username, room_id: app.get_active_room(true)}, {page_name: 'chatterbox'});
+            });
+
+            if (page.user_list_data) {
+                page.user_list_data.users_and_rooms.users.map(function(entry) {
+                    return entry.username;
+                }).filter(function(username) {
+                    // should see if user is in room.
+                    return app.profile.username != username;
+                }).forEach(function(username) {
+                    $user.find('#username').text(username);
+                    $users.append($user);
+                    $user = $user.clone();
+                });
+            }
+
+            $users.find('button').button();
+
+            $users.dialog({
+                title: 'Invite Users!',
+                modal: true,
+                buttons: {
+                    'Close': function() {
+                        $(this).dialog('close');
+                    }
+                }
+            })
         });
 
     });

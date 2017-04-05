@@ -350,62 +350,6 @@ module.exports = function(options) {
             this.value = '';
         });
 
-        page.$("#add_thing").on('click', function() {
-            var $things = $('<div><div class="content"/></div>');
-            var $content = $things.children('.content');
-
-            var blurbs = [
-                {
-                    text: 'Join Room',
-                    action: function() {
-                        page.prompt("New Room", "Create/join a room:", "BotD's House of Pancakes", function(room_name) {
-                            if (room_name) {
-                                room_name = room_name.trim();
-
-                                // Maybe do that.
-                                if (room_name.length > 0) {
-                                    page.send('join_room', {name: room_name}, {page_name: 'chatterbox'});
-                                }
-                            }
-
-                        });
-                    }
-                },
-                {
-                    text: "Crabble",
-                    action: function() {
-                        app.crabble = window.open('index.html?wup=crabble', '_blank', 'width=1300,height=830');
-                    }
-                },
-                {
-                    text: "Tick Tack",
-                    action: function() {
-                        app.tick_tack = window.open('index.html?wup=tick_tack', '_blank', 'width=1300,height=830');
-                    }
-                }
-            ];
-
-            blurbs.forEach(function(blurb) {
-                var $thing = $('<button class="blurb_button">' + blurb.text + '</button>');
-                $thing.on('click', function() {
-                    blurb.action();
-                    $things.dialog('close');
-                });
-
-                $content.append($thing);
-            });
-
-
-            $things.dialog({
-                modal: true,
-                title: 'Add Thing',
-                open: function() {
-                    $things.find('button').button();
-                }
-
-            });
-        });
-
         app.rename_room_tab = function(room_id, room_name) {
             var room = page.$('#room_names [room_id="' + room_id + '"]').prop('room');
             room.name = room_name;
@@ -564,9 +508,8 @@ module.exports = function(options) {
             var lobby = app.get_lobby();
             app.rename_room_tab(lobby.id, data.lobby.name);
 
-            page.$('#room_names [room_id="' + lobby.id + '"]').attr('room_id', data.lobby.id).prop('room', data.lobby);
+            page.$('#room_names [room_id="' + lobby.id + '"]').attr('room_id', data.lobby.id).prop('room', data.lobby).click();
             page.$('#chat_rooms [room_id="' + lobby.id + '"]').attr('room_id', data.lobby.id);
-            page.update_room(data.lobby);
         });
 
         page.peepy('ws.transfer_complete', function(params) {

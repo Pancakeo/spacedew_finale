@@ -282,6 +282,12 @@ module.exports = function($parent, options) {
             append_system(data.message, {class_name: 'sad', color: data.color, room_id: data.room_id})
         });
 
+        page.listen('boom_boom', function(data) {
+            page.toolio.confirm("Invitation", data.invited_by + " invited you to chat.", function() {
+                page.send('join_room', {room_id: data.room_id});
+            });
+        });
+
         page.listen('join_room', function(room) {
             app.add_room_tab(room, {focus: true});
             app.render_users_list();

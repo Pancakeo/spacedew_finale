@@ -9,6 +9,15 @@ exports.handle_message = function handle_message(session, message) {
     var data = message.data;
     var room = wiseau.get_room(data.room_id);
 
+    let invite_to_room = function(invite_info) {
+        let matching_session = sessionator.get_session_by_user(invite_info.username);
+
+        if (matching_session) {
+            matching_session.send('chatterbox', 'boom_boom', {room_id: invite_info.room_id, invited_by: session.profile.username});
+            session.send('chatterbox', 'system', {room_id: invite_info.room_id, message: "Invitation sent to " + invite_info.username, color: 'green'});
+        }
+    };
+
     var handle = {
         chat: function() {
             if (room == null) {
@@ -45,6 +54,11 @@ exports.handle_message = function handle_message(session, message) {
 
             if (data.message.length > 0) {
                 var recent_message = session.profile.username + ': ' + data.message;
+
+                if (recent_message.length > 1338) {
+                    recent_message = recent_message.substr(0, 1337) + ' [...]';
+                }
+
                 room.add_recent_message(recent_message);
                 sessionator.broadcast('chatterbox', 'blargh', {message: data.message, username: session.profile.username}, {room_id: room.id, strip_entities: false});
             }
@@ -63,27 +77,34 @@ exports.handle_message = function handle_message(session, message) {
             sessionator.broadcast('chatterbox', 'change_room_name', {new_name: room.name, blame: session.profile.username}, {room_id: room.id});
             configuration.set('lobby_room_name', room.name);
         },
-        join_room: function() {
+        create_room: function() {
             if (!data.name || data.name.length == 0) {
                 return;
             }
 
-            var room = wiseau.get_room_by_name(data.name);
+            room = wiseau.create_room(data.name);
+            room.join_room(session.profile.username);
+            event_bus.emit('update_userlist', {});
+            session.send('chatterbox', 'join_room', room, {});
+            session.send('chatterbox', 'system', {room_id: room.id, message: "Welcome to " + data.name + '.', color: 'blue'});
 
-            if (room == null) {
-                room = wiseau.create_room(data.name);
+            if (data.invite) {
+                invite_to_room({
+                    room_id: room.id,
+                    username: data.invite
+                });
+            }
+
+        },
+        invite_to_room: function() {
+            invite_to_room(data);
+        },
+        join_room: function() {
+            if (room != null && !room.is_member(session.profile.username)) {
+                session.send('chatterbox', 'join_room', room, {});
                 room.join_room(session.profile.username);
                 event_bus.emit('update_userlist', {});
-                session.send('chatterbox', 'join_room', room, {});
-            }
-            else {
-                // already exists.
-
-                if (!room.is_member(session.profile.username)) {
-                    room.join_room(session.profile.username);
-                    event_bus.emit('update_userlist', {});
-                    session.send('chatterbox', 'join_room', room, {});
-                }
+                sessionator.broadcast('chatterbox', 'system', {message: session.profile.username + " joined the room!", color: 'green'}, {room_id: room.id});
             }
         },
         create_transfer_progress: function() {

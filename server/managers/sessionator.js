@@ -26,6 +26,17 @@ setInterval(function() {
     exports.broadcast('connection', 'heartbeat', {ping_sent_at: Date.now()}, {require_logged_in: false});
 }, 7500);
 
+exports.get_session_by_user = function(username) {
+    let sessions = exports.get_sessions({whew: true});
+    let matching = sessions.filter(function(s) {
+        return s.username == username;
+    });
+
+    if (matching.length == 1) {
+        return matching[0];
+    }
+};
+
 exports.get_sessions = function(options) {
     options = Object.assign({
         whew: false,
