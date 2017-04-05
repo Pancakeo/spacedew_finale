@@ -120,6 +120,9 @@ module.exports = function($target) {
                 if (user.rocket_league_rank != null) {
                     $star.find('img').attr('src', 'images/rl_ranks/s4-' + user.rocket_league_rank + '.png');
                 }
+                else if (user.username.toLowerCase().startsWith('canister')) {
+                    $star.find('img').attr('src', 'images/rl_ranks/canister.png');
+                }
                 else {
                     $star.find('img').css({visibility: 'hidden'});
                 }

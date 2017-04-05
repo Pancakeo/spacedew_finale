@@ -44,6 +44,8 @@ exports.handle_message = function handle_message(session, message) {
             }
 
             if (data.message.length > 0) {
+                var recent_message = session.profile.username + ': ' + data.message;
+                room.add_recent_message(recent_message);
                 sessionator.broadcast('chatterbox', 'blargh', {message: data.message, username: session.profile.username}, {room_id: room.id, strip_entities: false});
             }
         },

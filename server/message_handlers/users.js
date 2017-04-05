@@ -142,6 +142,7 @@ exports.handle_message = function handle_message(session, message) {
                 evil_session.is_silenced = true;
 
                 setTimeout(function() {
+                    evil_session.send('chatterbox', 'system', {message: "You have been unsilenced.", color: 'green'});
                     evil_session.is_silenced = false;
                 }, 30 * 1000);
 

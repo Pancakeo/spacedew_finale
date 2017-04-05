@@ -407,8 +407,10 @@ module.exports = function(options) {
         });
 
         app.rename_room_tab = function(room_id, room_name) {
+            var room = page.$('#room_names [room_id="' + room_id + '"]').prop('room');
+            room.name = room_name;
             page.$('#room_names [room_id="' + room_id + '"]').html(room_name).attr('title', room_name);
-            page.update_room({name: room_name});
+            page.update_room(room);
         };
 
         app.users_pane_loaded = function() {
