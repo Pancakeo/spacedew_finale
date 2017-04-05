@@ -143,6 +143,7 @@ module.exports = function($target) {
 
             $users.contextMenu({
                 selector: '.user',
+                zIndex: 2001,
                 build: function($trigger, e) {
                     var username = $trigger.find('.username').text();
                     var user = $trigger.prop('user');
