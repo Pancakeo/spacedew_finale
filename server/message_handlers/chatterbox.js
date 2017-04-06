@@ -14,11 +14,15 @@ exports.handle_message = function handle_message(session, message) {
     var room = wiseau.get_room(data.room_id);
 
     let invite_to_room = function(invite_info) {
+        invite_info = Object.assign({
+            room_name: room && room.name
+        }, invite_info);
+
         let matching_session = sessionator.get_session_by_user(invite_info.username);
 
         if (matching_session) {
             if (!room.is_member(matching_session.username)) {
-                matching_session.send('chatterbox', 'boom_boom', {room_id: invite_info.room_id, invited_by: session.profile.username});
+                matching_session.send('chatterbox', 'boom_boom', {room_name: invite_info.room_name, room_id: invite_info.room_id, invited_by: session.profile.username});
                 session.send('chatterbox', 'system', {room_id: invite_info.room_id, message: "Invitation sent to " + invite_info.username, color: 'green'});
             }
         }
@@ -94,6 +98,7 @@ exports.handle_message = function handle_message(session, message) {
             if (data.invite) {
                 invite_to_room({
                     room_id: room.id,
+                    room_name: room.name,
                     username: data.invite
                 });
             }

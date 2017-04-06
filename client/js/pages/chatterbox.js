@@ -288,7 +288,7 @@ module.exports = function($parent, options) {
         });
 
         page.listen('boom_boom', function(data) {
-            page.toolio.confirm("Invitation", data.invited_by + " invited you to chat.", function() {
+            page.toolio.confirm("Invitation", data.invited_by + " invited you to chat.<br/><br/><b>Room Name:</b> " + data.room_name, function() {
                 page.send('join_room', {room_id: data.room_id});
             });
         });

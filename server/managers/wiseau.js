@@ -48,12 +48,20 @@ exports.create_room = function(room_name, room_id) {
             room.users.push({username: username});
         },
         leave_room: function(username) {
+            let success = false;
             for (var i = 0; i < room.users.length; i++) {
                 var user = room.users[i];
 
                 if (user.username.toLowerCase() == username.toLowerCase()) {
+                    success = true;
                     room.users.splice(i, 1);
                     i--;
+                }
+            }
+
+            if (success) {
+                if (lobby_room != room) {
+                    app.leave_room(username, room.id);
                 }
             }
         }
@@ -97,10 +105,6 @@ exports.logout_user = function(username) {
         var room = rooms[room_id];
         if (room.is_member(username)) {
             room.leave_room(username);
-
-            if (lobby_room != room) {
-                app.leave_room(username, room.id);
-            }
         }
     }
 };
