@@ -36,7 +36,27 @@
     }
 
     .room_tab.active {
-      color: white;
+      background: orange;
+      color: black;
+      border-width: 2px;
+      border-radius: 5px;
+    }
+
+    @keyframes fade_color {
+      from {
+        background: #0086b3;
+      }
+
+      to {
+        background: red;
+      }
+    }
+
+    .room_tab.blink {
+      animation-duration: 2.25s;
+      animation-name: fade_color;
+      animation-iteration-count: infinite;
+      animation-direction: alternate;
     }
   }
 

@@ -246,11 +246,11 @@ module.exports = function($target) {
         });
 
         page.$("#invite").button().on('click.invite', function() {
-            let $users = $('<div style="padding: 10px;">Invite users:</div>');
-            let $user = $('<div style="padding: 10px;"><span id="username"></span><button style="margin-left: 10px;">Invite!</button></div>');
+            let $users = $('<table><tbody></tbody></table>');
+            let $user = $('<tr><td id="username"></td><td><button>Invite?</button></td></tr>');
 
             $users.on('click', 'button', function() {
-                let username = $(this).prev('span').text();
+                let username = $(this).prop('username');
                 $(this).button('disable');
 
                 page.send('invite_to_room', {username: username, room_id: app.get_active_room(true)}, {page_name: 'chatterbox'});
@@ -260,11 +260,11 @@ module.exports = function($target) {
                 page.user_list_data.users_and_rooms.users.map(function(entry) {
                     return entry.username;
                 }).filter(function(username) {
-                    // should see if user is in room.
                     return app.profile.username != username;
                 }).forEach(function(username) {
                     $user.find('#username').text(username);
-                    $users.append($user);
+                    $user.find('button').prop('username', username);
+                    $users.find('tbody').append($user);
                     $user = $user.clone();
                 });
             }

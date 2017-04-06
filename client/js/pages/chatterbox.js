@@ -22,6 +22,7 @@ module.exports = function($parent, options) {
                 $chat.scrollTop($chat[0].scrollHeight);
             }
         };
+        app.scroll_chat = scroll_chat;
 
         var get_links_from_message = function(message) {
             var lines = message.split('<br/>');
@@ -53,7 +54,10 @@ module.exports = function($parent, options) {
             return {message: message, maybe_something: maybe_something};
         };
 
-        var show_notification = function(message) {
+        var show_notification = function(message, append_options) {
+            if (append_options.room_id && app.get_active_room(true) != append_options.room_id) {
+                app.alert_tab(append_options.room_id);
+            }
 
             if (!document.hasFocus()) {
                 if (app.settings.notify === true) {
@@ -94,11 +98,11 @@ module.exports = function($parent, options) {
                 $blargh = $('<div>' + $blargh + '</div>');
             }
 
+            show_notification($blargh.text(), append_options);
+
             let do_append = function(room_id) {
                 var $chat = page.$("div[room_id='" + room_id + "']");
                 $chat.append($blargh);
-
-                show_notification($blargh.text());
                 scroll_chat($chat);
             };
 
@@ -122,6 +126,8 @@ module.exports = function($parent, options) {
                 color: null
             }, append_options);
 
+            show_notification(message, append_options);
+
             let do_append = function(room_id) {
                 var $chat = page.$("div[room_id='" + room_id + "']");
                 var $message = $('<div class="message"><span class="timestamp">[' + moment().format("h:mm:ss A") + ']</span>' +
@@ -134,8 +140,6 @@ module.exports = function($parent, options) {
                 }
 
                 $chat.append($message);
-
-                show_notification(message);
                 scroll_chat($chat);
             };
 
@@ -151,6 +155,8 @@ module.exports = function($parent, options) {
         };
 
         var append_chat = function(data) {
+            show_notification(data.username + ": " + data.message, data);
+
             let do_append = function(room_id) {
                 var $chat = page.$("div[room_id='" + room_id + "']");
                 var message = data.message;
@@ -186,7 +192,6 @@ module.exports = function($parent, options) {
                 $message.find('a').css({color: outfit.fg_color});
 
                 $chat.append($message);
-                show_notification(data.username + ": " + data.message);
 
                 if ($link_box != null) {
                     $link_box.find('img, iframe').each(function() {
@@ -224,11 +229,11 @@ module.exports = function($parent, options) {
         };
 
         page.peepy('users.roams_the_earth', function(event) {
-            append_system(event.username + " roams the earth.", {class_name: 'happy'})
+            append_system(event.username + " roams the earth.", {class_name: 'happy', room_id: app.get_lobby(true)})
         });
 
         page.peepy('users.has_gone_to_a_better_place', function(event) {
-            append_system(event.username + " went to pick up a motorcycle.", {class_name: 'sad'})
+            append_system(event.username + " went to pick up a motorcycle.", {class_name: 'sad', room_id: app.get_lobby(true)})
         });
 
         event_bus.on('blargher.send', function(params) {
@@ -290,6 +295,21 @@ module.exports = function($parent, options) {
 
         page.listen('join_room', function(room) {
             app.add_room_tab(room, {focus: true});
+
+            if (room.recent_messages.length > 0) {
+                var $blargh = $('<div class="blargh recent_messages"/>');
+                $blargh.append('<div class="header">Recent Messages <span class="close">x</span></div>');
+                $blargh.append('<div class="body"/>');
+                var $body = $blargh.find('.body');
+
+                room.recent_messages.forEach(function(mess) {
+                    var message = get_links_from_message(mess.message).message;
+                    $body.append('<div>[' + moment(mess.timestamp).format('hh:mm:ss A') + '] ' + message + '</div>');
+                });
+
+                append_custom($blargh, {room_id: room.id});
+            }
+
             app.render_users_list();
         });
 

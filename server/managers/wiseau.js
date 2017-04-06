@@ -6,7 +6,7 @@ var moment = require('moment');
 var rooms = {};
 var lobby_room;
 
-var MAX_MESSAGES = 45;
+const MAX_MESSAGES = 45;
 
 exports.create_room = function(room_name, room_id) {
     room_id = room_id || uuid.v4();
@@ -21,6 +21,7 @@ exports.create_room = function(room_name, room_id) {
                 room.recent_messages.shift();
             }
 
+            message = app.wuptil.trim_string(message);
             room.recent_messages.push({message: message, timestamp: Date.now()});
         },
         is_member: function(username) {
@@ -96,6 +97,10 @@ exports.logout_user = function(username) {
         var room = rooms[room_id];
         if (room.is_member(username)) {
             room.leave_room(username);
+
+            if (lobby_room != room) {
+                app.leave_room(username, room.id);
+            }
         }
     }
 };

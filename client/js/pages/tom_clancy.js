@@ -244,6 +244,11 @@ module.exports = function(options) {
             }
         });
 
+        app.alert_tab = function(room_id) {
+            let $room_tab = page.$("#room_names").find('.room_tab[room_id="' + room_id + '"]');
+            $room_tab.addClass('blink');
+        };
+
         page.update_room = function(room) {
             page.$("#room_name").html(room.name).attr('title', room.name);
 
@@ -258,6 +263,13 @@ module.exports = function(options) {
                 page.$("#leave_room_wrapper").show();
             }
 
+            let $room_tab = page.$("#room_names").find('.room_tab[room_id="' + room.id + '"]');
+            $room_tab.removeClass('blink');
+
+            if (typeof(app.scroll_chat) == "function") {
+                let $chat = page.$("#chat_rooms").find("div[room_id='" + room.id + "']");
+                app.scroll_chat($chat);
+            }
         };
 
         page.$("#room_names").on('click', '.room_tab', function() {

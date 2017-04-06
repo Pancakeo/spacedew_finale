@@ -315,6 +315,7 @@ exports.connect = function(connection_id, ws) {
                 exports.broadcast('users', 'has_gone_to_a_better_place', {username: session.profile.username});
                 wiseau.logout_user(session.profile.username);
                 event_bus.emit('logout', session.profile);
+                event_bus.emit('update_userlist', {});
             }
 
             session.logged_in = false;

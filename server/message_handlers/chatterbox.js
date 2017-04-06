@@ -4,6 +4,10 @@ var wiseau = require('../managers/wiseau');
 var chat_commands = require('../chat_commands');
 var configuration = require('../conf/configuration');
 
+app.leave_room = function(username, room_id) {
+    sessionator.broadcast('chatterbox', 'system', {message: username + " leaves the room :/", color: 'red'}, {room_id: room_id});
+};
+
 exports.handle_message = function handle_message(session, message) {
     var sub_type = message.sub_type;
     var data = message.data;
@@ -13,8 +17,10 @@ exports.handle_message = function handle_message(session, message) {
         let matching_session = sessionator.get_session_by_user(invite_info.username);
 
         if (matching_session) {
-            matching_session.send('chatterbox', 'boom_boom', {room_id: invite_info.room_id, invited_by: session.profile.username});
-            session.send('chatterbox', 'system', {room_id: invite_info.room_id, message: "Invitation sent to " + invite_info.username, color: 'green'});
+            if (!room.is_member(matching_session.username)) {
+                matching_session.send('chatterbox', 'boom_boom', {room_id: invite_info.room_id, invited_by: session.profile.username});
+                session.send('chatterbox', 'system', {room_id: invite_info.room_id, message: "Invitation sent to " + invite_info.username, color: 'green'});
+            }
         }
     };
 
@@ -54,11 +60,6 @@ exports.handle_message = function handle_message(session, message) {
 
             if (data.message.length > 0) {
                 var recent_message = session.profile.username + ': ' + data.message;
-
-                if (recent_message.length > 1338) {
-                    recent_message = recent_message.substr(0, 1337) + ' [...]';
-                }
-
                 room.add_recent_message(recent_message);
                 sessionator.broadcast('chatterbox', 'blargh', {message: data.message, username: session.profile.username}, {room_id: room.id, strip_entities: false});
             }
@@ -78,9 +79,11 @@ exports.handle_message = function handle_message(session, message) {
             configuration.set('lobby_room_name', room.name);
         },
         create_room: function() {
-            if (!data.name || data.name.length == 0) {
+            if (!data.name || data.name.trim().length == 0) {
                 return;
             }
+
+            data.name = app.wuptil.trim_string(data.name);
 
             room = wiseau.create_room(data.name);
             room.join_room(session.profile.username);

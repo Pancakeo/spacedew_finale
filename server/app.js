@@ -9,7 +9,10 @@ require("console-stamp")(console, {
     }
 });
 
-global.app = {};
+global.app = {
+    wuptil: require('./util/wuptil')
+};
+
 app.shared_root = require('path').join(__dirname, '..', 'shared');
 app.config = require('./conf/configuration').load();
 global.event_bus = require(app.shared_root + '/event_bus');

@@ -5,6 +5,16 @@ exports.copy_object = function(obj) {
     return JSON.parse(JSON.stringify(obj));
 };
 
+const MAX_STRING_LENGTH = 1337;
+
+exports.trim_string = function(str) {
+    if (str && str.length > MAX_STRING_LENGTH) {
+        str = str.substr(0, MAX_STRING_LENGTH - 1) + ' [...]';
+    }
+
+    return str;
+};
+
 // Random integer between lower and upper.
 exports.random = function(lower, upper, inclusive) {
     var min = lower;
