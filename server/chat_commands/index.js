@@ -13,3 +13,4 @@ exports.exec = function(message, session, room_id)
 var modules = {};
 
 modules.trigger_warning = require('./trigger_warning');
+modules.ryebrarian = require('./ryebrarian');
