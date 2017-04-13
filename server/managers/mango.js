@@ -15,7 +15,7 @@ exports.get = function() {
 //
 //     // collection.insertMany([
 //     //     {a: 1}, {a: 2}, {a: 3}
-//     // ], function(err, result) {
+//     // ], function(err, result) {.
 //     //     console.log("Inserted 3 documents into the document collection");
 //     //     console.log(result);
 //     // });
