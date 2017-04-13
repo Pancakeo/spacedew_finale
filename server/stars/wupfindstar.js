@@ -68,9 +68,7 @@ exports.get_max_rank = function(profile_id, callback) {
             var $heh = $table.find('img');
             var max_rank = 0;
             var found_rank = false;
-
-            console.log($heh.length);
-
+            
             $heh.each(function() {
                 var $woboy = $(this);
                 var raw_rank = $woboy.attr('src');
