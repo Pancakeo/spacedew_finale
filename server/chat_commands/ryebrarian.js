@@ -3,8 +3,8 @@ var wuptil = require('../util/wuptil');
 
 exports.test = function(message)
 {
-    return /^\!m(edia)?(\s|$)/.test(message);
-}
+    return /^!m(edia)?(\s|$)/.test(message);
+};
 
 var parse = function(str)
 {
@@ -72,11 +72,11 @@ help_message += '!m(edia) t(ags) <tag> -- list all media with given tag\n';
 help_message += '!m(edia) / !m(edia) help -- this message!\n';
 help_message += 'Use quotes (") for any multi-word arguments\n';
 
-exports.exec = function(message, session, room_id) 
+exports.exec = function(message, session, room_id)
 {
     var command = parse(message);
     var action = command[1];
-    
+
     if (legal_actions.indexOf(action) == -1 || action == 'help')
     {
         setTimeout(function()
@@ -177,7 +177,7 @@ exports.exec = function(message, session, room_id)
                             {
                                 return prev + cur.name +'\t'+cur.url+'\n';
                             }, '');
-                            
+
                             setTimeout(function()
                             {
                                 session.broadcast('chatterbox', 'blargh', {message: message, username: 'Ryebrarian'}, {room_id: room_id, strip_entities: false});
@@ -204,11 +204,11 @@ exports.exec = function(message, session, room_id)
                                     }
                                 });
                             });
-                            
+
                             var message = Object.keys(tags).reduce(function(prev, cur) {
                                 return prev + cur + '\t' + tags[cur] + '\n';
                             }, '');
-                            
+
                             setTimeout(function()
                             {
                                 session.broadcast('chatterbox', 'blargh', {message: message, username: 'Ryebrarian'}, {room_id: room_id, strip_entities: false});
@@ -218,6 +218,6 @@ exports.exec = function(message, session, room_id)
                 break;
             }
         });
-    };
+    }
     return true;
-}
+};
