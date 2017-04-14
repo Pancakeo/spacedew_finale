@@ -18,12 +18,14 @@ exports.handle_message = function handle_message(session, message) {
             room_name: room && room.name
         }, invite_info);
 
-        let matching_session = sessionator.get_session_by_user(invite_info.username);
+        if (invite_info.username != null) {
+            let matching_session = sessionator.get_session_by_user(invite_info.username);
 
-        if (matching_session) {
-            if (!room.is_member(matching_session.username)) {
-                matching_session.send('chatterbox', 'boom_boom', {room_name: invite_info.room_name, room_id: invite_info.room_id, invited_by: session.profile.username});
-                session.send('chatterbox', 'system', {room_id: invite_info.room_id, message: "Invitation sent to " + invite_info.username, color: 'green'});
+            if (matching_session) {
+                if (!room.is_member(matching_session.username)) {
+                    matching_session.send('chatterbox', 'boom_boom', {room_name: invite_info.room_name, room_id: invite_info.room_id, invited_by: session.profile.username});
+                    session.send('chatterbox', 'system', {room_id: invite_info.room_id, message: "Invitation sent to " + invite_info.username, color: 'green'});
+                }
             }
         }
     };

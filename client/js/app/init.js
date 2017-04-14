@@ -64,19 +64,19 @@ module.exports = (function() {
     window.get_page = require('../app/page');
 
     switch (query_params.wup) {
+        case 'black_board':
+            if (window.opener && window.opener.app) {
+                window.app = window.opener.app;
+            }
+            require('../pages/black_board')();
+            break;
+
         case 'crabble':
             require('../pages/crabble')();
             break;
 
         case 'tick_tack':
             require('../pages/tick_tack')();
-            break;
-
-        case 'black_board':
-            if (window.opener && window.opener.app) {
-                window.app = window.opener.app;
-            }
-            require('../pages/black_board')();
             break;
 
         default:

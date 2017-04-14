@@ -1,21 +1,24 @@
 module.exports = function(page_name, callback) {
-    var event_bus = app.event_bus;
-    var toolio = require('../app/toolio');
-    var ws = require('../app/wupsocket');
+    const event_bus = app.event_bus;
+    const toolio = require('../app/toolio');
+    const ws = require('../app/wupsocket');
+    const listeners = [];
 
     $.get('html/pages/' + page_name + '.html', function(res) {
-        var page = {
+        let page = {
             $container: $(res),
             always_send: {},    // Keys that should go out with every message (e.g. game_id)
             $: function(selector) {
                 return jQuery(selector, this.$container);
             },
             listen: function(event_type, listener) {
-                event_bus.on(page_name + '.' + event_type, listener);
+                let cb = event_bus.on(page_name + '.' + event_type, listener, page.instance_id);
+                listeners.push(cb);
             },
             // Use to listen to any event
             peepy: function(full_event_name, listener) {
-                event_bus.on(full_event_name, listener);
+                let cb = event_bus.on(full_event_name, listener, page.instance_id);
+                listeners.push(cb);
             },
             emit: function(event_type, params) {
                 event_bus.emit(page_name + '.' + event_type, params);
@@ -36,10 +39,13 @@ module.exports = function(page_name, callback) {
             },
             get_template: function(template_id) {
                 return $templates.filter('[template="' + template_id + '"]').clone().removeAttr('template');
+            },
+            destroy: function() {
+                event_bus.stop_listening(listeners);
             }
         };
 
-        var $templates = page.$('[template]').detach();
+        let $templates = page.$('[template]').detach();
 
         Object.defineProperty(page, 'toolio', {
             get: function() {

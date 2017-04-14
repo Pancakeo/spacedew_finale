@@ -289,7 +289,7 @@ module.exports = function($parent, options) {
             let handlers = {
                 tags_all: function() {
                     let $blargh = $('<div class="blargh" style="width: 500px;"/>');
-                    $blargh.append('<div class="header">' + rye.username + ' <span class="close">x</span></div>');
+                    $blargh.append('<div class="header">' + rye.username + ' (All Tags) <span class="close">x</span></div>');
                     $blargh.append('<div class="body" style="padding: 0;"/>');
                     var $body = $blargh.find('.body');
 
@@ -302,12 +302,16 @@ module.exports = function($parent, options) {
                         $table.append($row);
                     });
 
+                    if (rye.tags.length == 0) {
+                        $table.append(page.get_template('rye_no_results'));
+                    }
+
                     $body.append($table);
                     append_custom($blargh, {room_id: rye.room_id});
                 },
                 tag_single: function() {
                     let $blargh = $('<div class="blargh" style="width: 1200px;"/>');
-                    $blargh.append('<div class="header">' + rye.username + ' <span class="close">x</span></div>');
+                    $blargh.append('<div class="header">' + rye.username + ' (Tag: ' + rye.tag + '<span class="close">x</span></div>');
                     $blargh.append('<div class="body" style="padding: 0;"/>');
                     var $body = $blargh.find('.body');
 
@@ -319,6 +323,10 @@ module.exports = function($parent, options) {
                         $row.find('#tag_content').text(r.content);
                         $table.append($row);
                     });
+
+                    if (rye.results.length == 0) {
+                        $table.append(page.get_template('rye_no_results'));
+                    }
 
                     $body.append($table);
                     append_custom($blargh, {room_id: rye.room_id});

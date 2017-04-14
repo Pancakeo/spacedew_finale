@@ -15,11 +15,13 @@ module.exports = function() {
             if (!app.logged_in) {
                 page.$("#status").text('Connected!');
                 page.$('button').prop('disabled', false);
-                
-                if (localStorage.auth_key != null && document.hasFocus()) {
-                    page.$("#status").text('Logging in (auth_key)...');
-                    page.$('button').prop('disabled', true);
-                    page.send('login_with_auth_key', {username: localStorage.username, auth_key: localStorage.auth_key});
+
+                if (document.hasFocus() || localStorage.is_local_dev) {
+                    if (localStorage.auth_key != null) {
+                        page.$("#status").text('Logging in (auth_key)...');
+                        page.$('button').prop('disabled', true);
+                        page.send('login_with_auth_key', {username: localStorage.username, auth_key: localStorage.auth_key});
+                    }
                 }
             }
         });

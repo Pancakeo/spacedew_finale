@@ -86,8 +86,13 @@ module.exports = (function() {
 
                 $(this).find("#prompter").off('keydown.blargh').on('keydown.blargh', function(e) {
                     if (e.which == 13) {
+                        e.stopPropagation();
                         use_input = true;
-                        $blargh.dialog('close');
+
+                        setTimeout(function() {
+                            $blargh.dialog('close');
+                        });
+
                     }
                 });
             },

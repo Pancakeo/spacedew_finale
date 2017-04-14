@@ -1,15 +1,31 @@
 <div>
-    <div template="team_row" class="team_row">
-        <div class="team_name"></div>
-        <div class="team_members"></div>
-    </div>
-
     <div id="yownet">
         <div id="game_wrapper">
             <span style="font-weight: bold">Game Name:</span> <span id="game_name"></span>
-            <button id="set_game_name">Set</button>
+            <button id="set_game_name">Set Name</button>
+            <button id="invite_to_game">Invite</button>
+            <button id="add_bot">Add AI</button>
         </div>
-        <div id="teams"></div>
+
+        <table id="players" class="wupfindtable">
+            <thead>
+            <tr>
+                <th>Player</th>
+                <th>Team</th>
+                <th style="width: 25px"></th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr template="player_row">
+                <td><input id="player_name" readonly="readonly"/></td>
+                <td><select id="player_team"></select></td>
+                <td>
+                    <button id="player_eject" style="display: none; color: red;">x</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
 
         <div id="messages"></div>
         <input id="composer"/>

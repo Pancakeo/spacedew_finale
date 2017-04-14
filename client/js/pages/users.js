@@ -167,16 +167,55 @@ module.exports = function($target) {
                                     page.prompt("New Room", "With name", "cowsmoke", function(room_name) {
                                         if (room_name) {
                                             room_name = room_name.trim();
+                                            let invite_user;
+
+                                            if (user.username != app.profile.username) {
+                                                invite_user = user.username;
+                                            }
 
                                             // Maybe do that.
                                             if (room_name.length > 0) {
-                                                page.send('create_room', {name: room_name, invite: username}, {page_name: 'chatterbox'});
+                                                page.send('create_room', {name: room_name, invite: invite_user}, {page_name: 'chatterbox'});
                                             }
                                         }
                                     });
                                     break;
 
-                                case 'mario_party':
+                                case 'sorry_jimmy':
+                                    $('<div>Choose wisely...</div>').dialog({
+                                        title: 'Select Game',
+                                        modal: true,
+                                        buttons: {
+                                            'Tick Tack': function() {
+                                                $(this).dialog('close');
+
+                                                require('./yownet')({
+                                                    game_type: 'Tick Tack',
+                                                    game_name: 'Ticky',
+                                                    on_start: function(whatever) {
+                                                        app.toolio.confirm("Popup", "Allow Popup?", function() {
+                                                            window.open('index.html?wup=tick_tack&game_id=' + whatever.game_id, '_blank', 'width=1300,height=830');
+                                                        });
+
+                                                    }
+                                                });
+                                            },
+                                            'Crabble': function() {
+                                                $(this).dialog('close');
+
+                                                require('./yownet')({
+                                                    game_type: 'Crabble',
+                                                    game_name: 'Crabby',
+                                                    on_start: function(whatever) {
+                                                        app.toolio.confirm("Popup", "Allow Popup?", function() {
+                                                            window.open('index.html?wup=crabble&game_id=' + whatever.game_id, '_blank', 'width=1300,height=830');
+                                                        });
+                                                    }
+
+                                                });
+                                            }
+                                        }
+                                    });
                                     break;
 
                                 default:
@@ -194,12 +233,9 @@ module.exports = function($target) {
                                 }
                             },
                             boom_boom: {
-                                name: "Boom boom " + username, icon: "fa-user-plus",
-                                disabled: function() {
-                                    return user.username == app.profile.username;
-                                }
+                                name: "Boom boom " + username, icon: "fa-user-plus"
                             },
-                            mario_party: {
+                            sorry_jimmy: {
                                 name: "Sorry, Jimmy", icon: "fa-beer"
                             }
                         }

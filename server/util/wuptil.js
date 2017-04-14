@@ -44,3 +44,12 @@ exports.choose = function(arr) {
     var idx = exports.random(0, arr.length, false);
     return arr[idx];
 };
+
+exports.generate_id = function() {
+    var d = Date.now();
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = (d + Math.random() * 16) % 16 | 0;
+        d = Math.floor(d / 16);
+        return (c == 'x' ? r : (r & 0x7 | 0x8)).toString(16);
+    });
+};
