@@ -1,3 +1,35 @@
 <div id="chatterbox">
     <div id="chat_rooms"></div>
+
+    <table template="rye_tags_all_table" class="wupfindtable center_content">
+        <thead>
+        <tr>
+            <th>Tag Name</th>
+            <th>Tag Count</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr template="rye_tags_all_row">
+            <td id="tag_name"></td>
+            <td id="tag_count"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <table template="rye_tag_single" class="wupfindtable center_content">
+        <thead>
+        <tr>
+            <th>Tag Name</th>
+            <th>Tag Content</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr template="rye_tag_single_row">
+            <td id="tag_name"></td>
+            <td id="tag_content"></td>
+        </tr>
+        </tbody>
+    </table>
 </div>

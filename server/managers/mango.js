@@ -1,6 +1,7 @@
 var mongo_client = require('mongodb').MongoClient;
 const MONGO_URL = 'mongodb://localhost:' + app.config.db_port + '/yehrye';
 
+// TODO - probably makes sense to have a get() that returns db + collection, to save a level of indentation.
 exports.get = function() {
     return new Promise(function(resolve, reject) {
         mongo_client.connect(MONGO_URL).then(function(db) {
@@ -9,22 +10,3 @@ exports.get = function() {
     });
 
 };
-
-// mongo_client.connect(url, function(err, db) {
-//     var collection = db.collection('documents');
-//
-//     // collection.insertMany([
-//     //     {a: 1}, {a: 2}, {a: 3}
-//     // ], function(err, result) {.
-//     //     console.log("Inserted 3 documents into the document collection");
-//     //     console.log(result);
-//     // });
-//
-//     collection.deleteMany({});
-//
-//     collection.find({}).toArray(function(err, docs) {
-//         console.log(docs);
-//     });
-//
-//     // db.close();
-// });

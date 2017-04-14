@@ -1,6 +1,10 @@
 var mango = require('../managers/mango');
 var wuptil = require('../util/wuptil');
 
+// TODO view_count
+// TODO owner
+const USERNAME ='Ryebrarian';
+
 exports.test = function(message)
 {
     return /^!m(edia)?(\s|$)/.test(message);
@@ -81,7 +85,7 @@ exports.exec = function(message, session, room_id)
     {
         setTimeout(function()
         {
-            session.broadcast('chatterbox', 'blargh', {message: help_message, username: 'Ryebrarian'}, {room_id: room_id, strip_entities: false});
+            session.broadcast('chatterbox', 'blargh', {message: help_message, username: USERNAME}, {room_id: room_id, strip_entities: false});
         }, 100);
     }
     else
@@ -115,7 +119,7 @@ exports.exec = function(message, session, room_id)
                                 }).then(function(result)
                                 {
                                     db.close();
-                                    session.broadcast('chatterbox', 'chat', {message: 'Media item '+name+' added.', username: 'Ryebrarian'}, {room_id: room_id});
+                                    session.broadcast('chatterbox', 'chat', {message: 'Media item '+name+' added.', username: USERNAME}, {room_id: room_id});
                                 });
                             }
                             else
@@ -123,10 +127,13 @@ exports.exec = function(message, session, room_id)
                                 db.close();
                                 setTimeout(function()
                                 {
-                                    session.broadcast('chatterbox', 'chat', {message: 'A media item by that name already exists!', username: 'Ryebrarian'}, {room_id: room_id});
+                                    session.broadcast('chatterbox', 'chat', {message: 'A media item by that name already exists!', username: USERNAME}, {room_id: room_id});
                                 }, 100);
                             }
                         });
+                    }
+                    else {
+                        session.broadcast('chatterbox', 'chat', {message: 'RTFM.', username: USERNAME}, {room_id: room_id});
                     }
                 break;
                 case 'view':
@@ -139,12 +146,12 @@ exports.exec = function(message, session, room_id)
                         {
                             if (media_item == null)
                             {
-                                session.broadcast('chatterbox', 'chat', {message: 'Media item '+name+' does not exist.', username: 'Ryebrarian'}, {room_id: room_id});
+                                session.broadcast('chatterbox', 'chat', {message: 'Media item '+name+' does not exist.', username: USERNAME}, {room_id: room_id});
                             }
                             else
                             {
-                                session.broadcast('chatterbox', 'chat', {message: 'Media item '+name+':', username: 'Ryebrarian'}, {room_id: room_id});
-                                session.broadcast('chatterbox', 'chat', {message: media_item.url, username: 'Ryebrarian'}, {room_id: room_id});
+                                session.broadcast('chatterbox', 'chat', {message: 'Media item '+name+':', username: USERNAME}, {room_id: room_id});
+                                session.broadcast('chatterbox', 'chat', {message: media_item.url, username: USERNAME}, {room_id: room_id});
                             }
                         }, 100);
                         db.close();
@@ -160,9 +167,12 @@ exports.exec = function(message, session, room_id)
                             var item = wuptil.choose(mediabits);
                             setTimeout(function()
                             {
-                                session.broadcast('chatterbox', 'chat', {message: 'Media item '+item.name+':', username: 'Ryebrarian'}, {room_id: room_id});
-                                session.broadcast('chatterbox', 'chat', {message: item.url, username: 'Ryebrarian'}, {room_id: room_id});
+                                session.broadcast('chatterbox', 'chat', {message: 'Media item '+item.name+':', username: USERNAME}, {room_id: room_id});
+                                session.broadcast('chatterbox', 'chat', {message: item.url, username: USERNAME}, {room_id: room_id});
                             }, 100);
+                        }
+                        else {
+                            session.broadcast('chatterbox', 'chat', {message: 'No content for that tag.', username: USERNAME}, {room_id: room_id});
                         }
                     });
                 break;
@@ -173,15 +183,21 @@ exports.exec = function(message, session, room_id)
                         var tag = command[2];
                         c.find({tags: tag}).toArray().then(function(results)
                         {
-                            var message = results.reduce(function(prev, cur)
-                            {
-                                return prev + cur.name +'\t'+cur.url+'\n';
-                            }, '');
+                            let client_results = results.map(function(r) {
+                                return {name: r.name, content: r.url};
+                            }).sort(function(a, b) {
+                                return a.name.localeCompare(b.name);
+                            });
 
                             setTimeout(function()
                             {
-                                session.broadcast('chatterbox', 'blargh', {message: message, username: 'Ryebrarian'}, {room_id: room_id, strip_entities: false});
+                                session.broadcast('chatterbox', 'ryebrarian', {type: 'tag_single', username: USERNAME, results: client_results, tag: tag}, {room_id: room_id});
                             },100);
+
+                            // var message = results.reduce(function(prev, cur)
+                            // {
+                            //     return prev + cur.name +'\t'+cur.url+'\n';
+                            // }, '');
                         });
                     }
                     else
@@ -205,13 +221,24 @@ exports.exec = function(message, session, room_id)
                                 });
                             });
 
-                            var message = Object.keys(tags).reduce(function(prev, cur) {
-                                return prev + cur + '\t' + tags[cur] + '\n';
-                            }, '');
+                            let dog_tags = Object.keys(tags).map((k) => {
+                                return {name: k, count: tags[k]}
+                            }).sort((a, b) => {
+                                if (a.count != b.count) {
+                                    return b.count - a.count
+                                }
+                                else {
+                                    return a.name.localeCompare(b.name);
+                                }
+                            });
+
+                            // var message = Object.keys(tags).reduce(function(prev, cur) {
+                            //     return prev + cur + '\t' + tags[cur] + '\n';
+                            // }, '');
 
                             setTimeout(function()
                             {
-                                session.broadcast('chatterbox', 'blargh', {message: message, username: 'Ryebrarian'}, {room_id: room_id, strip_entities: false});
+                                session.broadcast('chatterbox', 'ryebrarian', {type: 'tags_all', tags: dog_tags, username: USERNAME}, {room_id: room_id, strip_entities: false});
                             }, 100);
                         });
                     }

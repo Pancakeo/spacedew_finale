@@ -179,6 +179,12 @@ module.exports = function($parent, options) {
                     }
                 }, this_fucking_guy);
 
+                if (data.username == 'Ryebrarian') {
+                    this_fucking_guy.outfit.chat.username_color = 'teal';
+                    this_fucking_guy.outfit.chat.font_family = 'Courier New';
+                    this_fucking_guy.outfit.chat.font_size = 16;
+                }
+
                 var outfit = this_fucking_guy.outfit.chat;
                 var username_thing = data.username;
                 if (data.team == true) {
@@ -277,6 +283,52 @@ module.exports = function($parent, options) {
 
             app.disconnected = true;
             page.ws.reconnect();
+        });
+
+        page.listen('ryebrarian', function(rye) {
+            let handlers = {
+                tags_all: function() {
+                    let $blargh = $('<div class="blargh" style="width: 500px;"/>');
+                    $blargh.append('<div class="header">' + rye.username + ' <span class="close">x</span></div>');
+                    $blargh.append('<div class="body" style="padding: 0;"/>');
+                    var $body = $blargh.find('.body');
+
+                    let $table = page.get_template('rye_tags_all_table');
+
+                    rye.tags.forEach(function(t) {
+                        let $row = page.get_template('rye_tags_all_row');
+                        $row.find('#tag_name').text(t.name);
+                        $row.find('#tag_count').text(t.count);
+                        $table.append($row);
+                    });
+
+                    $body.append($table);
+                    append_custom($blargh, {room_id: rye.room_id});
+                },
+                tag_single: function() {
+                    let $blargh = $('<div class="blargh" style="width: 1200px;"/>');
+                    $blargh.append('<div class="header">' + rye.username + ' <span class="close">x</span></div>');
+                    $blargh.append('<div class="body" style="padding: 0;"/>');
+                    var $body = $blargh.find('.body');
+
+                    let $table = page.get_template('rye_tag_single');
+
+                    rye.results.forEach(function(r) {
+                        let $row = page.get_template('rye_tag_single_row');
+                        $row.find('#tag_name').text(r.name);
+                        $row.find('#tag_content').text(r.content);
+                        $table.append($row);
+                    });
+
+                    $body.append($table);
+                    append_custom($blargh, {room_id: rye.room_id});
+                }
+            };
+
+            if (typeof(handlers[rye.type]) == "function") {
+                handlers[rye.type]();
+            }
+
         });
 
         page.listen('chat', function(data) {
