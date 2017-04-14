@@ -209,7 +209,7 @@ module.exports = function($target) {
 
             if (app.is_mobile && !displayed_users_once) {
                 displayed_users_once = true;
-                var woboy_users = data.users.map(function(user) {
+                var woboy_users = data.users_and_rooms.users.map(function(user) {
                     return user.username;
                 }).join(', ');
 

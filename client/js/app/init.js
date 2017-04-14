@@ -14,7 +14,7 @@ module.exports = (function() {
         query_params[parts[0]] = parts[1];
     });
 
-        var domain = window.location.protocol + '//' + window.location.hostname;
+    var domain = window.location.protocol + '//' + window.location.hostname;
     if (window.location.port != 80) {
         domain += ":" + window.location.port
     }
