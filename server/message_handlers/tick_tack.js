@@ -19,7 +19,7 @@ exports.handle_message = function handle_message(session, message) {
 
     let handlers = {
         whew: function() {
-            session.send(page_key, 'whew', {whewboy: true});
+            session.send(page_key, 'whew', {whewboy: true, room_id: data.room_id});
         }
     };
 

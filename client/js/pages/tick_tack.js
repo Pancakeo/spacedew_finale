@@ -1,5 +1,5 @@
 module.exports = function(options) {
-    const game_id = app.toolio.get_query_param('game_id');
+    const room_id = app.toolio.get_query_param('room_id');
     const postMessage = function(data) {
         window.opener.postMessage(data, app.domain);
     };
@@ -12,12 +12,13 @@ module.exports = function(options) {
             listener_name: 'ws.send',
             type: page.page_name,
             sub_type: 'whew',
-            message: {whew: true}
+            message: {whew: true, room_id: room_id}
         })
     });
 
-    app.register_window_listener('tick_tack', function(data) {
-        console.log(data);
+    app.register_window_listener('tick_tack', function(message) {
+        console.log(message);
+        alert(message.data.whewboy);
     });
 
     setInterval(function() {

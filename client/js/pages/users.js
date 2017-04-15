@@ -194,7 +194,7 @@ module.exports = function($target) {
                                                     game_name: 'Ticky',
                                                     on_start: function(whatever) {
                                                         app.toolio.confirm("Popup", "Allow Popup?", function() {
-                                                            window.open('index.html?wup=tick_tack&game_id=' + whatever.game_id, '_blank', 'width=1300,height=830');
+                                                            window.open('index.html?wup=tick_tack&room_id=' + whatever.room_id, '_blank', 'width=1300,height=830');
                                                         });
 
                                                     }
@@ -208,7 +208,7 @@ module.exports = function($target) {
                                                     game_name: 'Crabby',
                                                     on_start: function(whatever) {
                                                         app.toolio.confirm("Popup", "Allow Popup?", function() {
-                                                            window.open('index.html?wup=crabble&game_id=' + whatever.game_id, '_blank', 'width=1300,height=830');
+                                                            window.open('index.html?wup=crabble&room_id=' + whatever.room_id, '_blank', 'width=1300,height=830');
                                                         });
                                                     }
 
@@ -277,8 +277,8 @@ module.exports = function($target) {
                         page.$("#add_bot").click();
                     },
                     on_start: function(whatever) {
-                        let popup = window.open('index.html?wup=tick_tack&game_id=' + whatever.game_id, '_blank', 'width=1300,height=830,left=200,top=200');
-                        page.ws.register_popup('tick_tack', whatever.game_id, popup);
+                        let popup = window.open('index.html?wup=tick_tack&room_id=' + whatever.room_id, '_blank', 'width=1300,height=830,left=200,top=200');
+                        page.ws.register_popup('tick_tack', whatever.room_id, popup);
                     }
                 });
             }
