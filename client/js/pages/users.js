@@ -194,7 +194,8 @@ module.exports = function($target) {
                                                     game_name: 'Ticky',
                                                     on_start: function(whatever) {
                                                         app.toolio.confirm("Popup", "Allow Popup?", function() {
-                                                            window.open('index.html?wup=tick_tack&room_id=' + whatever.room_id, '_blank', 'width=1300,height=830');
+                                                            let popup = window.open('index.html?wup=tick_tack&room_id=' + whatever.room_id, '_blank', 'width=1300,height=830,left=200,top=200');
+                                                            page.ws.register_popup('tick_tack', whatever.room_id, popup);
                                                         });
 
                                                     }
@@ -208,7 +209,8 @@ module.exports = function($target) {
                                                     game_name: 'Crabby',
                                                     on_start: function(whatever) {
                                                         app.toolio.confirm("Popup", "Allow Popup?", function() {
-                                                            window.open('index.html?wup=crabble&room_id=' + whatever.room_id, '_blank', 'width=1300,height=830');
+                                                            let popup = window.open('index.html?wup=crabble&room_id=' + whatever.room_id, '_blank', 'width=1300,height=830,left=100,top=100');
+                                                            page.ws.register_popup('crabble', whatever.room_id, popup);
                                                         });
                                                     }
 

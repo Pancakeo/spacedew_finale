@@ -269,7 +269,6 @@ module.exports = (function() {
     };
 
     app.register_window_listener('ws.send', function(data) {
-        console.log(data);
         wupsocket.send(data.type, data.sub_type, data.message);
     });
 
