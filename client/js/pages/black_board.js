@@ -64,6 +64,11 @@ module.exports = function() {
         }
     };
 
+    const send_message = function(message) {
+        message = $.extend(message, {listener_name: 'black_board'});
+        window.opener.postMessage(message, app.domain);
+    };
+
     get_page('black_board', function(page) {
         $('body').append(page.$container);
 
@@ -78,17 +83,17 @@ module.exports = function() {
 
         var ch = canvas_handler(ctx);
 
-        var send_thing = function(type, data) {
-            var message = {action: 'draw', type: type, data: data};
+        var perform_drawing_action = function(type, data) {
+            let message = $.extend({}, data, {action: 'draw', type: type});
             ch.handle_thing(message);
-            window.opener.postMessage(message, app.domain);
+            send_message(message);
         };
 
         page.$("#controls").on('click', '[menu_item]', function() {
             var menu_item = $(this).attr('menu_item');
             switch (menu_item) {
                 case 'great_clear':
-                    send_thing('colorful_clear', {color: board.style.bg_color, nuke: true});
+                    perform_drawing_action('colorful_clear', {color: board.style.bg_color, nuke: true});
                     break;
 
                 case 'eye_drop':
@@ -124,7 +129,7 @@ module.exports = function() {
         });
 
         page.$("#bg_color").on('change', function() {
-            send_thing('colorful_clear', {color: this.value, nuke: true});
+            perform_drawing_action('colorful_clear', {color: this.value, nuke: true});
         });
 
         page.$("#black_board_canvas").on('mouseleave', function(e) {
@@ -180,7 +185,7 @@ module.exports = function() {
                                 text: res
                             };
 
-                            send_thing('text', text);
+                            perform_drawing_action('text', text);
                         }
                         stop_tools();
                     });
@@ -199,7 +204,7 @@ module.exports = function() {
 
         setInterval(function() {
             if (Date.now() - board.my_position.last_change <= 100) {
-                send_thing('position', board.my_position);
+                perform_drawing_action('position', board.my_position);
             }
         }, 100);
 
@@ -215,7 +220,7 @@ module.exports = function() {
                     line_width: board.style.stroke_width
                 };
 
-                send_thing('line', line);
+                perform_drawing_action('line', line);
             },
             rekt: function(end_x, end_y) {
                 var start_x = ui.pinned_x - (board.style.stroke_width / 2);
@@ -233,7 +238,7 @@ module.exports = function() {
                     phil: board.style.phil
                 };
 
-                send_thing('rekt', rekt);
+                perform_drawing_action('rekt', rekt);
             },
             circle: function(end_x, end_y) {
                 var circle = {
@@ -245,7 +250,7 @@ module.exports = function() {
                     phil: board.style.phil
                 };
 
-                send_thing('circle', circle);
+                perform_drawing_action('circle', circle);
             }
         };
 
@@ -364,48 +369,48 @@ module.exports = function() {
         });
 
         var draw_queue = [];
-        window.addEventListener('message', function(e) {
-            var info = e.data;
-            var data = info.data;
 
-            if (info.type == 'colorful_clear' && data.nuke) {
+        app.register_window_listener('black_board', function(data) {
+
+            if (data.type == 'colorful_clear' && data.nuke) {
                 board.style.bg_color = data.color;
             }
 
-            if (info.type == 'load') {
+            if (data.type == 'load') {
                 $wait_dialog && $wait_dialog.dialog('close');
                 $wait_dialog = null;
 
-                draw_queue.forEach(function(info) {
-                    ch.handle_thing(info);
+                draw_queue.forEach(function(data) {
+                    ch.handle_thing(data);
                 });
             }
 
-            if (info.type != 'load') {
-                if (info.username == app.profile.username) {
+            if (data.type != 'load') {
+
+                if (data.username == app.profile.username) {
                     return;
                 }
             }
 
-            if (info.type == 'positions') {
-                board.user_positions = info.positions;
+            if (data.type == 'positions') {
+                board.user_positions = data.positions;
             }
 
-            if (info.type == 'load') {
-                board.style.bg_color = info.bg_color;
-                ch.handle_thing({type: 'colorful_clear', data: {color: info.bg_color, nuke: true}});
+            if (data.type == 'load') {
+                board.style.bg_color = data.bg_color;
+                ch.handle_thing({type: 'colorful_clear', color: data.bg_color, nuke: true});
 
-                info.data.forEach(function(thing) {
+                data.commands.forEach(function(thing) {
                     ch.handle_thing(thing);
                 })
             }
 
             if ($wait_dialog) {
-                draw_queue.push(info);
+                draw_queue.push(data);
                 return;
             }
 
-            ch.handle_thing(info);
+            ch.handle_thing(data);
         });
 
         var colors = ['red', 'blue', 'orange', 'green', 'black', 'white'];
@@ -453,7 +458,7 @@ module.exports = function() {
             }
         );
 
-        window.opener.postMessage({action: 'load'}, app.domain);
+        window.opener.postMessage({action: 'load', listener_name: 'black_board'}, app.domain);
 
         page.$("#buttons button[draw_style]").on('click', function() {
             $(this).siblings('button[draw_style]').removeClass('active');
@@ -534,14 +539,14 @@ module.exports = function() {
                         var data = {color: board.style.fg_color, alpha: board.style.alpha};
                         $.extend(data, board.tools.select_box);
 
-                        send_thing('colorful_clear', data);
+                        perform_drawing_action('colorful_clear', data);
                         stop_tools();
                         break;
                     // delete = erase
                     case 46:
                         var data = $.extend({color: board.style.bg_color}, board.tools.select_box);
 
-                        send_thing('colorful_clear', data);
+                        perform_drawing_action('colorful_clear', data);
                         stop_tools();
                         break;
                 }

@@ -43,7 +43,6 @@ var end_turn = function(game_id, action) {
     broadcast(game.game_id, 'current_turn', {hot_seat: game_state.hot_seat.name});
 };
 
-exports.requires_auth = false;
 exports.handle_message = function handle_message(session, message) {
     var sub_type = message.sub_type;
     var data = message.data;

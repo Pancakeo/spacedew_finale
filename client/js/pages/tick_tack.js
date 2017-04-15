@@ -1,28 +1,31 @@
 module.exports = function(options) {
-
-    options = $.extend({
-        game_id: null
-    }, options);
+    const game_id = app.toolio.get_query_param('game_id');
+    const postMessage = function(data) {
+        window.opener.postMessage(data, app.domain);
+    };
 
     get_page('tick_tack', function(page) {
         var $parent = $('body');
         $parent.append(page.$container);
 
-        if (!options.game_id) {
-            let yownet = require('./yownet')({
-                max_players: 2,
-                game_type: 'Tick Tack',
-                game_name: 'Ticking Time Bomb',
-
-                on_start: function() {
-                    // Enter game.
-                }
-            });
-        }
-        else {
-            // Enter game.
-        }
+        postMessage({
+            listener_name: 'ws.send',
+            type: page.page_name,
+            sub_type: 'whew',
+            message: {whew: true}
+        })
     });
+
+    app.register_window_listener('tick_tack', function(data) {
+        console.log(data);
+    });
+
+    setInterval(function() {
+        if (!window.opener || window.opener.closed) {
+            alert('whew');
+            window.close();
+        }
+    }, 100);
 
     return {};
 };

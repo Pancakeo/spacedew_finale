@@ -277,10 +277,8 @@ module.exports = function($target) {
                         page.$("#add_bot").click();
                     },
                     on_start: function(whatever) {
-                        app.toolio.confirm("Popup", "Allow Popup?", function() {
-                            window.open('index.html?wup=tick_tack&game_id=' + whatever.game_id, '_blank', 'width=1300,height=830');
-                        });
-
+                        let popup = window.open('index.html?wup=tick_tack&game_id=' + whatever.game_id, '_blank', 'width=1300,height=830,left=200,top=200');
+                        page.ws.register_popup('tick_tack', whatever.game_id, popup);
                     }
                 });
             }

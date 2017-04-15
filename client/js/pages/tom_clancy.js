@@ -433,17 +433,17 @@ module.exports = function(options) {
             }, 100);
 
             app.black_board = window.open('index.html?wup=black_board', '_blank', 'width=1300,height=830');
+            app.popups.push(app.black_board);
             app.black_board.room_id = app.get_active_room(true);
         };
 
-        window.addEventListener('message', function(e) {
-            switch (e.data.action) {
+        app.register_window_listener('black_board', function(data) {
+            switch (data.action) {
                 case 'load':
                     page.ws.send('black_board', 'sync', {room_id: app.get_active_room(true), mini: false});
                     break;
 
                 case 'draw':
-                    var data = e.data;
                     data.room_id = app.get_active_room(true);
                     page.ws.send('black_board', 'draw', data);
                     break;
@@ -451,7 +451,6 @@ module.exports = function(options) {
                 default:
                     break;
             }
-
         });
 
         app.get_lobby = function(just_id) {
@@ -488,9 +487,9 @@ module.exports = function(options) {
 
         page.peepy('users.leave_room', function(data) {
             if (data.success) {
-                let $room_tab = $('.room_tab[room_id="' + data.room_id + '"]');
-                let $room_box = $('.chat_thing[room_id="' + data.room_id + '"]');
-                let $canvas = $('.chat_thing[room_id="' + data.room_id + '"]');
+                let $room_tab = page.$('.room_tab[room_id="' + data.room_id + '"]');
+                let $room_box = page.$('.chat_thing[room_id="' + data.room_id + '"]');
+                let $canvas = page.$('.chat_thing[room_id="' + data.room_id + '"]');
 
                 let whewboard = $room_box.prop('whewboard');
                 if (whewboard) {
@@ -507,7 +506,7 @@ module.exports = function(options) {
                 $room_box.remove();
 
                 let lobby_room = app.get_lobby();
-                $room_tab = $('.room_tab[room_id="' + lobby_room.id + '"]');
+                $room_tab = page.$('.room_tab[room_id="' + lobby_room.id + '"]');
                 $room_tab.click();
             }
         });
@@ -521,7 +520,9 @@ module.exports = function(options) {
             app.rename_room_tab(lobby.id, data.lobby.name);
 
             page.$('#room_names [room_id="' + lobby.id + '"]').attr('room_id', data.lobby.id).prop('room', data.lobby).click();
-            page.$('#chat_rooms [room_id="' + lobby.id + '"]').attr('room_id', data.lobby.id);
+            page.$('#chat_rooms [room_id="' + lobby.id + '"]').attr('room_id', data.lobby.id).prop('room', data.lobby);
+            page.$('#right_pane [room_id="' + lobby.id + '"]').attr('room_id', data.lobby.id);
+            app.event_bus.emit('update_room_id', {old_room: lobby, new_room: data.lobby});
         });
 
         page.peepy('ws.transfer_complete', function(params) {

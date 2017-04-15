@@ -1,31 +1,31 @@
 module.exports = (function() {
     "use strict";
-    var toolio = app.toolio;
-    var event_bus = app.event_bus;
-    var DEFAULT_CHUNK_SIZE = 1024 * 1024;
-    var chunk_size = DEFAULT_CHUNK_SIZE;
+    const toolio = app.toolio;
+    const event_bus = app.event_bus;
+    const DEFAULT_CHUNK_SIZE = 1024 * 1024;
+    let chunk_size = DEFAULT_CHUNK_SIZE;
 
     if (localStorage.chunk_size) {
-        var user_chunk_size = Number(localStorage.chunk_size);
+        let user_chunk_size = Number(localStorage.chunk_size);
 
         if (!isNaN(user_chunk_size) && user_chunk_size > 0) {
             chunk_size = user_chunk_size;
         }
     }
 
-    var wupsocket = {
+    let wupsocket = {
         binary_transfers: {}
     };
 
-    var ws_connected = false;
-    var binary_connected = false;
-    var manually_closed = false;
-    var key;
+    let ws_connected = false;
+    let binary_connected = false;
+    let manually_closed = false;
+    let key;
 
-    var prime_socket = new Worker('js/public/prime_socket.js');
+    let prime_socket = new Worker('js/public/prime_socket.js');
     prime_socket.postMessage({});
 
-    var ws_handlers = {
+    let ws_handlers = {
         connection: function(message) {
             switch (message.sub_type) {
                 case 'heartbeat':
@@ -59,7 +59,7 @@ module.exports = (function() {
     };
 
     prime_socket.addEventListener('message', function(e) {
-        var params = e.data.params;
+        let params = e.data.params;
 
         switch (e.data.action) {
             case 'connect':
@@ -91,28 +91,36 @@ module.exports = (function() {
                 break;
 
             case 'message':
-                var message = params.message;
+                let message = params.message;
                 if (typeof(ws_handlers[message.type]) == "function") {
                     ws_handlers[message.type](message);
                 }
-                else {
-                    if (message.type != null && message.sub_type != null && message.data != null) {
-                        event_bus.emit(message.type + '.' + message.sub_type, message.data);
-                    }
+
+                if (message.type != null && message.sub_type != null && message.data != null) {
+                    event_bus.emit(message.type + '.' + message.sub_type, message.data);
+                }
+
+                if (wupsocket.popups[message.type] != null) {
+                    wupsocket.popups[message.type].forEach(function(p) {
+                        if (p.room_id == message.data.room_id) {
+                            let popup_message = $.extend(message, {listener_name: message.type});
+                            p.popup.postMessage(popup_message, app.domain);
+                        }
+                    });
                 }
 
                 break;
 
             case 'message_buffer':
-                var meta = params.meta;
+                let meta = params.meta;
 
                 if (meta.type == 'blackboard') {
-                    var inflated_response = pako.inflate(params.buffer, {to: 'string'});
-                    var response_as_json = JSON.parse(inflated_response);
-                    var useful_response = {
+                    let inflated_response = pako.inflate(params.buffer, {to: 'string'});
+                    let response_as_json = JSON.parse(inflated_response);
+                    let useful_response = {
                         bg_color: meta.bg_color,
                         room_id: meta.room_id,
-                        data: response_as_json
+                        commands: response_as_json
                     };
 
                     event_bus.emit('black_board.load', useful_response);
@@ -148,12 +156,12 @@ module.exports = (function() {
                 }
                 else {
                     if (meta.no_data == true) {
-                        var cur_chunk = wupsocket.binary_transfers[meta.transfer_id] && wupsocket.binary_transfers[meta.transfer_id].chunk;
+                        let cur_chunk = wupsocket.binary_transfers[meta.transfer_id] && wupsocket.binary_transfers[meta.transfer_id].chunk;
                         cur_chunk = cur_chunk || 0;
                         stored_size = cur_chunk * chunk_size;
                     }
                     else {
-                        var stored_size = wupsocket.binary_transfers[meta.transfer_id].data.reduce(function(prev, chunk) {
+                        let stored_size = wupsocket.binary_transfers[meta.transfer_id].data.reduce(function(prev, chunk) {
                             return prev + chunk.byteLength;
                         }, 0);
                     }
@@ -177,7 +185,7 @@ module.exports = (function() {
         if (!binary_connected) {
             app.append_system('Unable to send: Binary not connected.', {color: 'red'});
         }
-        var transfer_id = meta.transfer_id;
+        let transfer_id = meta.transfer_id;
 
         prime_socket.postMessage({
             action: 'create_transfer_progress',
@@ -186,8 +194,8 @@ module.exports = (function() {
             }
         });
 
-        var send_chunk = function(buffer, meta, start) {
-            var transfer_info = {
+        let send_chunk = function(buffer, meta, start) {
+            let transfer_info = {
                 complete: false,
                 transfer_id: transfer_id,
                 room_id: meta.room_id
@@ -201,7 +209,7 @@ module.exports = (function() {
                 transfer_info.complete = true;
                 transfer_info.file_info = meta;
 
-                var chunk = buffer.slice(start);
+                let chunk = buffer.slice(start);
                 prime_socket.postMessage({
                     action: 'send_binary',
                     params: {
@@ -211,7 +219,7 @@ module.exports = (function() {
                 }, [chunk]);
             }
             else {
-                var chunk = buffer.slice(start, start + chunk_size);
+                let chunk = buffer.slice(start, start + chunk_size);
                 prime_socket.postMessage({
                     action: 'send_binary',
                     params: {
@@ -237,7 +245,7 @@ module.exports = (function() {
             return;
         }
 
-        var wrapped_message = {
+        let wrapped_message = {
             type: type,
             sub_type: sub_type,
             data: data
@@ -260,6 +268,20 @@ module.exports = (function() {
         prime_socket.postMessage({action: 'disconnect'});
     };
 
+    app.register_window_listener('ws.send', function(data) {
+        wupsocket.send(data.type, data.sub_type, data.message);
+    });
+
+    wupsocket.popups = {};
+    wupsocket.register_popup = function(page_key, room_id, popup) {
+        if (!Array.isArray(wupsocket.popups[page_key])) {
+            wupsocket.popups[page_key] = [];
+        }
+
+        wupsocket.popups[page_key].push({room_id: room_id, popup: popup, page_key: page_key});
+        app.popups.push(popup);
+    };
+
     wupsocket.reconnect = function() {
         wupsocket.reconnecting = true;
 
@@ -274,7 +296,7 @@ module.exports = (function() {
             });
         }
         else {
-            var diff = 5000 - (Date.now() - wupsocket.last_reconnect_attempt);
+            let diff = 5000 - (Date.now() - wupsocket.last_reconnect_attempt);
             setTimeout(function() {
                 wupsocket.reconnect();
             }, diff)

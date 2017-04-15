@@ -23,13 +23,13 @@ module.exports = function(options) {
         });
 
         page.listen('event', function(data) {
-            if (data.instance_id != page.instance_id && data.room_id != page.game_id) {
+            if (data.instance_id != page.instance_id && data.room_id != page.room_id) {
                 return;
             }
 
             let event_handlers = {
                 start_game: function() {
-                    options.on_start({game_id: page.game_id});
+                    options.on_start({room_id: page.room_id});
                     page.$container.dialog('close');
                 },
                 system: function() {
@@ -79,10 +79,10 @@ module.exports = function(options) {
                 },
                 game_ready: function() {
                     page.always_send = {
-                        game_id: data.game_id
+                        room_id: data.room_id
                     };
 
-                    page.game_id = data.game_id;
+                    page.room_id = data.room_id;
 
                     page.$container.dialog({
                         title: 'Yownet: New ' + options.game_type + ' Game',

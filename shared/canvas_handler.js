@@ -3,10 +3,9 @@ module.exports = function(ctx) {
 
     // ctx.lineCap = 'round';
 
-    handler.handle_thing = function(info) {
-        var data = info.data;
+    handler.handle_thing = function(data) {
 
-        switch (info.type) {
+        switch (data.type) {
             case 'line':
                 ctx.beginPath();
                 ctx.lineCap = "round";

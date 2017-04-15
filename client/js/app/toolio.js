@@ -9,6 +9,13 @@ module.exports = (function() {
         });
     };
 
+    toolio.get_query_param = function(name) {
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+            results = regex.exec(location.search);
+        return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    }
+
     toolio.confirm = function(title, message, on_success, on_fail) {
         if (typeof(on_success) != "function") {
             on_success = function() {

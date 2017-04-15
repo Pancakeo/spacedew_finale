@@ -7,6 +7,7 @@ module.exports = function(page_name, callback) {
     $.get('html/pages/' + page_name + '.html', function(res) {
         let page = {
             $container: $(res),
+            page_name: page_name,
             always_send: {},    // Keys that should go out with every message (e.g. game_id)
             $: function(selector) {
                 return jQuery(selector, this.$container);

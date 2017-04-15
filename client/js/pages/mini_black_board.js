@@ -18,19 +18,26 @@ module.exports = function($target, room, $room_box) {
         });
 
         var pass_it_up = function(data) {
+            data = $.extend(data, {listener_name: 'black_board'});
             if (app.black_board && app.black_board.closed != true) {
                 app.black_board.postMessage(data, app.domain);
             }
         };
+
+        app.event_bus.on('update_room_id', function(params) {
+            if (params.old_room.id == room.id) {
+                room = params.new_room;
+            }
+        });
 
         page.peepy('black_board.load', function(data) {
             if (data.room_id == room.id) {
                 data.type = 'load';
                 pass_it_up(data);
 
-                ch.handle_thing({type: 'colorful_clear', data: {color: data.bg_color, nuke: true}});
+                ch.handle_thing({type: 'colorful_clear', color: data.bg_color, nuke: true});
 
-                data.data.forEach(function(thing) {
+                data.commands.forEach(function(thing) {
                     ch.handle_thing(thing);
                 });
             }
@@ -48,6 +55,5 @@ module.exports = function($target, room, $room_box) {
             $("#mini_black_board").hide();
             $("#users").attr('style', 'height: 100%;');
         }
-
     });
 };

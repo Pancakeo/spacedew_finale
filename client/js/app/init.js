@@ -30,8 +30,18 @@ module.exports = (function() {
         settings: {},
         profile: {},
         emu_list: [],
+        window_listeners: {},
+        popups: [],
         is_mobile: is_android || is_iphone,
         world: {user_settings: {}} // Users and shit.
+    };
+
+    app.register_window_listener = function(listener_name, listener) {
+        if (!Array.isArray(app.window_listeners[listener_name])) {
+            app.window_listeners[listener_name] = [];
+        }
+
+        app.window_listeners[listener_name].push(listener);
     };
 
     app.ws = require('../app/wupsocket'); // for Lustmord
@@ -65,9 +75,6 @@ module.exports = (function() {
 
     switch (query_params.wup) {
         case 'black_board':
-            if (window.opener && window.opener.app) {
-                window.app = window.opener.app;
-            }
             require('../pages/black_board')();
             break;
 
@@ -85,8 +92,18 @@ module.exports = (function() {
     }
 
     $(window).on('beforeunload', function() {
-        if (app.black_board && app.black_board.closed != true) {
-            app.black_board.close();
+        app.popups.forEach(function(p) {
+            if (p && p.closed != true) {
+                p.close();
+            }
+        });
+    });
+
+    window.addEventListener('message', function(e) {
+        if (Array.isArray(app.window_listeners[e.data.listener_name])) {
+            app.window_listeners[e.data.listener_name].forEach(function(listener) {
+                listener(e.data);
+            });
         }
     });
 

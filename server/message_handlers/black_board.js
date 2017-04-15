@@ -1,16 +1,18 @@
 "use strict";
-var event_bus = require(app.shared_root + '/event_bus');
-var sessionator = require('../managers/sessionator');
-var wiseau = require('../managers/wiseau');
-var wuptil = require('../util/wuptil');
+const event_bus = require(app.shared_root + '/event_bus');
+const sessionator = require('../managers/sessionator');
+const wiseau = require('../managers/wiseau');
+const wuptil = require('../util/wuptil');
 
-var positions = {};
+let positions = {};
 setInterval(function() {
-    var at_least_one = false;
-    var has_delete = false;
+    return;
+    // TODO
+    let at_least_one = false;
+    let has_delete = false;
 
-    for (var key in positions) {
-        var p = positions[key];
+    for (let key in positions) {
+        let p = positions[key];
 
         if (Date.now() - p.last_change <= 100) {
             at_least_one = true;
@@ -26,17 +28,17 @@ setInterval(function() {
     }
 
     if (at_least_one || has_delete) {
-        var room_id = wiseau.get_lobby().id;
+        let room_id = wiseau.get_lobby().id;
         sessionator.broadcast('black_board', 'draw', {type: 'positions', positions: positions, room_id: room_id});
     }
 
 }, 50);
 
 exports.handle_message = function handle_message(session, message) {
-    var sub_type = message.sub_type;
-    var data = message.data;
+    let sub_type = message.sub_type;
+    let data = message.data;
 
-    var room = wiseau.get_room(data.room_id);
+    let room = wiseau.get_room(data.room_id);
     if (room == null) {
         return;
     }
@@ -47,16 +49,16 @@ exports.handle_message = function handle_message(session, message) {
             break;
 
         case 'draw':
-            if (data.type == 'colorful_clear' && data.data.nuke) {
+            if (data.type == 'colorful_clear' && data.nuke) {
                 if (room.bob_ross.paths.length > 0) {
                     sessionator.broadcast('chatterbox', 'system', {message: session.profile.username + ' cleared the X-board.', room_id: data.room_id, color: 'green'});
                 }
 
-                room.bob_ross.clear(data.data.color);
+                room.bob_ross.clear(data.color);
             }
 
             if (data.type == 'position') {
-                positions[session.profile.username] = data.data;
+                positions[session.profile.username] = data;
             }
 
             room.bob_ross.handle_thing(data);

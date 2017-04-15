@@ -8,27 +8,26 @@ const uuid = require('node-uuid');
 
 const games = {};
 
-const broadcast = function(game_id, sub_type, data) {
+const broadcast = function(room_id, sub_type, data) {
     sessionator.broadcast(exports.key, sub_type, data, {
-        room_id: game_id,
+        room_id: room_id,
         require_logged_in: false
     });
 };
 
-exports.get_game = function(game_id) {
-    return games[game_id];
+exports.get_game = function(room_id) {
+    return games[room_id];
 };
 
-exports.requires_auth = false;
 exports.handle_message = function handle_message(session, message) {
     let sub_type = message.sub_type;
     let data = message.data;
     let page_key = exports.key;
-    let game = games[data.game_id];
+    let game = games[data.room_id];
 
     let handlers = {
         chat: function() {
-            broadcast(data.game_id, 'event', {
+            broadcast(data.room_id, 'event', {
                 type: 'chat',
                 username: session.profile.username,
                 message: data.message
@@ -47,7 +46,7 @@ exports.handle_message = function handle_message(session, message) {
                     }
                 }
 
-                broadcast(data.game_id, 'event', {
+                broadcast(data.room_id, 'event', {
                     type: 'remove_bot',
                     id: data.id
                 })
@@ -64,7 +63,7 @@ exports.handle_message = function handle_message(session, message) {
 
                 game.players.push(bot);
 
-                broadcast(data.game_id, 'event', {
+                broadcast(data.room_id, 'event', {
                     type: 'add_bot',
                     id: bot.id,
                     team: 'Team 2',
@@ -76,19 +75,19 @@ exports.handle_message = function handle_message(session, message) {
         start_game: function() {
             if (game) {
                 if (game.players.length < game.min_players) {
-                    broadcast(data.game_id, 'event', {
+                    broadcast(data.room_id, 'event', {
                         type: 'system',
                         message: "Not enough players."
                     });
                 }
                 else if (game.players.length > game.max_players) {
-                    broadcast(data.game_id, 'event', {
+                    broadcast(data.room_id, 'event', {
                         type: 'system',
                         message: "Too many players!"
                     });
                 }
                 else {
-                    broadcast(data.game_id, 'event', {
+                    broadcast(data.room_id, 'event', {
                         type: 'start_game'
                     });
                 }
@@ -97,25 +96,25 @@ exports.handle_message = function handle_message(session, message) {
         set_game_name: function() {
             if (game != null && data.game_name.trim().length > 0) {
                 game.game_name = data.game_name.trim();
-                broadcast(data.game_id, 'event', {
+                broadcast(data.room_id, 'event', {
                     type: 'rename_game',
                     game_name: game.game_name
                 });
             }
         },
         create_game: function() {
-            let game_id = uuid.v4();
+            let room_id = uuid.v4();
 
             // Hack for testing.
             if (!session.profile.username) {
                 session.profile.username = data.username;
             }
 
-            let game_room = wiseau.create_room(game_id, game_id);
+            let game_room = wiseau.create_room(room_id, room_id);
             game_room.join_room(session.profile.username);
 
             game = {
-                game_id: game_id,
+                room_id: room_id,
                 game_type: data.game_type,
                 game_name: data.game_name,
                 sessions: [session],
@@ -149,11 +148,11 @@ exports.handle_message = function handle_message(session, message) {
             }
 
             game.teams.push("Observer");
-            games[game_id] = game;
+            games[room_id] = game;
 
             session.send(page_key, 'event', {
                 type: 'game_ready',
-                game_id: game_id,
+                room_id: room_id,
                 players: game.players,
                 teams: game.teams,
                 instance_id: data.instance_id,
