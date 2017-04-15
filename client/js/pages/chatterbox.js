@@ -285,58 +285,40 @@ module.exports = function($parent, options) {
             page.ws.reconnect();
         });
 
-        page.listen('ryebrarian', function(rye) {
-            let handlers = {
-                tags_all: function() {
-                    let $blargh = $('<div class="blargh" style="width: 500px;"/>');
-                    $blargh.append('<div class="header">' + rye.username + ' (All Tags) <span class="close">x</span></div>');
-                    $blargh.append('<div class="body" style="padding: 0;"/>');
-                    var $body = $blargh.find('.body');
+        page.listen('blargh_grid', function(grid_data) {
+            let grid_width = grid_data.grid_width || 500;
 
-                    let $table = page.get_template('rye_tags_all_table');
+            let $blargh = $('<div class="blargh"/>').css({width: grid_width});
+            $blargh.append('<div class="header">' + grid_data.username + ' (' + grid_data.title + ') <span class="close">x</span></div>');
+            $blargh.append('<div class="body" style="padding: 0;"/>');
+            var $body = $blargh.find('.body');
 
-                    rye.tags.forEach(function(t) {
-                        let $row = page.get_template('rye_tags_all_row');
-                        $row.find('#tag_name').text(t.name);
-                        $row.find('#tag_count').text(t.count);
-                        $table.append($row);
-                    });
+            let $table = $('<table class="wupfindtable center_content"><thead></thead><tbody><tr><td colspan="' + grid_data.columns.length + '">No data in table.</td></tr></tbody>');
+            let $header = $('<tr/>');
+            $table.find('thead').append($header);
 
-                    if (rye.tags.length == 0) {
-                        $table.append(page.get_template('rye_no_results'));
-                    }
+            grid_data.columns.forEach(function(col) {
+                $header.append('<th>' + col + '</th>');
+            });
 
-                    $body.append($table);
-                    append_custom($blargh, {room_id: rye.room_id});
-                },
-                tag_single: function() {
-                    let $blargh = $('<div class="blargh" style="width: 1200px;"/>');
-                    $blargh.append('<div class="header">' + rye.username + ' (Tag: ' + rye.tag + '<span class="close">x</span></div>');
-                    $blargh.append('<div class="body" style="padding: 0;"/>');
-                    var $body = $blargh.find('.body');
+            let $tbody = $table.find('tbody');
 
-                    let $table = page.get_template('rye_tag_single');
-
-                    rye.results.forEach(function(r) {
-                        let $row = page.get_template('rye_tag_single_row');
-                        $row.find('#tag_name').text(r.name);
-                        $row.find('#tag_content').text(r.content);
-                        $table.append($row);
-                    });
-
-                    if (rye.results.length == 0) {
-                        $table.append(page.get_template('rye_no_results'));
-                    }
-
-                    $body.append($table);
-                    append_custom($blargh, {room_id: rye.room_id});
-                }
-            };
-
-            if (typeof(handlers[rye.type]) == "function") {
-                handlers[rye.type]();
+            if (grid_data.rows.length > 0) {
+                $tbody.empty();
             }
 
+            grid_data.rows.forEach(function(row) {
+                let $row = $('<tr/>');
+                row.forEach(function(col) {
+                    $row.append('<td>' + col + '</td>');
+                });
+
+                $tbody.append($row);
+            });
+
+
+            $body.append($table);
+            append_custom($blargh, {room_id: grid_data.room_id});
         });
 
         page.listen('chat', function(data) {

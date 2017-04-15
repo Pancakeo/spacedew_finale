@@ -268,12 +268,30 @@ module.exports = function($target) {
             recurIdleCall: true
         });
 
+        page.event_bus.on('users_pane_loaded', function() {
+            if (localStorage.tickTack) {
+                require('./yownet')({
+                    game_type: 'Tick Tack',
+                    game_name: 'Ticky',
+                    on_open: function(page) {
+                        page.$("#add_bot").click();
+                    },
+                    on_start: function(whatever) {
+                        app.toolio.confirm("Popup", "Allow Popup?", function() {
+                            window.open('index.html?wup=tick_tack&game_id=' + whatever.game_id, '_blank', 'width=1300,height=830');
+                        });
+
+                    }
+                });
+            }
+        });
+
         // I'm sure this is fine!
         var wait_for_app = setInterval(function() {
             if (app.ready) {
                 page.send('sync', {room_id: app.get_active_room(true)});
                 clearInterval(wait_for_app);
-                app.users_pane_loaded();
+                app.event_bus.emit('users_pane_loaded', {});
             }
         }, 50);
 

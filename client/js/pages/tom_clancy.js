@@ -369,13 +369,13 @@ module.exports = function(options) {
             page.update_room(room);
         };
 
-        app.users_pane_loaded = function() {
+        app.event_bus.on('users_pane_loaded', function() {
             var $active = page.$("#room_names .room_tab.active");
             if ($active.length == 1) {
                 var room = $active.prop('room');
                 page.update_room(room);
             }
-        };
+        });
 
         app.add_room_tab = function(room, add_options) {
             add_options = $.extend({

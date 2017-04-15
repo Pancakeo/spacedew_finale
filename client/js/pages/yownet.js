@@ -3,9 +3,8 @@ module.exports = function(options) {
         game_name: 'Game Name',
         game_type: 'Game Type',
         max_players: 2,
-        on_start: function() {
-
-        }
+        on_start: () => {},
+        on_open: () => {}
     }, options);
 
     // For testing:
@@ -91,6 +90,7 @@ module.exports = function(options) {
                         width: 800,
                         open: function() {
                             page.$("#composer").focus();
+                            options.on_open(page);
                         },
                         close: function() {
                             page.destroy();
