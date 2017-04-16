@@ -155,13 +155,15 @@ module.exports = (function() {
                     event_bus.emit('ws.transfer_complete', {transfer_id: meta.transfer_id});
                 }
                 else {
+                    let stored_size;
+
                     if (meta.no_data == true) {
                         let cur_chunk = wupsocket.binary_transfers[meta.transfer_id] && wupsocket.binary_transfers[meta.transfer_id].chunk;
                         cur_chunk = cur_chunk || 0;
                         stored_size = cur_chunk * chunk_size;
                     }
                     else {
-                        let stored_size = wupsocket.binary_transfers[meta.transfer_id].data.reduce(function(prev, chunk) {
+                        stored_size = wupsocket.binary_transfers[meta.transfer_id].data.reduce(function(prev, chunk) {
                             return prev + chunk.byteLength;
                         }, 0);
                     }
