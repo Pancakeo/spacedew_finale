@@ -6,15 +6,13 @@ const wuptil = require('../util/wuptil');
 
 let positions = {};
 setInterval(function() {
-    return;
-    // TODO
     let at_least_one = false;
     let has_delete = false;
 
     for (let key in positions) {
         let p = positions[key];
 
-        if (Date.now() - p.last_change <= 100) {
+        if (Date.now() - p.last_change <= 500) {
             at_least_one = true;
         }
         else if (Date.now() - p.last_change >= (1000 * 10)) {

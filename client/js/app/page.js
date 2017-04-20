@@ -1,4 +1,18 @@
-module.exports = function(page_name, callback) {
+module.exports = function(...args) {
+    let page_name, options, callback;
+    if (args.length === 3) {
+        page_name = args[0];
+        options = args[1];
+        callback = args[2];
+    }
+    else if (args.length == 2) {
+        page_name = args[0];
+        options = {};
+        callback = args[1];
+    }
+
+    options = $.extend({popup: false}, options);
+
     const event_bus = app.event_bus;
     const toolio = require('../app/toolio');
     const ws = require('../app/wupsocket');
@@ -43,8 +57,45 @@ module.exports = function(page_name, callback) {
             },
             destroy: function() {
                 event_bus.stop_listening(listeners);
+            },
+            post_message: function(data, target) {
+                if (target == null) {
+                    target = window.opener;
+                }
+
+                if (target && target.closed != true) {
+                    target.postMessage(data, app.domain);
+                }
             }
         };
+
+        if (options.popup) {
+            page.send = function(sub_type, data) {
+                data = $.extend(data, page.always_send);
+
+                let ws_message = {
+                    listener_name: 'ws.send',
+                    type: page.page_name,
+                    sub_type: sub_type,
+                    message: data
+                };
+
+                page.post_message(ws_message);
+            };
+
+            page.message_handlers = {};
+
+            app.register_window_listener('ws.' + page.page_name, function(message) {
+                if (typeof(page.message_handlers[message.sub_type]) == "function") {
+                    page.message_handlers[message.sub_type](message.data);
+                }
+            });
+
+            page.listen = function(event_type, listener) {
+                page.message_handlers[event_type] = listener;
+            };
+
+        }
 
         let $templates = page.$('[template]').detach();
 

@@ -10,8 +10,7 @@ const games = {};
 
 const broadcast = function(room_id, sub_type, data) {
     sessionator.broadcast(exports.key, sub_type, data, {
-        room_id: room_id,
-        require_logged_in: false
+        room_id: room_id
     });
 };
 
@@ -87,6 +86,12 @@ exports.handle_message = function handle_message(session, message) {
                     });
                 }
                 else {
+                    game.players.forEach(function(p) {
+                        if (!game.players_in_game.includes(p.name) && p.bot) {
+                            game.players_in_game.push(p.name);
+                        }
+                    });
+
                     broadcast(data.room_id, 'event', {
                         type: 'start_game'
                     });
@@ -121,6 +126,12 @@ exports.handle_message = function handle_message(session, message) {
                 host: session,
                 last_activity: Date.now(),
                 teams: [],
+                players_in_game: [],
+                ready: function() {
+                    return game.players.every(function(p) {
+                        return game.players_in_game.includes(p.name);
+                    });
+                },
                 players: [{
                     name: session.profile.username,
                     team: 'Team 1'

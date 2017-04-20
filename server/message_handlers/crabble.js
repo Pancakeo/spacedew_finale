@@ -8,8 +8,7 @@ var yownet = require('./yownet');
 
 var broadcast = function(game_id, sub_type, data) {
     sessionator.broadcast(exports.key, sub_type, data, {
-        room_id: game_id,
-        require_logged_in: false
+        room_id: game_id
     });
 };
 

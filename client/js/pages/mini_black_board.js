@@ -33,6 +33,7 @@ module.exports = function($target, room, $room_box) {
         page.peepy('black_board.load', function(data) {
             if (data.room_id == room.id) {
                 data.type = 'load';
+                data.username = app.profile.username;
                 pass_it_up(data);
 
                 ch.handle_thing({type: 'colorful_clear', color: data.bg_color, nuke: true});

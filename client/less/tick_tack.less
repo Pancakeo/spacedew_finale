@@ -1,3 +1,105 @@
+.tick_tack_tile_select {
+  .letter {
+    font-size: 72px;
+    padding: 20px;
+    border: 2px #ccc solid;
+    width: 150px;
+    text-align: center;
+
+    &:hover {
+      background: gold;
+    }
+
+    &.selected {
+      background: green;
+    }
+  }
+
+}
+
 #tick_tack {
+  .hidden {
+    visibility: hidden;
+  }
+  .heading {
+    font-size: 150%;
+  }
+
+  #composer {
+    font-size: 1.5em;
+  }
+
+  #status {
+    padding: 5px;
+    background: yellow;
+    color: black;
+    font-size: 125%;
+    border: 1px black solid;
+    min-height: 20px;
+
+    &.go_already {
+      background: green;
+      color: white;
+    }
+  }
+
+  #grid {
+    .cell {
+      display: inline-block;
+      border: 1px black solid;
+      width: 100px;
+      height: 100px;
+
+      &.allowed {
+        background: lightgreen;
+        opacity: 0.4;
+      }
+
+      &.not_allowed {
+        background: salmon;
+        opacity: 0.4;
+      }
+    }
+  }
+
+  #messages {
+    border: 1px #ccc solid;
+    height: 300px;
+    overflow-y: scroll;
+
+    .message_wrapper {
+      padding: 3px;
+
+      > div {
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      .username {
+        font-weight: bold;
+        margin-right: 5px;
+      }
+    }
+  }
+
+  #players {
+    width: 100px;
+    height: 300px;
+    overflow-y: scroll;
+    border: 1px #ccc solid;
+  }
+
+  #composer {
+    width: 100%;
+  }
+
+  .flexer {
+    display: flex;
+
+    > div {
+      flex-grow: 2;
+      width: 50%;
+    }
+  }
 
 }

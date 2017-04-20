@@ -103,7 +103,7 @@ module.exports = (function() {
                 if (wupsocket.popups[message.type] != null) {
                     wupsocket.popups[message.type].forEach(function(p) {
                         if (p.room_id == message.data.room_id) {
-                            let popup_message = $.extend(message, {listener_name: message.type});
+                            let popup_message = $.extend(message, {listener_name: 'ws.' + message.type});
                             p.popup.postMessage(popup_message, app.domain);
                         }
                     });

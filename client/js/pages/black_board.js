@@ -35,7 +35,8 @@ module.exports = function() {
         left_mouse_button_down: false,
         pinned_x: null,
         pinned_y: null,
-        hold_up: null
+        hold_up: null,
+        my_username: null
     };
 
     var board = {
@@ -282,7 +283,7 @@ module.exports = function() {
             overlay_ctx.fillStyle = contrast_color;
 
             for (var key in board.user_positions) {
-                if (key != app.profile.username) {
+                if (key != ui.username) {
                     var p = board.user_positions[key];
                     overlay_ctx.fillText(key, p.x, p.y);
                 }
@@ -379,6 +380,7 @@ module.exports = function() {
             if (data.type == 'load') {
                 $wait_dialog && $wait_dialog.dialog('close');
                 $wait_dialog = null;
+                ui.username = data.username;
 
                 draw_queue.forEach(function(data) {
                     ch.handle_thing(data);
@@ -387,7 +389,7 @@ module.exports = function() {
 
             if (data.type != 'load') {
 
-                if (data.username == app.profile.username) {
+                if (data.username == ui.username) {
                     return;
                 }
             }
