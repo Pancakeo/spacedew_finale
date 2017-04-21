@@ -8,12 +8,6 @@ const uuid = require('node-uuid');
 
 const games = {};
 
-const broadcast = function(room_id, sub_type, data) {
-    sessionator.broadcast(exports.key, sub_type, data, {
-        room_id: room_id
-    });
-};
-
 exports.get_game = function(room_id) {
     return games[room_id];
 };
@@ -22,11 +16,31 @@ exports.handle_message = function handle_message(session, message) {
     let sub_type = message.sub_type;
     let data = message.data;
     let page_key = exports.key;
+
     let game = games[data.room_id];
+
+    const broadcast = function(type, send_data) {
+        if (send_data == null) {
+            send_data = arguments[0];
+        }
+        else {
+            send_data = Object.assign({}, {type: type}, send_data);
+        }
+
+
+        sessionator.broadcast(exports.key, 'event', send_data, {
+            room_id: data.room_id
+        });
+    };
+
+    const send = function(send_data) {
+        Object.assign({room_id: data.room_id}, send_data);
+        session.send(page_key, 'event', send_data);
+    };
 
     let handlers = {
         chat: function() {
-            broadcast(data.room_id, 'event', {
+            broadcast({
                 type: 'chat',
                 username: session.profile.username,
                 message: data.message
@@ -45,10 +59,10 @@ exports.handle_message = function handle_message(session, message) {
                     }
                 }
 
-                broadcast(data.room_id, 'event', {
+                broadcast({
                     type: 'remove_bot',
                     id: data.id
-                })
+                });
             }
         },
         add_bot: function() {
@@ -57,42 +71,31 @@ exports.handle_message = function handle_message(session, message) {
                 let bot = {
                     bot: true,
                     name: 'Botty ' + Math.floor(Math.random() * 1000),
-                    id: app.wuptil.generate_id()
+                    id: app.wuptil.generate_id(),
+                    in_game: true,
+                    observer: false
                 };
 
                 game.players.push(bot);
-
-                broadcast(data.room_id, 'event', {
-                    type: 'add_bot',
-                    id: bot.id,
-                    team: 'Team 2',
-                    name: bot.name,
-                    teams: game.teams
-                })
+                broadcast('add_bot', bot);
             }
         },
         start_game: function() {
             if (game) {
                 if (game.players.length < game.min_players) {
-                    broadcast(data.room_id, 'event', {
+                    broadcast({
                         type: 'system',
                         message: "Not enough players."
                     });
                 }
                 else if (game.players.length > game.max_players) {
-                    broadcast(data.room_id, 'event', {
+                    broadcast({
                         type: 'system',
                         message: "Too many players!"
                     });
                 }
                 else {
-                    game.players.forEach(function(p) {
-                        if (!game.players_in_game.includes(p.name) && p.bot) {
-                            game.players_in_game.push(p.name);
-                        }
-                    });
-
-                    broadcast(data.room_id, 'event', {
+                    broadcast({
                         type: 'start_game'
                     });
                 }
@@ -101,7 +104,8 @@ exports.handle_message = function handle_message(session, message) {
         set_game_name: function() {
             if (game != null && data.game_name.trim().length > 0) {
                 game.game_name = data.game_name.trim();
-                broadcast(data.room_id, 'event', {
+
+                broadcast({
                     type: 'rename_game',
                     game_name: game.game_name
                 });
@@ -122,30 +126,25 @@ exports.handle_message = function handle_message(session, message) {
                 room_id: room_id,
                 game_type: data.game_type,
                 game_name: data.game_name,
-                sessions: [session],
-                host: session,
                 last_activity: Date.now(),
-                teams: [],
-                players_in_game: [],
+                min_players: 2,
+                max_players: 4,
                 ready: function() {
-                    return game.players.every(function(p) {
-                        return game.players_in_game.includes(p.name);
-                    });
+                    return game.players.every(p => p.in_game);
                 },
                 players: [{
                     name: session.profile.username,
-                    team: 'Team 1'
-                }],
-                debug: function() {
-                    let en_bref = Object.assign({}, game);
-                    delete en_bref.sessions;
-                    delete en_bref.host;
-                    delete en_bref.debug;
-                    return en_bref;
-                }
+                    observer: false
+                }]
             };
 
-            game.min_players = 2;
+            Object.defineProperty(game, 'sessions', {
+                value: [session]
+            });
+
+            Object.defineProperty(game, 'host', {
+                value: session
+            });
 
             if (data.game_type == 'Tick Tack') {
                 game.max_players = 2;
@@ -154,20 +153,13 @@ exports.handle_message = function handle_message(session, message) {
                 game.max_players = 4;
             }
 
-            for (let i = 1; i <= game.max_players; i++) {
-                game.teams.push('Team ' + i);
-            }
-
-            game.teams.push("Observer");
             games[room_id] = game;
 
-            session.send(page_key, 'event', {
+            send({
                 type: 'game_ready',
-                room_id: room_id,
-                players: game.players,
-                teams: game.teams,
+                room_id: game.room_id,
                 instance_id: data.instance_id,
-                max_players: game.max_players
+                game: game
             });
         }
     };

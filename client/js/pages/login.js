@@ -16,7 +16,7 @@ module.exports = function() {
                 page.$("#status").text('Connected!');
                 page.$('button').prop('disabled', false);
 
-                if (document.hasFocus() || localStorage.is_local_dev) {
+                if (!document.hidden || localStorage.is_local_dev) {
                     if (localStorage.auth_key != null) {
                         page.$("#status").text('Logging in (auth_key)...');
                         page.$('button').prop('disabled', true);

@@ -1,22 +1,3 @@
-.tick_tack_tile_select {
-  .letter {
-    font-size: 72px;
-    padding: 20px;
-    border: 2px #ccc solid;
-    width: 150px;
-    text-align: center;
-
-    &:hover {
-      background: gold;
-    }
-
-    &.selected {
-      background: green;
-    }
-  }
-
-}
-
 #tick_tack {
   .hidden {
     visibility: hidden;
@@ -45,6 +26,7 @@
 
   #grid {
     .cell {
+      position: relative;
       display: inline-block;
       border: 1px black solid;
       width: 100px;
@@ -59,7 +41,20 @@
         background: salmon;
         opacity: 0.4;
       }
+
+      .letter {
+        position: absolute;
+        top: 28px;
+        left: 28px;
+        font-size: 42px;
+        color: blue;
+
+        &.O {
+          color: red;
+        }
+      }
     }
+
   }
 
   #messages {

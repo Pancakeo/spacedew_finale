@@ -3,8 +3,10 @@ module.exports = function(options) {
         game_name: 'Game Name',
         game_type: 'Game Type',
         max_players: 2,
-        on_start: () => {},
-        on_open: () => {}
+        on_start: () => {
+        },
+        on_open: () => {
+        }
     }, options);
 
     // For testing:
@@ -55,20 +57,12 @@ module.exports = function(options) {
                     $messages.scrollTop($messages[0].scrollHeight);
                 },
                 add_bot: function() {
-                    let $team_select = $('<select id="player_team"/>');
-                    data.teams.forEach(function(team, idx) {
-                        let $opt = $('<option>' + team + '</option>');
-                        $team_select.append($opt);
-                    });
-
                     let $tbody = page.$("#players tbody");
                     let $player_row = page.get_template('player_row');
                     $player_row.attr('bot_id', data.id);
                     $player_row.find('#player_name').val(data.name);
-                    $player_row.find('#player_team').replaceWith($team_select);
+                    $player_row.find('#is_observer').attr('disabled', true);
                     $player_row.find('#player_eject').show().button().prop('bot_id', data.id);
-
-                    $player_row.find('#player_team').val(data.team);
                     $tbody.append($player_row);
                 },
                 remove_bot: function() {
@@ -83,6 +77,7 @@ module.exports = function(options) {
                     };
 
                     page.room_id = data.room_id;
+                    page.game = data.game;
 
                     page.$container.dialog({
                         title: 'Yownet: New ' + options.game_type + ' Game',
@@ -105,19 +100,11 @@ module.exports = function(options) {
                         }
                     });
 
-                    let $team_select = $('<select id="player_team"/>');
-                    data.teams.forEach(function(team, idx) {
-                        let $opt = $('<option>' + team + '</option>');
-                        $team_select.append($opt);
-                    });
-
                     let $tbody = page.$("#players tbody");
-                    data.players.forEach(function(p) {
+                    page.game.players.forEach(function(p) {
                         let $player_row = page.get_template('player_row');
                         $player_row.find('#player_name').val(p.name);
-                        $player_row.find('#player_team').replaceWith($team_select);
-
-                        $player_row.find('#player_team').val(p.team);
+                        $player_row.find('#is_observer').prop('checked', p.observer);
                         $tbody.append($player_row);
                     })
                 }

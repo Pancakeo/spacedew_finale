@@ -29,39 +29,12 @@ module.exports = function(options) {
             let cell = $cell.prop('cell');
 
             if (cell.letter == null) {
-                page.get_template('tile_select').dialog({
-                    modal: true,
-                    title: 'Select Tile',
-                    open: function() {
-                        $(this).find('.letter').each(function() {
-                            $(this).prop('letter', $(this).text());
-                        });
-
-                        $(this).on('click', '.letter', function() {
-                            $(this).siblings().removeClass('selected');
-                            $(this).addClass('selected');
-                        })
-                    },
-                    buttons: {
-                        'Confirm': function() {
-                            let letter = $(this).find('.selected').prop('letter');
-                            if (letter == null) {
-                                page.alert("Hey Now", "Must Choose.");
-                                return;
-                            }
-
-                            page.send('move', {cell: cell, letter: letter});
-                            $(this).dialog('close');
-                        },
-                        'Cancel': function() {
-                            $(this).dialog('close');
-                        }
-                    }
-                })
+                page.send('move', {cell: cell});
             }
         });
 
         let my_username;
+        let me;
 
         const draw_board = function() {
             let $grid = page.$("#grid");
@@ -77,7 +50,15 @@ module.exports = function(options) {
                     $grid_fragment.append($grid_row);
                 }
 
-                let $cell = $('<div class="cell empty"/>').attr({row: cell.row, col: cell.col}).prop('cell', cell);
+                let $cell = $('<div class="cell"/>').attr({row: cell.row, col: cell.col}).prop('cell', cell);
+
+                if (cell.letter != null) {
+                    let $letter = $('<div class="letter">' + cell.letter + '</div>');
+                    $letter.addClass(cell.letter);
+                    $cell.append($letter);
+                }
+
+
                 $grid_row.append($cell);
             });
 
@@ -113,7 +94,13 @@ module.exports = function(options) {
                 });
             }
             else {
-                page.$("#status").removeClass('go_already').text("Waiting for " + game.current_turn);
+                if (game.current_turn == null) {
+                    page.$("#status").removeClass('go_already').text("It all over.");
+                }
+                else {
+                    page.$("#status").removeClass('go_already').text("Waiting for " + game.current_turn);
+                }
+
             }
         };
 
@@ -126,11 +113,33 @@ module.exports = function(options) {
 
         page.send('enter_game', {});
         page.listen('game_ready', function(data) {
+            data.players.some(function(p) {
+                if (p.name == my_username) {
+                    me = p;
+                    return true;
+                }
+            });
+
+            page.$("#my_letter").text(me.letter);
+
             $wait_dialog && $wait_dialog.dialog('close');
             game = data;
+
             draw_board();
             draw_payers();
             update_turn();
+        });
+
+        page.listen('current_turn', function(data) {
+            game.current_turn = data.current_turn;
+            update_turn();
+        });
+
+        page.listen('move', function(data) {
+            let $cell = get_cell(data.cell.col, data.cell.row);
+            $cell.prop('cell').letter = data.cell.letter;
+
+            draw_board();
         });
 
         page.listen('player_info', function(data) {
