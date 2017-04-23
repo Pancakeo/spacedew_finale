@@ -41,6 +41,12 @@ module.exports = function($target) {
             update_user_list_style();
         });
 
+        Object.defineProperty(app, 'user_list_data', {
+            get: function() {
+                return page.user_list_data;
+            }
+        });
+
         page.user_list_data = null;
         app.render_users_list = function(data) {
             if (data != null) {
@@ -191,14 +197,7 @@ module.exports = function($target) {
 
                                                 require('./yownet')({
                                                     game_type: 'Tick Tack',
-                                                    game_name: 'Ticky',
-                                                    on_start: function(whatever) {
-                                                        app.toolio.confirm("Popup", "Allow Popup?", function() {
-                                                            let popup = window.open('index.html?wup=tick_tack&room_id=' + whatever.room_id, '_blank', 'width=1300,height=830,left=200,top=200');
-                                                            page.ws.register_popup('tick_tack', whatever.room_id, popup);
-                                                        });
-
-                                                    }
+                                                    game_name: 'Ticky'
                                                 });
                                             },
                                             'Crabble': function() {
@@ -206,14 +205,7 @@ module.exports = function($target) {
 
                                                 require('./yownet')({
                                                     game_type: 'Crabble',
-                                                    game_name: 'Crabby',
-                                                    on_start: function(whatever) {
-                                                        app.toolio.confirm("Popup", "Allow Popup?", function() {
-                                                            let popup = window.open('index.html?wup=crabble&room_id=' + whatever.room_id, '_blank', 'width=1300,height=830,left=100,top=100');
-                                                            page.ws.register_popup('crabble', whatever.room_id, popup);
-                                                        });
-                                                    }
-
+                                                    game_name: 'Crabby'
                                                 });
                                             }
                                         }
@@ -276,7 +268,7 @@ module.exports = function($target) {
                     game_type: 'Tick Tack',
                     game_name: 'Ticky',
                     on_open: function(page) {
-                        page.$("#add_bot").click();
+                        // page.$("#add_bot").click();
                     },
                     on_start: function(whatever) {
                         let popup = window.open('index.html?wup=tick_tack&room_id=' + whatever.room_id, '_blank', 'width=1300,height=830,left=200,top=200');

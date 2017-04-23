@@ -2,8 +2,6 @@
 const event_bus = require(app.shared_root + '/event_bus');
 const sessionator = require('../managers/sessionator');
 const wiseau = require('../managers/wiseau');
-const _ = require("lodash");
-const board = require(app.shared_root + '/crabble_stuff').board;
 const uuid = require('node-uuid');
 
 const games = {};
@@ -27,18 +25,32 @@ exports.handle_message = function handle_message(session, message) {
             send_data = Object.assign({}, {type: type}, send_data);
         }
 
-
         sessionator.broadcast(exports.key, 'event', send_data, {
             room_id: data.room_id
         });
     };
 
     const send = function(send_data) {
-        Object.assign({room_id: data.room_id}, send_data);
+        send_data = Object.assign({room_id: data.room_id}, send_data);
         session.send(page_key, 'event', send_data);
     };
 
     let handlers = {
+        sorry_jimmy: function() {
+            let matching_session = sessionator.get_session_by_user(data.username);
+            let room = wiseau.get_room(data.room_id);
+
+            if (matching_session && room && game) {
+                if (!room.is_member(matching_session.username)) {
+                    matching_session.send('chatterbox', 'sorry_jimmy', {invited_by: session.profile.username, game_name: game.game_name, game_type: game.game_type, room_id: data.room_id});
+
+                    send({
+                        type: 'system',
+                        message: 'Invited ' + matching_session.username
+                    });
+                }
+            }
+        },
         chat: function() {
             broadcast({
                 type: 'chat',
@@ -47,6 +59,7 @@ exports.handle_message = function handle_message(session, message) {
             });
         },
         remove_bot: function() {
+            // TODO host check
             if (game != null) {
                 let success = false;
 
@@ -66,6 +79,7 @@ exports.handle_message = function handle_message(session, message) {
             }
         },
         add_bot: function() {
+            // TODO host check
             if (game != null && game.players.length < game.max_players) {
 
                 let bot = {
@@ -81,7 +95,7 @@ exports.handle_message = function handle_message(session, message) {
             }
         },
         start_game: function() {
-            if (game) {
+            if (game && session.profile.username == game.host.profile.username) {
                 if (game.players.length < game.min_players) {
                     broadcast({
                         type: 'system',
@@ -102,6 +116,7 @@ exports.handle_message = function handle_message(session, message) {
             }
         },
         set_game_name: function() {
+            // TODO host check
             if (game != null && data.game_name.trim().length > 0) {
                 game.game_name = data.game_name.trim();
 
@@ -114,18 +129,12 @@ exports.handle_message = function handle_message(session, message) {
         create_game: function() {
             let room_id = uuid.v4();
 
-            // Hack for testing.
-            if (!session.profile.username) {
-                session.profile.username = data.username;
-            }
-
-            let game_room = wiseau.create_room(room_id, room_id);
+            let game_room = wiseau.create_room(data.game_name, room_id);
             game_room.join_room(session.profile.username);
 
             game = {
                 room_id: room_id,
                 game_type: data.game_type,
-                game_name: data.game_name,
                 last_activity: Date.now(),
                 min_players: 2,
                 max_players: 4,
@@ -137,6 +146,16 @@ exports.handle_message = function handle_message(session, message) {
                     observer: false
                 }]
             };
+
+            Object.defineProperty(game, 'game_name', {
+                get: function() {
+                    return game_room.name;
+                },
+                set: function(val) {
+                    game_room.name = val;
+                },
+                enumerable: true
+            });
 
             Object.defineProperty(game, 'sessions', {
                 value: [session]
@@ -159,6 +178,26 @@ exports.handle_message = function handle_message(session, message) {
                 type: 'game_ready',
                 room_id: game.room_id,
                 instance_id: data.instance_id,
+                game: game
+            });
+        },
+        join_game: function() {
+            let player = {
+                name: session.profile.username,
+                observer: false
+            };
+            broadcast('add_player', player);
+
+
+            let game_room = wiseau.get_room(data.room_id);
+            game_room.join_room(session.profile.username);
+
+            game.players.push(player);
+            // TODO remove player
+
+            send({
+                type: 'game_ready',
+                room_id: game.room_id,
                 game: game
             });
         }

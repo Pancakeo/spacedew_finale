@@ -335,6 +335,16 @@ module.exports = function($parent, options) {
             });
         });
 
+        page.listen('sorry_jimmy', function(data) {
+            console.log(data);
+
+            page.toolio.confirm("Invitation", data.invited_by + " invited you to play " + data.game_type + ".<br/><br/><b>Game Name:</b> " + data.game_name, function() {
+                require('./yownet')({
+                    join_game: data.room_id
+                });
+            });
+        });
+
         page.listen('join_room', function(room) {
             app.add_room_tab(room, {focus: true});
 

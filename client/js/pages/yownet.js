@@ -3,6 +3,7 @@ module.exports = function(options) {
         game_name: 'Game Name',
         game_type: 'Game Type',
         max_players: 2,
+        join_game: null,
         on_start: () => {
         },
         on_open: () => {
@@ -31,8 +32,23 @@ module.exports = function(options) {
 
             let event_handlers = {
                 start_game: function() {
-                    options.on_start({room_id: page.room_id});
                     page.$container.dialog('close');
+
+                    switch (page.game.game_type) {
+                        case 'Tick Tack':
+                            app.toolio.confirm("Popup", "Hit OK to Join Game Thing Popup", function() {
+                                let popup = window.open('index.html?wup=tick_tack&room_id=' + page.room_id, '_blank', 'width=1300,height=830,left=200,top=200');
+                                page.ws.register_popup('tick_tack', page.room_id, popup);
+                            });
+                            break;
+
+                        case 'Crabble':
+                            app.toolio.confirm("Popup", "Hit OK to Join Game Thing Popup", function() {
+                                let popup = window.open('index.html?wup=crabble&room_id=' + page.room_id, '_blank', 'width=1300,height=830,left=100,top=100');
+                                page.ws.register_popup('crabble', page.room_id, popup);
+                            });
+                            break;
+                    }
                 },
                 system: function() {
                     var $chat = $('<div class="message_wrapper"/>');
@@ -68,6 +84,13 @@ module.exports = function(options) {
                 remove_bot: function() {
                     page.$("#players tbody tr[bot_id='" + data.id + "']").remove();
                 },
+                add_player: function() {
+                    let $tbody = page.$("#players tbody");
+                    let $player_row = page.get_template('player_row');
+                    // $player_row.attr('bot_id', data.id);
+                    $player_row.find('#player_name').val(data.name);
+                    $tbody.append($player_row);
+                },
                 rename_game: function() {
                     page.$("#game_name").text(data.game_name);
                 },
@@ -79,6 +102,18 @@ module.exports = function(options) {
                     page.room_id = data.room_id;
                     page.game = data.game;
 
+                    let buttons = {};
+                    if (!options.join_game) {
+                        buttons = {
+                            'Start': function() {
+                                page.send('start_game', {});
+                            },
+                            'Cancel': function() {
+                                $(this).dialog('close');
+                            }
+                        };
+                    }
+
                     page.$container.dialog({
                         title: 'Yownet: New ' + options.game_type + ' Game',
                         modal: true,
@@ -86,18 +121,16 @@ module.exports = function(options) {
                         open: function() {
                             page.$("#composer").focus();
                             options.on_open(page);
+
+                            if (options.join_game) {
+                                page.$("button").button('disable');
+                            }
+
                         },
                         close: function() {
                             page.destroy();
                         },
-                        buttons: {
-                            'Start': function() {
-                                page.send('start_game', {});
-                            },
-                            'Cancel': function() {
-                                $(this).dialog('close');
-                            }
-                        }
+                        buttons: buttons
                     });
 
                     let $tbody = page.$("#players tbody");
@@ -116,7 +149,41 @@ module.exports = function(options) {
         });
 
         page.$("#invite_to_game").button().on('click', function() {
+            let $users = $('<table><tbody></tbody></table>');
+            let $user = $('<tr><td id="username"></td><td><button>Invite?</button></td></tr>');
 
+            $users.on('click', 'button', function() {
+                let username = $(this).prop('username');
+                $(this).button('disable');
+
+                page.send('sorry_jimmy', {username: username, room_id: page.room_id});
+            });
+
+
+            if (app.user_list_data) {
+                app.user_list_data.users_and_rooms.users.map(function(entry) {
+                    return entry.username;
+                }).filter(function(username) {
+                    return app.profile.username != username;
+                }).forEach(function(username) {
+                    $user.find('#username').text(username);
+                    $user.find('button').prop('username', username);
+                    $users.find('tbody').append($user);
+                    $user = $user.clone();
+                });
+            }
+
+            $users.find('button').button();
+
+            $users.dialog({
+                title: 'Invite Users!',
+                modal: true,
+                buttons: {
+                    'Close': function() {
+                        $(this).dialog('close');
+                    }
+                }
+            })
         });
 
         page.$("#add_bot").button().on('click', function() {
@@ -145,13 +212,15 @@ module.exports = function(options) {
             }
         });
 
-        let create_game = function() {
-            page.send('create_game', {username: app.profile.username, instance_id: page.instance_id, game_type: options.game_type, game_name: options.game_name});
-        };
+        if (options.join_game) {
+            page.room_id = options.join_game;
+            page.send('join_game', {room_id: options.join_game});
+        }
+        else {
+            page.send('create_game', {instance_id: page.instance_id, game_type: options.game_type, game_name: options.game_name});
+            page.$("#game_name").text(options.game_name);
+        }
 
-        create_game();
-
-        page.$("#game_name").text(options.game_name);
     });
 
     return {};

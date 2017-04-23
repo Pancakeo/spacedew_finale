@@ -165,7 +165,7 @@ exports.handle_message = function handle_message(session, message) {
                 player_o.letter = 'O';
 
                 broadcast('system', {message: game.current_turn + " will go first!"});
-                send('game_ready', game);
+                broadcast('game_ready', game);
 
                 let p = get_player(game.current_turn);
                 if (p.bot) {
