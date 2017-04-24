@@ -336,9 +336,20 @@ module.exports = function($parent, options) {
         });
 
         page.listen('sorry_jimmy', function(data) {
-            console.log(data);
 
             page.toolio.confirm("Invitation", data.invited_by + " invited you to play " + data.game_type + ".<br/><br/><b>Game Name:</b> " + data.game_name, function() {
+
+                let already_open = app.popups.some(function(p) {
+                    if (p.closed != true && p.woboy && p.woboy.room_id == data.room_id) {
+                        p.focus();
+                        return true;
+                    }
+                });
+
+                if (already_open) {
+                    return;
+                }
+
                 let popup = window.open('index.html?wup=yownet', '_blank', 'width=1300,height=830,left=200,top=100');
 
                 popup.woboy = {
