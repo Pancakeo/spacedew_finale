@@ -83,6 +83,17 @@ module.exports = function(...args) {
                 page.post_message(ws_message);
             };
 
+            page.set_ws_room_id = function() {
+                let ws_message = {
+                    listener_name: 'ws.set_room_id',
+                    room_id: page.room_id,
+                    page_name: page_name,
+                    instance_id: page.instance_id
+                };
+
+                page.post_message(ws_message);
+            };
+
             page.message_handlers = {};
 
             app.register_window_listener('ws.' + page.page_name, function(message) {

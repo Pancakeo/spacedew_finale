@@ -106,6 +106,9 @@ exports.handle_message = function handle_message(session, message) {
             }
 
         },
+        create_game: function() {
+            session.send('chatterbox', 'create_game', {instance_id: data.instance_id});
+        },
         invite_to_room: function() {
             invite_to_room(data);
         },

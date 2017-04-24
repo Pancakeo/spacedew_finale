@@ -41,12 +41,6 @@ module.exports = function($target) {
             update_user_list_style();
         });
 
-        Object.defineProperty(app, 'user_list_data', {
-            get: function() {
-                return page.user_list_data;
-            }
-        });
-
         page.user_list_data = null;
         app.render_users_list = function(data) {
             if (data != null) {
@@ -188,28 +182,36 @@ module.exports = function($target) {
                                     break;
 
                                 case 'sorry_jimmy':
-                                    $('<div>Choose wisely...</div>').dialog({
-                                        title: 'Select Game',
-                                        modal: true,
-                                        buttons: {
-                                            'Tick Tack': function() {
-                                                $(this).dialog('close');
+                                    page.prompt("Game Name", "Game Name", "cowsmoke", function(val) {
+                                        if (val && val.trim().length > 0) {
 
-                                                require('./yownet')({
-                                                    game_type: 'Tick Tack',
-                                                    game_name: 'Ticky'
-                                                });
-                                            },
-                                            'Crabble': function() {
-                                                $(this).dialog('close');
-
-                                                require('./yownet')({
-                                                    game_type: 'Crabble',
-                                                    game_name: 'Crabby'
-                                                });
+                                            let invite_user = null;
+                                            if (username != app.profile.username) {
+                                                invite_user = username;
                                             }
+
+                                            let usernames = [];
+                                            if (page.user_list_data) {
+                                                usernames = page.user_list_data.users_and_rooms.users.filter(u => u.username != app.profile.username).map(u => u.username);
+                                            }
+                                            let instance_id = app.toolio.generate_id();
+                                            let popup = window.open('index.html?wup=yownet', '_blank', 'width=1300,height=830,left=200,top=100');
+                                            popup.woboy = {
+                                                game_name: val,
+                                                invite_user: invite_user,
+                                                instance_id: instance_id,
+                                                usernames: usernames
+                                            };
+
+                                            page.ws.register_popup({
+                                                page_key: 'yownet',
+                                                room_id: null,
+                                                instance_id: instance_id,
+                                                popup: popup
+                                            });
                                         }
                                     });
+
                                     break;
 
                                 default:
@@ -260,22 +262,6 @@ module.exports = function($target) {
             },
             idle: 60000 * 5, // 5 minutes
             recurIdleCall: true
-        });
-
-        page.event_bus.on('users_pane_loaded', function() {
-            if (localStorage.tickTack) {
-                require('./yownet')({
-                    game_type: 'Tick Tack',
-                    game_name: 'Ticky',
-                    on_open: function(page) {
-                        // page.$("#add_bot").click();
-                    },
-                    on_start: function(whatever) {
-                        let popup = window.open('index.html?wup=tick_tack&room_id=' + whatever.room_id, '_blank', 'width=1300,height=830,left=200,top=200');
-                        page.ws.register_popup('tick_tack', whatever.room_id, popup);
-                    }
-                });
-            }
         });
 
         // I'm sure this is fine!

@@ -1,6 +1,10 @@
 module.exports = function(options) {
-    const room_id = app.toolio.get_query_param('room_id');
+    options = $.extend({
+        room_id: null
+    }, options);
+
     let game = {};
+    const room_id = options.room_id;
 
     const sendMessage = function(sub_type, data) {
         data = $.extend(data, {room_id: room_id});
@@ -123,6 +127,8 @@ module.exports = function(options) {
             page.$("#my_letter").text(me.letter);
 
             $wait_dialog && $wait_dialog.dialog('close');
+            $wait_dialog = null;
+
             game = data;
 
             draw_board();
@@ -181,12 +187,6 @@ module.exports = function(options) {
             }
         });
     });
-
-    setInterval(function() {
-        if (!window.opener || window.opener.closed) {
-            window.close();
-        }
-    }, 100);
 
     return {};
 };

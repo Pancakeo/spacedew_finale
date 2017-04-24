@@ -339,8 +339,18 @@ module.exports = function($parent, options) {
             console.log(data);
 
             page.toolio.confirm("Invitation", data.invited_by + " invited you to play " + data.game_type + ".<br/><br/><b>Game Name:</b> " + data.game_name, function() {
-                require('./yownet')({
-                    join_game: data.room_id
+                let popup = window.open('index.html?wup=yownet', '_blank', 'width=1300,height=830,left=200,top=100');
+
+                popup.woboy = {
+                    room_id: data.room_id,
+                    game_name: data.game_name
+                };
+
+                page.ws.register_popup({
+                    page_key: 'yownet',
+                    room_id: data.room_id,
+                    instance_id: instance_id,
+                    popup: popup
                 });
             });
         });

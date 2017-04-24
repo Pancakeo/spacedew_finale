@@ -17,22 +17,25 @@ exports.handle_message = function handle_message(session, message) {
 
     let game = games[data.room_id];
 
-    const broadcast = function(type, send_data) {
-        if (send_data == null) {
-            send_data = arguments[0];
-        }
-        else {
-            send_data = Object.assign({}, {type: type}, send_data);
-        }
+    const broadcast = function(sub_type, broadcast_data) {
+        broadcast_data = Object.assign({}, broadcast_data);
 
-        sessionator.broadcast(exports.key, 'event', send_data, {
+        sessionator.broadcast(exports.key, sub_type, broadcast_data, {
             room_id: data.room_id
         });
     };
 
-    const send = function(send_data) {
-        send_data = Object.assign({room_id: data.room_id}, send_data);
-        session.send(page_key, 'event', send_data);
+    const send = function(sub_type, message) {
+        message = Object.assign({}, message, {room_id: data.room_id});
+        session.send(page_key, sub_type, message);
+    };
+
+    const is_host = function(session) {
+        if (!game || !session) {
+            return false;
+        }
+
+        return game.host.profile.username == session.profile.username;
     };
 
     let handlers = {
@@ -44,16 +47,12 @@ exports.handle_message = function handle_message(session, message) {
                 if (!room.is_member(matching_session.username)) {
                     matching_session.send('chatterbox', 'sorry_jimmy', {invited_by: session.profile.username, game_name: game.game_name, game_type: game.game_type, room_id: data.room_id});
 
-                    send({
-                        type: 'system',
-                        message: 'Invited ' + matching_session.username
-                    });
+                    send('system', {message: 'Invited ' + matching_session.username})
                 }
             }
         },
         chat: function() {
-            broadcast({
-                type: 'chat',
+            broadcast('chat', {
                 username: session.profile.username,
                 message: data.message
             });
@@ -72,8 +71,7 @@ exports.handle_message = function handle_message(session, message) {
                     }
                 }
 
-                broadcast({
-                    type: 'remove_bot',
+                broadcast('remove_bot', {
                     id: data.id
                 });
             }
@@ -95,23 +93,19 @@ exports.handle_message = function handle_message(session, message) {
             }
         },
         start_game: function() {
-            if (game && session.profile.username == game.host.profile.username) {
+            if (game && session.profile.username) {
                 if (game.players.length < game.min_players) {
-                    broadcast({
-                        type: 'system',
+                    broadcast('system', {
                         message: "Not enough players."
                     });
                 }
                 else if (game.players.length > game.max_players) {
-                    broadcast({
-                        type: 'system',
+                    broadcast('system', {
                         message: "Too many players!"
                     });
                 }
                 else {
-                    broadcast({
-                        type: 'start_game'
-                    });
+                    broadcast('start_game');
                 }
             }
         },
@@ -120,8 +114,7 @@ exports.handle_message = function handle_message(session, message) {
             if (game != null && data.game_name.trim().length > 0) {
                 game.game_name = data.game_name.trim();
 
-                broadcast({
-                    type: 'rename_game',
+                broadcast('rename_game', {
                     game_name: game.game_name
                 });
             }
@@ -132,9 +125,20 @@ exports.handle_message = function handle_message(session, message) {
             let game_room = wiseau.create_room(data.game_name, room_id);
             game_room.join_room(session.profile.username);
 
+            let game_type;
+            switch (data.game_key) {
+                case 'tick_tack':
+                    game_type = 'Tick Tack';
+                    break;
+
+                default:
+                    break;
+            }
+
             game = {
                 room_id: room_id,
-                game_type: data.game_type,
+                game_type: game_type,
+                game_key: data.game_key,
                 last_activity: Date.now(),
                 min_players: 2,
                 max_players: 4,
@@ -165,7 +169,7 @@ exports.handle_message = function handle_message(session, message) {
                 value: session
             });
 
-            if (data.game_type == 'Tick Tack') {
+            if (data.game_key == 'tick_tack') {
                 game.max_players = 2;
             }
             else {
@@ -174,12 +178,22 @@ exports.handle_message = function handle_message(session, message) {
 
             games[room_id] = game;
 
-            send({
-                type: 'game_ready',
+            send('game_ready', {
                 room_id: game.room_id,
                 instance_id: data.instance_id,
                 game: game
             });
+
+            if (data.invite_user != null) {
+                let matching_session = sessionator.get_session_by_user(data.invite_user);
+
+                if (matching_session) {
+                    if (!game_room.is_member(matching_session.username)) {
+                        matching_session.send('chatterbox', 'sorry_jimmy', {game_name: game.game_name, room_id: game.room_id, invited_by: session.profile.username});
+                        send('system', {room_id: game.room_id, message: "Invitation sent to " + data.invite_user, color: 'green'});
+                    }
+                }
+            }
         },
         join_game: function() {
             let player = {
@@ -188,15 +202,13 @@ exports.handle_message = function handle_message(session, message) {
             };
             broadcast('add_player', player);
 
-
             let game_room = wiseau.get_room(data.room_id);
             game_room.join_room(session.profile.username);
 
             game.players.push(player);
             // TODO remove player
 
-            send({
-                type: 'game_ready',
+            send('game_ready', {
                 room_id: game.room_id,
                 game: game
             });

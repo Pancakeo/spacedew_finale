@@ -100,14 +100,12 @@ module.exports = (function() {
                     event_bus.emit(message.type + '.' + message.sub_type, message.data);
                 }
 
-                if (wupsocket.popups[message.type] != null) {
-                    wupsocket.popups[message.type].forEach(function(p) {
-                        if (p.room_id == message.data.room_id) {
-                            let popup_message = $.extend(message, {listener_name: 'ws.' + message.type});
-                            p.popup.postMessage(popup_message, app.domain);
-                        }
-                    });
-                }
+                wupsocket.popups.forEach(function(p) {
+                    if (p.room_id == message.data.room_id || p.instance_id == message.data.instance_id) {
+                        let popup_message = $.extend(message, {listener_name: 'ws.' + message.type});
+                        p.popup.postMessage(popup_message, app.domain);
+                    }
+                });
 
                 break;
 
@@ -274,14 +272,21 @@ module.exports = (function() {
         wupsocket.send(data.type, data.sub_type, data.message);
     });
 
-    wupsocket.popups = {};
-    wupsocket.register_popup = function(page_key, room_id, popup) {
-        if (!Array.isArray(wupsocket.popups[page_key])) {
-            wupsocket.popups[page_key] = [];
-        }
+    app.register_window_listener('ws.set_room_id', function(data) {
+        let page_name = data.page_name;
 
-        wupsocket.popups[page_key].push({room_id: room_id, popup: popup, page_key: page_key});
-        app.popups.push(popup);
+        wupsocket.popups.forEach(function(p) {
+            if (p.instance_id == data.instance_id) {
+                p.room_id = data.room_id;
+            }
+        });
+    });
+
+    wupsocket.popups = [];
+    wupsocket.register_popup = function(registration) {
+        let page_key = registration.page_key;
+        wupsocket.popups.push(registration);
+        app.popups.push(registration.popup);
     };
 
     wupsocket.reconnect = function() {

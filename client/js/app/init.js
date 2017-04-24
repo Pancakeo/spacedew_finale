@@ -78,12 +78,8 @@ module.exports = (function() {
             require('../pages/black_board')();
             break;
 
-        case 'crabble':
-            require('../pages/crabble')();
-            break;
-
-        case 'tick_tack':
-            require('../pages/tick_tack')();
+        case 'yownet':
+            require('../pages/yownet')();
             break;
 
         default:
