@@ -196,6 +196,10 @@ exports.handle_message = function handle_message(session, message) {
             }
         },
         join_game: function() {
+            if (data.room_id == null) {
+                return;
+            }
+            
             let player = {
                 name: session.profile.username,
                 observer: false
