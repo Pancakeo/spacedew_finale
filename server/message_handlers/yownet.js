@@ -189,7 +189,7 @@ exports.handle_message = function handle_message(session, message) {
 
                 if (matching_session) {
                     if (!game_room.is_member(matching_session.username)) {
-                        matching_session.send('chatterbox', 'sorry_jimmy', {game_name: game.game_name, room_id: game.room_id, invited_by: session.profile.username});
+                        matching_session.send('chatterbox', 'sorry_jimmy', {game_name: game.game_name, game_type: game.game_type, room_id: game.room_id, invited_by: session.profile.username});
                         send('system', {room_id: game.room_id, message: "Invitation sent to " + data.invite_user, color: 'green'});
                     }
                 }
@@ -199,14 +199,17 @@ exports.handle_message = function handle_message(session, message) {
             if (data.room_id == null) {
                 return;
             }
-            
+
+            let game_room = wiseau.get_room(data.room_id);
+            if (!game_room || game_room.is_member(session.profile.username)) {
+                return;
+            }
+
             let player = {
                 name: session.profile.username,
                 observer: false
             };
             broadcast('add_player', player);
-
-            let game_room = wiseau.get_room(data.room_id);
             game_room.join_room(session.profile.username);
 
             game.players.push(player);
