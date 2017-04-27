@@ -1,0 +1,95 @@
+#c4 {
+  .hidden {
+    visibility: hidden;
+  }
+  .heading {
+    font-size: 150%;
+  }
+
+  #composer {
+    font-size: 1.5em;
+  }
+
+  #status {
+    padding: 5px;
+    background: yellow;
+    color: black;
+    font-size: 125%;
+    border: 1px black solid;
+    min-height: 20px;
+
+    &.go_already {
+      background: green;
+      color: white;
+    }
+  }
+
+  #grid {
+    .cell {
+      position: relative;
+      display: inline-block;
+      border: 1px black solid;
+      width: 50px;
+      height: 50px;
+
+      button {
+        width: 100%;
+        height: 100%;
+      }
+
+      .circle {
+        width: 100%;
+        height: 100%;
+        
+        &.red {
+          background: red;
+        }
+
+        &.blue {
+          background: blue;
+        }
+      }
+    }
+
+  }
+
+  #messages {
+    border: 1px #ccc solid;
+    height: 300px;
+    overflow-y: scroll;
+
+    .message_wrapper {
+      padding: 3px;
+
+      > div {
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      .username {
+        font-weight: bold;
+        margin-right: 5px;
+      }
+    }
+  }
+
+  #players {
+    width: 100px;
+    height: 300px;
+    overflow-y: scroll;
+    border: 1px #ccc solid;
+  }
+
+  #composer {
+    width: 100%;
+  }
+
+  .flexer {
+    display: flex;
+
+    > div {
+      flex-grow: 2;
+    }
+  }
+
+}

@@ -4,17 +4,9 @@ module.exports = function() {
     var event_bus = require('../../../shared/event_bus');
 
     get_page('crabble', function(page) {
-        var yownet = require('./yownet')({
-            max_players: 4,
-            game_name: 'Crabo',
-            game_type: 'Crabble',
-            on_start: function(host_stuff) {
-                page.send('start_game', host_stuff);
-            }
-        });
-
         var $parent = $('body');
         $parent.append(page.$container);
+
         var crabble_thing = require('../crabble/crabble_helper')(page);
 
         var host_stuff = {

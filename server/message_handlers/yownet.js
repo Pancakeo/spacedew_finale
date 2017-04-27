@@ -109,6 +109,24 @@ exports.handle_message = function handle_message(session, message) {
                 }
             }
         },
+        set_game_key: function() {
+            if (game) {
+                game.game_key = data.game_key;
+                switch (data.game_key) {
+                    case 'c4':
+                        game.game_type = "Captain's Mistress";
+                        break;
+                    case 'tick_tack':
+                        game.game_type = "Noughts and Crosses";
+                        break;
+                    default:
+                        game.game_type = "HEH";
+                        break;
+                }
+
+                broadcast('update_game', {game: game});
+            }
+        },
         set_game_name: function() {
             // TODO host check
             if (game != null && data.game_name.trim().length > 0) {
@@ -125,20 +143,13 @@ exports.handle_message = function handle_message(session, message) {
             let game_room = wiseau.create_room(data.game_name, room_id);
             game_room.join_room(session.profile.username);
 
-            let game_type;
-            switch (data.game_key) {
-                case 'tick_tack':
-                    game_type = 'Tick Tack';
-                    break;
-
-                default:
-                    break;
-            }
+            let game_type = "Captain's Mistress";
+            let game_key = 'c4';
 
             game = {
                 room_id: room_id,
                 game_type: game_type,
-                game_key: data.game_key,
+                game_key: game_key,
                 last_activity: Date.now(),
                 min_players: 2,
                 max_players: 4,
@@ -169,7 +180,8 @@ exports.handle_message = function handle_message(session, message) {
                 value: session
             });
 
-            if (data.game_key == 'tick_tack') {
+            let two_player_games = ['tick_tack', 'c4'];
+            if (two_player_games.includes(game_key)) {
                 game.max_players = 2;
             }
             else {

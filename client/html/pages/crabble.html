@@ -1,57 +1,59 @@
-<div id="crabble">
+<div>
+    <div id="crabble">
+        <h1>Woboy</h1>
+        <div id="game_wrapper">
+            <div id="left">
+                <div id="board"></div>
+            </div>
 
-    <div id="game_wrapper">
-        <div id="left">
-            <div id="board"></div>
+            <div id="right">
+                <div id="players_list">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Player</th>
+                            <th>Score</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        <tr template="player_row">
+                            <td field_name="player_name"></td>
+                            <td field_name="player_score"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="chat"></div>
+                <div id="white_board"></div>
+
+                <div style="margin-top: 20px;">
+                    <div id="not_yet">
+                        It is not your turn.
+                    </div>
+
+                    <div id="gogogo" style="display: none;">
+                        It's your turn!
+                    </div>
+
+                    <!--<div style="font-size: 13px; margin-top: 20px;">Drag to re-arrange. Click to select, then click again to place on board.</div>-->
+
+                    <div id="letters">
+
+                    </div>
+                </div>
+
+                <div id="turn_stuff" style="display: none;">
+                    <button id="play_hand">Play</button>
+                    <button id="pass_turn">Pass</button>
+                    <button id="reset_turn">Reset</button>
+                    <button id="swap_stuff">Swap</button>
+                </div>
+
+            </div>
+
+
         </div>
-
-        <div id="right">
-            <div id="players_list">
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Player</th>
-                        <th>Score</th>
-                    </tr>
-                    </thead>
-
-                    <tbody>
-                    <tr template="player_row">
-                        <td field_name="player_name"></td>
-                        <td field_name="player_score"></td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div id="chat"></div>
-            <div id="white_board"></div>
-
-            <div style="margin-top: 20px;">
-                <div id="not_yet">
-                    It is not your turn.
-                </div>
-
-                <div id="gogogo" style="display: none;">
-                    It's your turn!
-                </div>
-
-                <!--<div style="font-size: 13px; margin-top: 20px;">Drag to re-arrange. Click to select, then click again to place on board.</div>-->
-
-                <div id="letters">
-
-                </div>
-            </div>
-
-            <div id="turn_stuff" style="display: none;">
-                <button id="play_hand">Play</button>
-                <button id="pass_turn">Pass</button>
-                <button id="reset_turn">Reset</button>
-                <button id="swap_stuff">Swap</button>
-            </div>
-
-        </div>
-
 
     </div>
-
 </div>

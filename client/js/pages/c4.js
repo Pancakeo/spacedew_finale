@@ -6,7 +6,7 @@ module.exports = function(options) {
     let game = {};
     const room_id = options.room_id;
 
-    get_page('tick_tack', {popup: true}, function(page) {
+    get_page('c4', {popup: true}, function(page) {
         let $wait_dialog = $('<div>Waiting Is...</div>').dialog({
             title: "Waiting for other players...",
             modal: true
@@ -20,24 +20,28 @@ module.exports = function(options) {
             return $cell;
         };
 
-        page.$("#grid").on('click', '.cell', function() {
-            let $cell = $(this);
-            let cell = $cell.prop('cell');
-
-            if (cell.letter == null) {
-                page.send('move', {cell: cell});
-            }
+        page.$("#grid").on('click', '.col_drop', function() {
+            page.send('move', {column: $(this).prop('column')});
         });
 
         let my_username;
         let me;
 
         const draw_board = function() {
-            let $grid = page.$("#grid");
+            let $grid = page.$("#grid").empty();
             let $grid_fragment = $(document.createDocumentFragment());
 
             let current_row = null;
             let $grid_row = null;
+
+            $grid_row = $('<div/>');
+            for (let col = 1; col <= 7; col++) {
+                let $cell = $('<div class="cell"/>');
+                let $button = $('<button class="col_drop">v</button>').prop('column', col);
+                $cell.append($button);
+                $grid_row.append($cell);
+            }
+            $grid_fragment.append($grid_row);
 
             game.board.forEach(function(cell) {
                 if (cell.row != current_row) {
@@ -48,10 +52,10 @@ module.exports = function(options) {
 
                 let $cell = $('<div class="cell"/>').attr({row: cell.row, col: cell.col}).prop('cell', cell);
 
-                if (cell.letter != null) {
-                    let $letter = $('<div class="letter">' + cell.letter + '</div>');
-                    $letter.addClass(cell.letter);
-                    $cell.append($letter);
+                if (cell.color != null) {
+                    let $color_circle = $('<div class="circle"/>');
+                    $color_circle.addClass(cell.color);
+                    $cell.append($color_circle);
                 }
 
 
@@ -59,6 +63,7 @@ module.exports = function(options) {
             });
 
             $grid.empty().append($grid_fragment);
+            page.$(".col_drop").button();
         };
 
         const draw_payers = function() {
@@ -75,21 +80,10 @@ module.exports = function(options) {
         const update_turn = function() {
             if (game.current_turn == my_username) {
                 page.$("#status").addClass('go_already').text("It's your turn!");
-
-                let $grid = page.$("#grid");
-
-                game.board.forEach(function(cell) {
-                    let $cell = get_cell(cell.col, cell.row);
-
-                    if (cell.letter == null) {
-                        $cell.addClass('allowed');
-                    }
-                    else {
-                        $cell.addClass('not_allowed');
-                    }
-                });
+                page.$(".col_drop").button('enable');
             }
             else {
+                page.$(".col_drop").button('disable');
                 if (game.current_turn == null) {
                     page.$("#status").removeClass('go_already').text("It all over.");
                 }
@@ -113,7 +107,7 @@ module.exports = function(options) {
                 }
             });
 
-            page.$("#my_letter").text(me.letter);
+            page.$("#my_letter").text(me.color);
 
             $wait_dialog && $wait_dialog.dialog('close');
             $wait_dialog = null;
@@ -131,9 +125,8 @@ module.exports = function(options) {
         });
 
         page.listen('move', function(data) {
-            let $cell = get_cell(data.cell.col, data.cell.row);
-            $cell.prop('cell').letter = data.cell.letter;
-
+            let $cell = get_cell(data.move.col, data.move.row);
+            $cell.prop('cell').color = data.move.color;
             draw_board();
         });
 

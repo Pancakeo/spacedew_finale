@@ -1,10 +1,21 @@
 <div>
     <div id="yownet">
         <div id="game_wrapper">
-            <span style="font-weight: bold">Game Name:</span> <span id="game_name"></span>
-            <button id="set_game_name">Set Name</button>
-            <button id="invite_to_game">Invite</button>
-            <button id="add_bot">Add AI</button>
+            <div>
+                <span style="font-weight: bold">Game Name:</span> <span id="game_name"></span>
+                <button id="set_game_name">Set Name</button>
+                <button id="invite_to_game">Invite</button>
+                <button id="add_bot">Add AI</button>
+            </div>
+
+            <div>
+                <span style="font-weight: bold">Game Type:</span>
+                <select id="game_type">
+                    <option value="c4">Captain's Mistress</option>
+                    <option value="tick_tack">Noughts and Crosses</option>
+                    <option value="crabble">Crabble</option>
+                </select>
+            </div>
         </div>
 
         <table id="players" class="wupfindtable">

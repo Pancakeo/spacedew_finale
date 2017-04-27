@@ -19,23 +19,36 @@ module.exports = function(options) {
 
         if (options.instance_id) {
             page.instance_id = options.instance_id;
-            page.send('create_game', {instance_id: options.instance_id, game_name: options.game_name, invite_user: options.invite_user, game_key: 'tick_tack'});
+            page.send('create_game', {instance_id: options.instance_id, game_name: options.game_name, invite_user: options.invite_user});
         }
         else {
             page.send('join_game', {room_id: options.room_id});
             page.$("button").button({disabled: true});
         }
 
+        page.$("#game_type").on('change', function() {
+            page.send('set_game_key', {game_key: $(this).val()})
+        });
+
+        page.listen('update_game', function(data) {
+            page.game = data.game;
+            page.$("#game_type").val(page.game.game_key);
+        });
+
         page.listen('start_game', function(data) {
             page.$container.empty();
 
-            switch (page.game.game_type) {
-                case 'Tick Tack':
+            switch (page.game.game_key) {
+                case 'tick_tack':
                     require('./tick_tack')({room_id: page.room_id});
                     break;
 
-                case 'Crabble':
+                case 'c4':
+                    require('./c4')({room_id: page.room_id});
+                    break;
 
+                case 'crabble':
+                    require('./crabble')({room_id: page.room_id});
                     break;
             }
         });
