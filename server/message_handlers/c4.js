@@ -131,7 +131,8 @@ exports.handle_message = function handle_message(session, message) {
                                 let match = quads.some(function(cell_set) {
                                     if (cell_set.every(c => c)) {
                                         return cell_set[0].color == cell_set[1].color
-                                            && cell_set[0].color == cell_set[2].color;
+                                            && cell_set[0].color == cell_set[2].color
+                                            && cell_set[0].color == cell_set[3].color
                                     }
                                 });
 
