@@ -110,7 +110,7 @@ exports.handle_message = function handle_message(session, message) {
                     };
 
                     game.drop_it = function(column) {
-                        for (let row = ROWS; row >= 0; row--) {
+                        for (let row = ROWS; row >= 1; row--) {
                             let cell = game.board.get_cell(column, row);
                             if (cell.color == null) {
                                 cell.color = game.current_player().color;
