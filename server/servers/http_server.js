@@ -15,7 +15,7 @@ express_app.use(compress());
 if (app.config.use_ssl) {
     var https = require('https');
     var ssl_cert_folder = app.config.ssl_cert_folder;
-    let https_port = 443;
+    let https_port = app.config.https_port;
 
     let priv_key_path = path.join(ssl_cert_folder, 'privkey.pem');
     let full_chain_path = path.join(ssl_cert_folder, 'fullchain.pem');
@@ -42,7 +42,7 @@ if (app.config.use_ssl) {
     require('http').createServer((req, res) => {
         res.writeHead(301, {location: 'https://' + app.config.server_domain});
         res.end();
-    }).listen(80);
+    }).listen(app.config.http_port);
 }
 else {
     var http = require('http');

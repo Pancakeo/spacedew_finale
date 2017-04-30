@@ -1,6 +1,7 @@
 {
   "db_port": 27017,
-  "http_port": 1991,
+  "http_port": 80,
+  "https_port": 443,
   "connection_timeout": 120,
   "lobby_room_name": "Welcome to Yehrye",
   "server_domain": "yehrye.com",
