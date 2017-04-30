@@ -40,7 +40,7 @@ if (app.config.use_ssl) {
     });
 
     require('http').createServer((req, res) => {
-        res.writeHead(301, {location: 'https://' + app.config.server_domain});
+        res.writeHead(301, {location: 'https://www.' + app.config.server_domain});
         res.end();
     }).listen(app.config.http_port);
 }
