@@ -5,13 +5,16 @@ var querystring = require('querystring');
 var event_bus = require(app.shared_root + '/event_bus');
 const STEAM_OPENID_URL = "http://steamcommunity.com/openid";
 
-if (!app.config.server_url) {
+if (!app.config.server_domain) {
     throw "server_url must be set in conf/server_config.json";
 }
 
+let protocol = app.config.use_ssl ? 'https' : 'http';
+protocol += '://';
+
 var relyingParty = new openid.RelyingParty(
-    app.config.server_url + '/steam_verify',
-    app.config.server_url, // Realm (optional, specifies realm for OpenID authentication)
+    protocol + app.config.server_domain + '/steam_verify',
+    protocol + app.config.server_domain, // Realm (optional, specifies realm for OpenID authentication)
     true, // Use stateless verification
     false, // Strict mode
     []); // List of extensions to enable and include

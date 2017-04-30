@@ -18,15 +18,13 @@ app.config = require('./conf/configuration').load();
 global.event_bus = require(app.shared_root + '/event_bus');
 
 var WebSocketServer = require('ws').Server;
-var chat_port = app.config.chat_port;
 var uuid = require('node-uuid');
 
 require('./servers/http_server');
 require('./servers/binary_server');
 var sessionator = require('./managers/sessionator');
 
-console.log("Listening for WebSocket requests (chat) on port " + chat_port);
-var wss = new WebSocketServer({port: chat_port});
+var wss = new WebSocketServer({server: app.chat_server});
 
 var message_router = require('./managers/message_router');
 

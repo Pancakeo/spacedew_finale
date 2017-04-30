@@ -59,13 +59,14 @@ module.exports = (function() {
 
     var shared_config = require('../../../shared/shared_config'); // TODO - consider copying shared/* to a more relative folder.
 
+    let protocol = shared_config.use_ssl ? 'wss' : 'ws';
     var server_settings = {
-        server: 'ws://localhost:' + shared_config.chat_port,
-        binary_server: 'ws://localhost:' + shared_config.binary_port
+        server: protocol + '://localhost:' + shared_config.chat_port,
+        binary_server: protocol + '://localhost:' + shared_config.binary_port
     };
 
     for (var server in server_settings) {
-        if (server_settings[server].match('ws://localhost') !== null) {
+        if (server_settings[server].match(protocol + '://localhost') !== null) {
             server_settings[server] = server_settings[server].replace('localhost', window.location.hostname);
         }
     }

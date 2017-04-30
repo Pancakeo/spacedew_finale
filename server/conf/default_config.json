@@ -3,5 +3,6 @@
   "http_port": 1991,
   "connection_timeout": 120,
   "lobby_room_name": "Welcome to Yehrye",
-  "server_url": "http://yehrye.com"
+  "server_domain": "yehrye.com",
+  "ssl_cert_folder": ""
 }

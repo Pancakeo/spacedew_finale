@@ -1,13 +1,11 @@
 "use strict";
 
 var WebSocketServer = require('ws').Server;
-var binary_port = app.config.binary_port;
 var uuid = require('node-uuid');
 
 var sessionator = require('../managers/sessionator');
 
-console.log("Listening for WebSocket requests (binary) on port " + binary_port);
-var wss = new WebSocketServer({port: binary_port});
+var wss = new WebSocketServer({server: app.binary_server});
 
 var message_router = require('../managers/message_router');
 
