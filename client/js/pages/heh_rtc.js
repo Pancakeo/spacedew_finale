@@ -38,6 +38,10 @@ module.exports = function(options) {
             // let data_channel = peer.createDataChannel("woboy", {ordered: false, maxRetransmits: 0});
             let data_channel = peer.createDataChannel("woboy", {});
 
+            peer.ondatachannel = (event) => {
+                app.append_system('Er...', event);
+            };
+
             setInterval(function() {
                 if (data_channel.readyState == 'open') {
                     data_channel.send('Whew.');
