@@ -30,7 +30,7 @@ module.exports = function(options) {
     let peer;
 
     let peer_o_matic = function() {
-        peer = new RTCPeerConnection();
+        peer = new RTCPeerConnection(config);
         app.rtc_peer = peer;
 
         if (options.host) {
