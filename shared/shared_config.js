@@ -2,5 +2,5 @@
 module.exports = {
     chat_port: 2001,
     binary_port: 2112,
-    use_ssl: true
+    use_ssl: false
 };
