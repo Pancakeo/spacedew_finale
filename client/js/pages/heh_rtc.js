@@ -99,6 +99,12 @@ module.exports = function(options) {
 
         peer.onicecandidate = (ice) => {
             if (ice.candidate) {
+
+                if (ice.candidate.candidate.includes('192.168')) {
+                    console.log('ignoring 192.168');
+                    return;
+                }
+
                 console.log('send add_ice', ice);
                 send('add_ice', {candidate: ice.candidate.toJSON(), description: peer.localDescription.toJSON()});
             }
@@ -116,6 +122,11 @@ module.exports = function(options) {
 
     app.event_bus.on('heh_rtc.add_ice', function(data) {
         if (data.client_id == client_id) {
+            return;
+        }
+
+        if (data.candidate.candidate.includes('192.168')) {
+            console.log('ignoring 192.168');
             return;
         }
 
