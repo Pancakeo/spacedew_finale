@@ -140,10 +140,7 @@ module.exports = function(options) {
 
         console.log('add_ice', data);
 
-        peer.setRemoteDescription(new RTCSessionDescription(data.description)).catch(e => {
-            console.log('failed to set description - queuing');
-            queued_descriptions.push(data.description);
-        });
+        peer.setRemoteDescription(new RTCSessionDescription(data.description));
 
         if (!options.host) {
             peer.createAnswer()

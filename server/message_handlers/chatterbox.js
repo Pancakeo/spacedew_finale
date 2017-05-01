@@ -82,7 +82,10 @@ exports.handle_message = function handle_message(session, message) {
             room.add_recent_message(recent_message);
 
             sessionator.broadcast('chatterbox', 'change_room_name', {new_name: room.name, blame: session.profile.username}, {room_id: room.id});
-            configuration.set('lobby_room_name', room.name);
+            if (room == wiseau.get_lobby()) {
+                configuration.set('lobby_room_name', room.name);
+            }
+
         },
         create_room: function() {
             if (!data.name || data.name.trim().length == 0) {
