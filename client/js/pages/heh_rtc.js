@@ -16,6 +16,7 @@ module.exports = function(options) {
     console.log('rtc', options);
 
     const client_id = app.toolio.generate_id();
+    let queued_descriptions = [];
 
     const send = function(sub_type, data) {
         data = $.extend({
@@ -117,6 +118,7 @@ module.exports = function(options) {
             peer.close();
         }
 
+        queued_descriptions = [];
         peer_o_matic();
     });
 
@@ -131,7 +133,11 @@ module.exports = function(options) {
         // }
 
         console.log('add_ice', data);
-        peer.setRemoteDescription(new RTCSessionDescription(data.description));
+
+        peer.setRemoteDescription(new RTCSessionDescription(data.description)).catch(e => {
+            console.log('failed to set description - queuing');
+            queued_descriptions.push(data.description);
+        });
 
         if (!options.host) {
             peer.createAnswer()
