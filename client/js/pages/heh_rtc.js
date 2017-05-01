@@ -31,15 +31,21 @@ module.exports = function(options) {
 
     let peer_o_matic = function() {
         peer = new RTCPeerConnection();
-        peer.oniceconnectionstatechange = event => {
-            console.log('Ice state change', event);
-        };
         app.rtc_peer = peer;
 
         if (options.host) {
             // UDP:
             // let data_channel = peer.createDataChannel("woboy", {ordered: false, maxRetransmits: 0});
             let data_channel = peer.createDataChannel("woboy", {});
+
+            peer.oniceconnectionstatechange = event => {
+                console.log('Ice state change', event);
+
+                if (event.target.iceConnectionState == "failed") {
+                    console.log('woboy, failed');
+                }
+            };
+
 
             peer.ondatachannel = (event) => {
                 app.append_system('Er...', event);
@@ -92,7 +98,7 @@ module.exports = function(options) {
         }
 
         peer.onicecandidate = (ice) => {
-            if (ice.candidate) {
+            if (ice.candidate && !ice.candidate.candidate.includes('192.168.1')) {
                 console.log('send add_ice', ice);
                 send('add_ice', {candidate: ice.candidate.toJSON(), description: peer.localDescription.toJSON()});
             }
