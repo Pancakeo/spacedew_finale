@@ -13,6 +13,8 @@ module.exports = function(options) {
         ]
     };
 
+    console.log('rtc', options);
+
     const client_id = app.toolio.generate_id();
 
     const send = function(sub_type, data) {
@@ -29,14 +31,22 @@ module.exports = function(options) {
 
     let peer_o_matic = function() {
         peer = new RTCPeerConnection();
+<<<<<<< HEAD
         peer.oniceconnectionstatechange = event => {
             console.log('Ice state change', event);
         };
+=======
+        app.rtc_peer = peer;
+>>>>>>> origin/master
 
         if (options.host) {
             // UDP:
             // let data_channel = peer.createDataChannel("woboy", {ordered: false, maxRetransmits: 0});
             let data_channel = peer.createDataChannel("woboy", {});
+
+            peer.ondatachannel = (event) => {
+                app.append_system('Er...', event);
+            };
 
             setInterval(function() {
                 if (data_channel.readyState == 'open') {
@@ -66,6 +76,8 @@ module.exports = function(options) {
         }
         else {
             peer.ondatachannel = (event) => {
+                app.append_system('Woooboy!');
+
                 event.channel.onopen = function() {
                     app.append_system('Woooboy! (el data) HEH...');
                     event.channel.send('Ok.');
@@ -80,8 +92,6 @@ module.exports = function(options) {
 
                 }
             };
-
-            send('que_paso', {});
         }
 
         peer.onicecandidate = (ice) => {
@@ -102,7 +112,7 @@ module.exports = function(options) {
     });
 
     app.event_bus.on('heh_rtc.add_ice', function(data) {
-        if (data.client_id == client_id || !peer) {
+        if (data.client_id == client_id) {
             return;
         }
 
