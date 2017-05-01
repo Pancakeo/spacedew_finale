@@ -44,6 +44,12 @@ module.exports = function(options) {
 
                 if (event.target.iceConnectionState == "failed") {
                     console.log('woboy, failed');
+
+                    if (queued_descriptions.length > 0) {
+                        let desc = queued_descriptions.shift();
+                        console.log('trying', desc);
+                        peer.setRemoteDescription(new RTCSessionDescription(desc));
+                    }
                 }
             };
 
