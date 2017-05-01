@@ -100,10 +100,10 @@ module.exports = function(options) {
         peer.onicecandidate = (ice) => {
             if (ice.candidate) {
 
-                if (ice.candidate.candidate.includes('192.168')) {
-                    console.log('ignoring 192.168');
-                    return;
-                }
+                // if (ice.candidate.candidate.includes('192.168')) {
+                //     console.log('ignoring 192.168');
+                //     return;
+                // }
 
                 console.log('send add_ice', ice);
                 send('add_ice', {candidate: ice.candidate.toJSON(), description: peer.localDescription.toJSON()});
@@ -125,10 +125,10 @@ module.exports = function(options) {
             return;
         }
 
-        if (data.candidate.candidate.includes('192.168')) {
-            console.log('ignoring 192.168');
-            return;
-        }
+        // if (data.candidate.candidate.includes('192.168')) {
+        //     console.log('ignoring 192.168');
+        //     return;
+        // }
 
         console.log('add_ice', data);
         peer.setRemoteDescription(new RTCSessionDescription(data.description));
