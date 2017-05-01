@@ -98,7 +98,7 @@ module.exports = function(options) {
         }
 
         peer.onicecandidate = (ice) => {
-            if (ice.candidate && !ice.candidate.candidate.includes('192.168')) {
+            if (ice.candidate) {
                 console.log('send add_ice', ice);
                 send('add_ice', {candidate: ice.candidate.toJSON(), description: peer.localDescription.toJSON()});
             }
