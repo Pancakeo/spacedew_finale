@@ -31,13 +31,10 @@ module.exports = function(options) {
 
     let peer_o_matic = function() {
         peer = new RTCPeerConnection();
-<<<<<<< HEAD
         peer.oniceconnectionstatechange = event => {
             console.log('Ice state change', event);
         };
-=======
         app.rtc_peer = peer;
->>>>>>> origin/master
 
         if (options.host) {
             // UDP:
