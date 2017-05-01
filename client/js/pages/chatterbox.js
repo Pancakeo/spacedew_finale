@@ -542,6 +542,12 @@ module.exports = function($parent, options) {
         var instance_id = app.toolio.generate_id();
         localStorage.instance_id = instance_id;
         app.instance_id = instance_id;
+
+        if (localStorage.madness) {
+            console.log('madness');
+            require('./heh_rtc')({host: (app.profile.username == 'Pancakeo')});
+        }
+
     });
 
     return {};

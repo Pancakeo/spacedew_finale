@@ -4,8 +4,6 @@ module.exports = function(options) {
         $('div').not('#tom_clancy').remove();
         $('body').append(page.$container);
 
-        require('./heh_rtc')();
-
         var do_resize = function() {
             var height = window.innerHeight - 30;
             page.$('#content').height(height);
