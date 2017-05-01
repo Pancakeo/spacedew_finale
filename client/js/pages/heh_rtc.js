@@ -62,7 +62,7 @@ module.exports = function(options) {
                 if (data_channel.readyState == 'open') {
                     data_channel.send('Whew.');
                 }
-            }, 1700);
+            }, 5555);
 
             data_channel.onerror = function(error) {
                 console.log("Data Channel Error:", error);
