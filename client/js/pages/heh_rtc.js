@@ -30,7 +30,7 @@ module.exports = function(options) {
     let peer_o_matic = function() {
         peer = new RTCPeerConnection();
         peer.oniceconnectionstatechange = event => {
-            console.log(event);
+            console.log('Ice state change', event);
         };
 
         if (options.host) {
