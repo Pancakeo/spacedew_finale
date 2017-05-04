@@ -36,8 +36,8 @@ module.exports = function(options) {
 
         if (options.host) {
             // UDP:
-            // let data_channel = peer.createDataChannel("woboy", {ordered: false, maxRetransmits: 0});
-            let data_channel = peer.createDataChannel("woboy", {});
+            let data_channel = peer.createDataChannel("woboy", {ordered: false, maxRetransmits: 0});
+            // let data_channel = peer.createDataChannel("woboy", {});
 
             peer.oniceconnectionstatechange = event => {
                 console.log('Ice state change', event);
@@ -78,6 +78,7 @@ module.exports = function(options) {
             };
 
             data_channel.onmessage = function(wup) {
+                console.log(wup);
                 app.append_system('RTC Chat: ' + wup.data);
             };
 
@@ -95,6 +96,7 @@ module.exports = function(options) {
                 };
 
                 event.channel.onmessage = function(message) {
+                    console.log(message);
                     app.append_system('RTC Chat: ' + message.data);
                     setTimeout(function() {
                         event.channel.send('No problem.');
