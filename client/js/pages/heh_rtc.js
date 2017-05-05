@@ -13,8 +13,6 @@ module.exports = function(options) {
         ]
     };
 
-    console.log('rtc', options);
-
     const client_id = app.toolio.generate_id();
     let queued_descriptions = [];
 
@@ -36,8 +34,8 @@ module.exports = function(options) {
 
         if (options.host) {
             // UDP:
-            let data_channel = peer.createDataChannel("woboy", {ordered: false, maxRetransmits: 0});
-            // let data_channel = peer.createDataChannel("woboy", {});
+            // let data_channel = peer.createDataChannel("woboy", {ordered: false, maxRetransmits: 0});
+            let data_channel = peer.createDataChannel("woboy", {});
 
             peer.oniceconnectionstatechange = event => {
                 console.log('Ice state change', event);
@@ -108,12 +106,6 @@ module.exports = function(options) {
 
         peer.onicecandidate = (ice) => {
             if (ice.candidate) {
-
-                // if (ice.candidate.candidate.includes('192.168')) {
-                //     console.log('ignoring 192.168');
-                //     return;
-                // }
-
                 console.log('send add_ice', ice);
                 send('add_ice', {candidate: ice.candidate.toJSON(), description: peer.localDescription.toJSON()});
             }
@@ -134,12 +126,6 @@ module.exports = function(options) {
         if (data.client_id == client_id) {
             return;
         }
-
-        // if (data.candidate.candidate.includes('192.168')) {
-        //     console.log('ignoring 192.168');
-        //     return;
-        // }
-
         console.log('add_ice', data);
 
         peer.setRemoteDescription(new RTCSessionDescription(data.description));
