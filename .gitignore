@@ -38,5 +38,4 @@ node_modules
 .idea
 settings.db
 build
-shared_config.js
-shared/shared_config.js
+shared/shared_config_override.js
