@@ -6,6 +6,13 @@ let shared_config = {
     use_ssl: true
 };
 
+// Put things that you want to set locally, but don't want to check-in remotely, in:
+// shared/shared_config_override.js
+// Which would then have the format of:
+// module.exports = {
+//     use_ssl: false
+// };
+
 let override_stuff = {};
 
 try {
@@ -16,5 +23,5 @@ catch (e) {
 }
 
 shared_config = Object.assign({}, shared_config, override_stuff);
-console.log("Shared config", shared_config);
+// console.log("Shared config", shared_config);
 module.exports = shared_config;

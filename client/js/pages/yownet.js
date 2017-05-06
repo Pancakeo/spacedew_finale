@@ -38,19 +38,22 @@ module.exports = function(options) {
         page.listen('start_game', function(data) {
             page.$container.empty();
 
-            switch (page.game.game_key) {
-                case 'tick_tack':
+            let handlers = {
+                tick_tack: function() {
                     require('./tick_tack')({room_id: page.room_id});
-                    break;
-
-                case 'c4':
+                },
+                c4: function() {
                     require('./c4')({room_id: page.room_id});
-                    break;
-
-                case 'crabble':
+                },
+                crabble: function() {
                     require('./crabble')({room_id: page.room_id});
-                    break;
-            }
+                },
+                spacedew: function() {
+                    require('./spacedew')({room_id: page.room_id});
+                }
+            };
+
+            handlers[page.game.game_key] && handlers[page.game.game_key]();
         });
 
         page.listen('system', function(data) {
@@ -119,7 +122,11 @@ module.exports = function(options) {
                 $player_row.find('#player_name').val(p.name);
                 $player_row.find('#is_observer').prop('checked', p.observer);
                 $tbody.append($player_row);
-            })
+            });
+
+            if (localStorage.fast_crab) {
+                page.$("#add_bot").click();
+            }
         });
 
         page.$("#players").on('click', '#player_eject', function() {
@@ -159,6 +166,10 @@ module.exports = function(options) {
 
         page.$("#add_bot").button().on('click', function() {
             page.send('add_bot', {});
+
+            if (localStorage.fast_crab) {
+                page.$("#start_game").click();
+            }
         });
 
         page.$("#game_name").text(options.game_name);

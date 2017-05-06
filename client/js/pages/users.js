@@ -264,6 +264,30 @@ module.exports = function($target) {
             recurIdleCall: true
         });
 
+
+        app.event_bus.on('users_pane_loaded', function() {
+            if (localStorage.fast_crab) {
+                let usernames = [];
+                if (page.user_list_data) {
+                    usernames = page.user_list_data.users_and_rooms.users.filter(u => u.username != app.profile.username).map(u => u.username);
+                }
+                let instance_id = app.toolio.generate_id();
+                let popup = window.open('index.html?wup=yownet', '_blank', 'width=1300,height=830,left=200,top=100');
+                popup.woboy = {
+                    game_name: "Fast Crab",
+                    instance_id: instance_id,
+                    usernames: usernames
+                };
+
+                page.ws.register_popup({
+                    page_key: 'yownet',
+                    room_id: null,
+                    instance_id: instance_id,
+                    popup: popup
+                });
+            }
+        });
+
         // I'm sure this is fine!
         var wait_for_app = setInterval(function() {
             if (app.ready) {

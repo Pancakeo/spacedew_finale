@@ -110,19 +110,17 @@ exports.handle_message = function handle_message(session, message) {
             }
         },
         set_game_key: function() {
+
+            let mappings = {
+                c4: "Captain's Mistress",
+                tick_tack: "Noughts and Crosses",
+                crabble: "Crabble",
+                spacedew: "Spacedew Finale"
+            };
+
             if (game) {
                 game.game_key = data.game_key;
-                switch (data.game_key) {
-                    case 'c4':
-                        game.game_type = "Captain's Mistress";
-                        break;
-                    case 'tick_tack':
-                        game.game_type = "Noughts and Crosses";
-                        break;
-                    default:
-                        game.game_type = "HEH";
-                        break;
-                }
+                game.game_type = mappings[game.game_key] || 'HEH';
 
                 broadcast('update_game', {game: game});
             }
@@ -143,8 +141,8 @@ exports.handle_message = function handle_message(session, message) {
             let game_room = wiseau.create_room(data.game_name, room_id);
             game_room.join_room(session.profile.username);
 
-            let game_type = "Captain's Mistress";
-            let game_key = 'c4';
+            let game_type = "Spacedew Finale";
+            let game_key = 'spacedew';
 
             game = {
                 room_id: room_id,
