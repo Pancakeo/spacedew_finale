@@ -291,7 +291,7 @@ module.exports = function($target) {
         // I'm sure this is fine!
         var wait_for_app = setInterval(function() {
             if (app.ready) {
-                page.send('sync', {room_id: app.get_active_room(true)});
+                page.send('sync', {room_id: app.get_active_room(true), mobile: app.is_mobile});
                 clearInterval(wait_for_app);
                 app.event_bus.emit('users_pane_loaded', {});
             }

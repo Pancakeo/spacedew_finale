@@ -95,7 +95,10 @@ exports.handle_message = function handle_message(session, message) {
 
             send_user_settings();
             send_users_list();
-            send_ross(room, session);
+
+            if (data.mobile != true) {
+                send_ross(room, session);
+            }
         },
         warn: function() {
             var sessions = sessionator.get_sessions();

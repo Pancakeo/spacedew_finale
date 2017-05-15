@@ -425,7 +425,7 @@ module.exports = function($parent, options) {
 
             localStorage.auth_key = data.auth_key;
             lobby = data.lobby;
-            page.ws.send('users', 'sync', {room_id: app.get_active_room(true)});
+            page.ws.send('users', 'sync', {room_id: app.get_active_room(true), mobile: app.is_mobile});
 
             if (lobby.recent_messages.length > 0) {
                 var $blargh = $('<div class="blargh recent_messages"/>');
