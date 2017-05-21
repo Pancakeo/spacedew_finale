@@ -1,4 +1,6 @@
 module.exports = function(...args) {
+    const $ = require('jquery');
+
     let page_name, options, callback;
     if (args.length === 3) {
         page_name = args[0];
@@ -17,6 +19,8 @@ module.exports = function(...args) {
     const toolio = require('../app/toolio');
     const ws = require('../app/wupsocket');
     const listeners = [];
+
+    const jQuery = $;
 
     $.get('html/pages/' + page_name + '.html', function(res) {
         let page = {

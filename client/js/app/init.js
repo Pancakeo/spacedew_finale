@@ -1,4 +1,6 @@
 module.exports = (function() {
+    var $ = require('jquery');
+    require('jquery-ui');
     var toolio = require('../app/toolio');
 
     var search = window.location.search;
@@ -47,15 +49,15 @@ module.exports = (function() {
     app.ws = require('../app/wupsocket'); // for Lustmord
 
     // Dialog stuff.
-    $.widget("yehrye.dialog", $.ui.dialog, {
-        close: function() {
-            var _this = this;
-            setTimeout(function() {
-                _this.uiDialog.remove();
-            }, 0);
-            this._superApply(arguments);
-        }
-    });
+    // $.widget("yehrye.dialog", $.ui.dialog, {
+    //     close: function() {
+    //         var _this = this;
+    //         setTimeout(function() {
+    //             _this.uiDialog.remove();
+    //         }, 0);
+    //         this._superApply(arguments);
+    //     }
+    // });
 
     var shared_config = require('../../../shared/shared_config'); // TODO - consider copying shared/* to a more relative folder.
 

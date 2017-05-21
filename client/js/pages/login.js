@@ -1,6 +1,9 @@
 module.exports = function() {
     var event_bus = app.event_bus;
     var ws = require('../app/wupsocket');
+    var $ = require('jquery');
+    const jQuery = $;
+    require('jquery-ui');
 
     get_page('login', function(page) {
         var $parent = $('body');
