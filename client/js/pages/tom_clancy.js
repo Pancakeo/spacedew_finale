@@ -245,7 +245,7 @@ module.exports = function(options) {
         });
 
         app.alert_tab = function(room_id) {
-            let $room_tab = page.$("#room_names").find('.room_tab[room_id="' + room_id + '"]');
+            var $room_tab = page.$("#room_names").find('.room_tab[room_id="' + room_id + '"]');
             $room_tab.addClass('blink');
         };
 
@@ -263,11 +263,11 @@ module.exports = function(options) {
                 page.$("#leave_room_wrapper").show();
             }
 
-            let $room_tab = page.$("#room_names").find('.room_tab[room_id="' + room.id + '"]');
+            var $room_tab = page.$("#room_names").find('.room_tab[room_id="' + room.id + '"]');
             $room_tab.removeClass('blink');
 
             if (typeof(app.scroll_chat) == "function") {
-                let $chat = page.$("#chat_rooms").find("div[room_id='" + room.id + "']");
+                var $chat = page.$("#chat_rooms").find("div[room_id='" + room.id + "']");
                 app.scroll_chat($chat);
             }
         };
@@ -487,11 +487,11 @@ module.exports = function(options) {
 
         page.peepy('users.leave_room', function(data) {
             if (data.success) {
-                let $room_tab = page.$('.room_tab[room_id="' + data.room_id + '"]');
-                let $room_box = page.$('.chat_thing[room_id="' + data.room_id + '"]');
-                let $canvas = page.$('.chat_thing[room_id="' + data.room_id + '"]');
+                var $room_tab = page.$('.room_tab[room_id="' + data.room_id + '"]');
+                var $room_box = page.$('.chat_thing[room_id="' + data.room_id + '"]');
+                var $canvas = page.$('.chat_thing[room_id="' + data.room_id + '"]');
 
-                let whewboard = $room_box.prop('whewboard');
+                var whewboard = $room_box.prop('whewboard');
                 if (whewboard) {
                     whewboard.remove();
                 }
@@ -505,7 +505,7 @@ module.exports = function(options) {
                 $room_tab.remove();
                 $room_box.remove();
 
-                let lobby_room = app.get_lobby();
+                var lobby_room = app.get_lobby();
                 $room_tab = page.$('.room_tab[room_id="' + lobby_room.id + '"]');
                 $room_tab.click();
             }

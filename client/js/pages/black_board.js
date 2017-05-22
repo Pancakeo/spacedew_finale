@@ -85,7 +85,7 @@ module.exports = function() {
         var ch = canvas_handler(ctx);
 
         var perform_drawing_action = function(type, data) {
-            let message = $.extend({}, data, {action: 'draw', type: type});
+            var message = $.extend({}, data, {action: 'draw', type: type});
             ch.handle_thing(message);
             send_message(message);
         };

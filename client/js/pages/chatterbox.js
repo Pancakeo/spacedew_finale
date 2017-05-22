@@ -1,4 +1,6 @@
 module.exports = function($parent, options) {
+    const moment = require('moment');
+    
     get_page('chatterbox', function(page) {
         var event_bus = app.event_bus;
         var linkomatic = require('../app/linkomatic')();
@@ -100,7 +102,7 @@ module.exports = function($parent, options) {
 
             show_notification($blargh.text(), append_options);
 
-            let do_append = function(room_id) {
+            var do_append = function(room_id) {
                 var $chat = page.$("div[room_id='" + room_id + "']");
                 $chat.append($blargh);
                 scroll_chat($chat);
@@ -108,7 +110,7 @@ module.exports = function($parent, options) {
 
             if (append_options.room_id == null) {
                 page.$(".chat_thing").each(function() {
-                    let room_id = $(this).attr('room_id');
+                    var room_id = $(this).attr('room_id');
                     do_append(room_id);
                     $blargh = $blargh.clone(); // this doesn't entirely work for some $blarghs.
                 });
@@ -128,7 +130,7 @@ module.exports = function($parent, options) {
 
             show_notification(message, append_options);
 
-            let do_append = function(room_id) {
+            var do_append = function(room_id) {
                 var $chat = page.$("div[room_id='" + room_id + "']");
                 var $message = $('<div class="message"><span class="timestamp">[' + moment().format("h:mm:ss A") + ']</span>' +
                     '<span class="message_text">' + message + '</span></div>');
@@ -145,7 +147,7 @@ module.exports = function($parent, options) {
 
             if (append_options.room_id == null) {
                 page.$(".chat_thing").each(function() {
-                    let room_id = $(this).attr('room_id');
+                    var room_id = $(this).attr('room_id');
                     do_append(room_id);
                 });
             }
@@ -157,7 +159,7 @@ module.exports = function($parent, options) {
         var append_chat = function(data) {
             show_notification(data.username + ": " + data.message, data);
 
-            let do_append = function(room_id) {
+            var do_append = function(room_id) {
                 var $chat = page.$("div[room_id='" + room_id + "']");
                 var message = data.message;
 
@@ -225,7 +227,7 @@ module.exports = function($parent, options) {
 
             if (data.room_id == null) {
                 page.$(".chat_thing").each(function() {
-                    let room_id = $(this).attr('room_id');
+                    var room_id = $(this).attr('room_id');
                     do_append(room_id);
                 });
             }
@@ -286,29 +288,29 @@ module.exports = function($parent, options) {
         });
 
         page.listen('blargh_grid', function(grid_data) {
-            let grid_width = grid_data.grid_width || 500;
+            var grid_width = grid_data.grid_width || 500;
 
-            let $blargh = $('<div class="blargh"/>').css({width: grid_width});
+            var $blargh = $('<div class="blargh"/>').css({width: grid_width});
             $blargh.append('<div class="header">' + grid_data.username + ' (' + grid_data.title + ') <span class="close">x</span></div>');
             $blargh.append('<div class="body" style="padding: 0;"/>');
             var $body = $blargh.find('.body');
 
-            let $table = $('<table class="wupfindtable center_content"><thead></thead><tbody><tr><td colspan="' + grid_data.columns.length + '">No data in table.</td></tr></tbody>');
-            let $header = $('<tr/>');
+            var $table = $('<table class="wupfindtable center_content"><thead></thead><tbody><tr><td colspan="' + grid_data.columns.length + '">No data in table.</td></tr></tbody>');
+            var $header = $('<tr/>');
             $table.find('thead').append($header);
 
             grid_data.columns.forEach(function(col) {
                 $header.append('<th>' + col + '</th>');
             });
 
-            let $tbody = $table.find('tbody');
+            var $tbody = $table.find('tbody');
 
             if (grid_data.rows.length > 0) {
                 $tbody.empty();
             }
 
             grid_data.rows.forEach(function(row) {
-                let $row = $('<tr/>');
+                var $row = $('<tr/>');
                 row.forEach(function(col) {
                     $row.append('<td>' + col + '</td>');
                 });
@@ -339,7 +341,7 @@ module.exports = function($parent, options) {
 
             page.toolio.confirm("Invitation", data.invited_by + " invited you to play " + data.game_type + ".<br/><br/><b>Game Name:</b> " + data.game_name, function() {
 
-                let already_open = app.popups.some(function(p) {
+                var already_open = app.popups.some(function(p) {
                     if (p.closed != true && p.woboy && p.woboy.room_id == data.room_id) {
                         p.focus();
                         return true;
@@ -350,7 +352,7 @@ module.exports = function($parent, options) {
                     return;
                 }
 
-                let popup = window.open('index.html?wup=yownet', '_blank', 'width=1300,height=830,left=200,top=100');
+                var popup = window.open('index.html?wup=yownet', '_blank', 'width=1300,height=830,left=200,top=100');
 
                 popup.woboy = {
                     room_id: data.room_id,

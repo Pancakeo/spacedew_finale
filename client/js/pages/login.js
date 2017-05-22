@@ -3,7 +3,7 @@ module.exports = function() {
     var ws = require('../app/wupsocket');
     var $ = require('jquery');
     const jQuery = $;
-    require('jquery-ui');
+    require('jquery-ui-bundle');
 
     get_page('login', function(page) {
         var $parent = $('body');

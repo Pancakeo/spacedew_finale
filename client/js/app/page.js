@@ -1,16 +1,16 @@
-module.exports = function(...args) {
+module.exports = function() {
     const $ = require('jquery');
 
-    let page_name, options, callback;
-    if (args.length === 3) {
-        page_name = args[0];
-        options = args[1];
-        callback = args[2];
+    var page_name, options, callback;
+    if (arguments.length === 3) {
+        page_name = arguments[0];
+        options = arguments[1];
+        callback = arguments[2];
     }
-    else if (args.length == 2) {
-        page_name = args[0];
+    else if (arguments.length == 2) {
+        page_name = arguments[0];
         options = {};
-        callback = args[1];
+        callback = arguments[1];
     }
 
     options = $.extend({popup: false}, options);
@@ -23,7 +23,7 @@ module.exports = function(...args) {
     const jQuery = $;
 
     $.get('html/pages/' + page_name + '.html', function(res) {
-        let page = {
+        var page = {
             $container: $(res),
             page_name: page_name,
             always_send: {},    // Keys that should go out with every message (e.g. game_id)
@@ -31,12 +31,12 @@ module.exports = function(...args) {
                 return jQuery(selector, this.$container);
             },
             listen: function(event_type, listener) {
-                let cb = event_bus.on(page_name + '.' + event_type, listener, page.instance_id);
+                var cb = event_bus.on(page_name + '.' + event_type, listener, page.instance_id);
                 listeners.push(cb);
             },
             // Use to listen to any event
             peepy: function(full_event_name, listener) {
-                let cb = event_bus.on(full_event_name, listener, page.instance_id);
+                var cb = event_bus.on(full_event_name, listener, page.instance_id);
                 listeners.push(cb);
             },
             emit: function(event_type, params) {
@@ -77,7 +77,7 @@ module.exports = function(...args) {
             page.send = function(sub_type, data) {
                 data = $.extend(data, page.always_send);
 
-                let ws_message = {
+                var ws_message = {
                     listener_name: 'ws.send',
                     type: page.page_name,
                     sub_type: sub_type,
@@ -88,7 +88,7 @@ module.exports = function(...args) {
             };
 
             page.set_ws_room_id = function() {
-                let ws_message = {
+                var ws_message = {
                     listener_name: 'ws.set_room_id',
                     room_id: page.room_id,
                     page_name: page_name,
@@ -112,7 +112,7 @@ module.exports = function(...args) {
 
         }
 
-        let $templates = page.$('[template]').detach();
+        var $templates = page.$('[template]').detach();
 
         Object.defineProperty(page, 'toolio', {
             get: function() {

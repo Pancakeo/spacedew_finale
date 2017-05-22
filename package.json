@@ -12,6 +12,7 @@
     "dev": "npm run build && webpack-dev-server",
     "devo": "webpack-dev-server",
     "docs": "echo heh",
+    "prod": "npm run clean && webpack -p",
     "test": "jest",
     "watch": "webpack --watch"
   },
@@ -26,15 +27,15 @@
   },
   "homepage": "https://github.com/Pancakeo/spacedew_finale#readme",
   "dependencies": {
+    "font-awesome": "^4.7.0",
     "jquery": "^3.2.1",
     "jquery-contextmenu": "^2.4.5",
-    "jquery-ui": "^1.12.1",
+    "jquery-ui-bundle": "^1.12.1",
     "moment": "^2.18.1",
     "pako": "^1.0.5",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
-    "react-hot-loader": "^3.0.0-beta.7",
-    "rimraf": "^2.6.1"
+    "react-hot-loader": "^3.0.0-beta.7"
   },
   "devDependencies": {
     "babel-core": "^6.24.1",
@@ -44,13 +45,17 @@
     "copy-webpack-plugin": "^4.0.1",
     "css-loader": "^0.28.1",
     "extract-text-webpack-plugin": "^2.1.0",
+    "file-loader": "^0.11.1",
+    "font-awesome-webpack": "0.0.5-beta.2",
     "html-webpack-plugin": "^2.28.0",
     "jest": "^20.0.3",
     "less": "^2.7.2",
     "less-loader": "^4.0.3",
     "mocha": "^3.4.1",
     "nyc": "^10.3.2",
+    "rimraf": "^2.6.1",
     "style-loader": "^0.17.0",
+    "url-loader": "^0.5.8",
     "webpack": "^2.5.1",
     "webpack-dev-server": "^2.4.5"
   }

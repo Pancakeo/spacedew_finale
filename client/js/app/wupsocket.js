@@ -1,31 +1,32 @@
 module.exports = (function() {
     "use strict";
+    const pako = require('pako');
     const toolio = app.toolio;
     const event_bus = app.event_bus;
     const DEFAULT_CHUNK_SIZE = 1024 * 1024;
-    let chunk_size = DEFAULT_CHUNK_SIZE;
+    var chunk_size = DEFAULT_CHUNK_SIZE;
 
     if (localStorage.chunk_size) {
-        let user_chunk_size = Number(localStorage.chunk_size);
+        var user_chunk_size = Number(localStorage.chunk_size);
 
         if (!isNaN(user_chunk_size) && user_chunk_size > 0) {
             chunk_size = user_chunk_size;
         }
     }
 
-    let wupsocket = {
+    var wupsocket = {
         binary_transfers: {}
     };
 
-    let ws_connected = false;
-    let binary_connected = false;
-    let manually_closed = false;
-    let key;
+    var ws_connected = false;
+    var binary_connected = false;
+    var manually_closed = false;
+    var key;
 
-    let prime_socket = new Worker('js/public/prime_socket.js');
+    var prime_socket = new Worker('js/public/prime_socket.js');
     prime_socket.postMessage({});
 
-    let ws_handlers = {
+    var ws_handlers = {
         connection: function(message) {
             switch (message.sub_type) {
                 case 'heartbeat':
@@ -59,7 +60,7 @@ module.exports = (function() {
     };
 
     prime_socket.addEventListener('message', function(e) {
-        let params = e.data.params;
+        var params = e.data.params;
 
         switch (e.data.action) {
             case 'connect':
@@ -91,7 +92,7 @@ module.exports = (function() {
                 break;
 
             case 'message':
-                let message = params.message;
+                var message = params.message;
                 if (typeof(ws_handlers[message.type]) == "function") {
                     ws_handlers[message.type](message);
                 }
@@ -102,7 +103,7 @@ module.exports = (function() {
 
                 wupsocket.popups.forEach(function(p) {
                     if (p.room_id == message.data.room_id || p.instance_id == message.data.instance_id) {
-                        let popup_message = $.extend(message, {listener_name: 'ws.' + message.type});
+                        var popup_message = $.extend(message, {listener_name: 'ws.' + message.type});
                         p.popup.postMessage(popup_message, app.domain);
                     }
                 });
@@ -110,12 +111,12 @@ module.exports = (function() {
                 break;
 
             case 'message_buffer':
-                let meta = params.meta;
+                var meta = params.meta;
 
                 if (meta.type == 'blackboard') {
-                    let inflated_response = pako.inflate(params.buffer, {to: 'string'});
-                    let response_as_json = JSON.parse(inflated_response);
-                    let useful_response = {
+                    var inflated_response = pako.inflate(params.buffer, {to: 'string'});
+                    var response_as_json = JSON.parse(inflated_response);
+                    var useful_response = {
                         bg_color: meta.bg_color,
                         room_id: meta.room_id,
                         commands: response_as_json
@@ -146,17 +147,17 @@ module.exports = (function() {
                     }
                 }
 
-                if (meta.complete == true) {
+                if (meta.compvare == true) {
                     meta.file_info.username = meta.username;
                     app.handle_binary(wupsocket.binary_transfers[meta.transfer_id].data, meta.file_info);
                     delete wupsocket.binary_transfers[meta.transfer_id];
-                    event_bus.emit('ws.transfer_complete', {transfer_id: meta.transfer_id});
+                    event_bus.emit('ws.transfer_compvare', {transfer_id: meta.transfer_id});
                 }
                 else {
-                    let stored_size;
+                    var stored_size;
 
                     if (meta.no_data == true) {
-                        let cur_chunk = wupsocket.binary_transfers[meta.transfer_id] && wupsocket.binary_transfers[meta.transfer_id].chunk;
+                        var cur_chunk = wupsocket.binary_transfers[meta.transfer_id] && wupsocket.binary_transfers[meta.transfer_id].chunk;
                         cur_chunk = cur_chunk || 0;
                         stored_size = cur_chunk * chunk_size;
                     }
@@ -185,7 +186,7 @@ module.exports = (function() {
         if (!binary_connected) {
             app.append_system('Unable to send: Binary not connected.', {color: 'red'});
         }
-        let transfer_id = meta.transfer_id;
+        var transfer_id = meta.transfer_id;
 
         prime_socket.postMessage({
             action: 'create_transfer_progress',
@@ -194,9 +195,9 @@ module.exports = (function() {
             }
         });
 
-        let send_chunk = function(buffer, meta, start) {
-            let transfer_info = {
-                complete: false,
+        var send_chunk = function(buffer, meta, start) {
+            var transfer_info = {
+                compvare: false,
                 transfer_id: transfer_id,
                 room_id: meta.room_id
             };
@@ -206,10 +207,10 @@ module.exports = (function() {
             }
 
             if (start + chunk_size >= buffer.byteLength) {
-                transfer_info.complete = true;
+                transfer_info.compvare = true;
                 transfer_info.file_info = meta;
 
-                let chunk = buffer.slice(start);
+                var chunk = buffer.slice(start);
                 prime_socket.postMessage({
                     action: 'send_binary',
                     params: {
@@ -219,7 +220,7 @@ module.exports = (function() {
                 }, [chunk]);
             }
             else {
-                let chunk = buffer.slice(start, start + chunk_size);
+                var chunk = buffer.slice(start, start + chunk_size);
                 prime_socket.postMessage({
                     action: 'send_binary',
                     params: {
@@ -245,7 +246,7 @@ module.exports = (function() {
             return;
         }
 
-        let wrapped_message = {
+        var wrapped_message = {
             type: type,
             sub_type: sub_type,
             data: data
@@ -273,7 +274,7 @@ module.exports = (function() {
     });
 
     app.register_window_listener('ws.set_room_id', function(data) {
-        let page_name = data.page_name;
+        var page_name = data.page_name;
 
         wupsocket.popups.forEach(function(p) {
             if (p.instance_id == data.instance_id) {
@@ -284,7 +285,7 @@ module.exports = (function() {
 
     wupsocket.popups = [];
     wupsocket.register_popup = function(registration) {
-        let page_key = registration.page_key;
+        var page_key = registration.page_key;
         wupsocket.popups.push(registration);
         app.popups.push(registration.popup);
     };
@@ -303,7 +304,7 @@ module.exports = (function() {
             });
         }
         else {
-            let diff = 5000 - (Date.now() - wupsocket.last_reconnect_attempt);
+            var diff = 5000 - (Date.now() - wupsocket.last_reconnect_attempt);
             setTimeout(function() {
                 wupsocket.reconnect();
             }, diff)

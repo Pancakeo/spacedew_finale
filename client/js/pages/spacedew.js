@@ -8,19 +8,19 @@ module.exports = function(options) {
     const KEYCODE_S = 115;
     const KEYCODE_D = 100;
 
-    let users = [];
+    var users = [];
 
-    let game = {};
+    var game = {};
     const room_id = options.room_id;
 
-    let lizard = new Image();
+    var lizard = new Image();
     lizard.src = 'images/game/player.png';
 
-    let evil = new Image();
+    var evil = new Image();
     evil.src = 'images/game/evil.png';
 
     // TODO tweak these values and stuff.
-    let player = {
+    var player = {
         keys_down: {},
         mouse: {
             down: false,
@@ -48,7 +48,7 @@ module.exports = function(options) {
         }
     };
 
-    let evil_wup = {
+    var evil_wup = {
         x: 700,
         y: 600,
         speed: {
@@ -64,7 +64,7 @@ module.exports = function(options) {
 
     users.push(evil_wup);
 
-    let bullets = [];
+    var bullets = [];
 
     setInterval(function() {
         if (!document.hasFocus()) {
@@ -76,19 +76,19 @@ module.exports = function(options) {
             if (Date.now() - player.weapon.last_fire >= player.weapon.cooldown) {
                 player.weapon.last_fire = Date.now();
 
-                let bullet = {origin: {x: player.x + 16, y: player.y + 16}, speed: player.weapon.speed, radius: player.weapon.radius, created_at: Date.now()};
+                var bulvar = {origin: {x: player.x + 16, y: player.y + 16}, speed: player.weapon.speed, radius: player.weapon.radius, created_at: Date.now()};
 
-                let diff_x = bullet.origin.x - player.mouse.x;
-                let diff_y = bullet.origin.y - player.mouse.y;
+                var diff_x = bullet.origin.x - player.mouse.x;
+                var diff_y = bullet.origin.y - player.mouse.y;
 
                 diff_x = -diff_x;
                 diff_y = -diff_y;
 
-                let wup = (diff_x * diff_x) + (diff_y * diff_y);
+                var wup = (diff_x * diff_x) + (diff_y * diff_y);
                 wup = Math.sqrt(wup);
 
-                let norm_x = diff_x / wup;
-                let norm_y = diff_y / wup;
+                var norm_x = diff_x / wup;
+                var norm_y = diff_y / wup;
 
                 bullet.norm = {x: norm_x, y: norm_y};
                 bullet.x = bullet.origin.x;
@@ -104,7 +104,7 @@ module.exports = function(options) {
             b.y += b.norm.y * b.speed;
         });
 
-        let horizontal_movement = false;
+        var horizontal_movement = false;
 
         if (player.keys_down[KEYCODE_A] || player.keys_down[KEYCODE_D]) {
             horizontal_movement = true;
@@ -136,7 +136,7 @@ module.exports = function(options) {
 
         player.x += player.speed.x;
 
-        let vertical_movement = false;
+        var vertical_movement = false;
 
         if (player.keys_down[KEYCODE_W] || player.keys_down[KEYCODE_S]) {
             vertical_movement = true;
@@ -169,18 +169,18 @@ module.exports = function(options) {
         player.y += player.speed.y;
     }, 16);
 
-    let tracked_keys = [KEYCODE_W, KEYCODE_A, KEYCODE_D, KEYCODE_S];
+    var tracked_keys = [KEYCODE_W, KEYCODE_A, KEYCODE_D, KEYCODE_S];
 
     get_page('spacedew', {popup: true}, function(page) {
         $(document).on('keydown', function(e) {
-            let keyCode = e.keyCode + 32;
+            var keyCode = e.keyCode + 32;
             if (tracked_keys.includes(keyCode)) {
                 player.keys_down[keyCode] = true;
             }
         });
 
         $(document).on('keyup', function(e) {
-            let keyCode = e.keyCode + 32;
+            var keyCode = e.keyCode + 32;
             if (tracked_keys.includes(keyCode)) {
                 delete player.keys_down[keyCode];
             }
@@ -205,14 +205,14 @@ module.exports = function(options) {
         });
 
         $(window).on('resize', function() {
-            let $canvas = page.$("canvas");
+            var $canvas = page.$("canvas");
             $canvas[0].width = $(window).width() - 30;
             $canvas[0].height = $(window).height() - 50;
 
         });
 
-        let draw = function() {
-            let ctx = page.$("#game")[0].getContext('2d');
+        var draw = function() {
+            var ctx = page.$("#game")[0].getContext('2d');
             ctx.clearRect(0, 0, 2700, 1500);
 
             // ctx.beginPath();
@@ -224,9 +224,9 @@ module.exports = function(options) {
                 ctx.drawImage(user.image, user.x, user.y);
             });
 
-            let bullets_to_kill = [];
-            for (let i = bullets.length - 1; i >= 0; i--) {
-                let b = bullets[i];
+            var bullets_to_kill = [];
+            for (var i = bullets.length - 1; i >= 0; i--) {
+                var b = bullets[i];
 
                 ctx.beginPath();
                 ctx.fillStyle = 'red';
@@ -243,7 +243,7 @@ module.exports = function(options) {
         };
         requestAnimationFrame(draw);
 
-        let $parent = $('body');
+        var $parent = $('body');
         $parent.append(page.$container);
         window.resizeTo(window.screen.availWidth, window.screen.availHeight);
 

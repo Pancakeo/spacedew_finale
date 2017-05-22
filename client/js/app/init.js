@@ -1,7 +1,11 @@
 module.exports = (function() {
+    require('../../less/_everything.less');
+    
     var $ = require('jquery');
-    require('jquery-ui');
+    window.$ = $;
+    require('jquery-ui-bundle');
     var toolio = require('../app/toolio');
+    require("font-awesome-webpack");
 
     var search = window.location.search;
     var matches = search.split('&');
@@ -61,7 +65,7 @@ module.exports = (function() {
 
     var shared_config = require('../../../shared/shared_config'); // TODO - consider copying shared/* to a more relative folder.
 
-    let protocol = shared_config.use_ssl ? 'wss' : 'ws';
+    var protocol = shared_config.use_ssl ? 'wss' : 'ws';
     var server_settings = {
         server: protocol + '://localhost:' + shared_config.chat_port,
         binary_server: protocol + '://localhost:' + shared_config.binary_port

@@ -3,41 +3,41 @@ module.exports = function(options) {
         room_id: null
     }, options);
 
-    let game = {};
+    var game = {};
     const room_id = options.room_id;
 
     get_page('tick_tack', {popup: true}, function(page) {
-        let $wait_dialog = $('<div>Waiting Is...</div>').dialog({
+        var $wait_dialog = $('<div>Waiting Is...</div>').dialog({
             title: "Waiting for other players...",
             modal: true
         });
 
-        let $parent = $('body');
+        var $parent = $('body');
         $parent.append(page.$container);
 
         const get_cell = function(col, row) {
-            let $cell = page.$("#grid").find('.cell[row="' + row + '"][col="' + col + '"]');
+            var $cell = page.$("#grid").find('.cell[row="' + row + '"][col="' + col + '"]');
             return $cell;
         };
 
         page.$("#grid").on('click', '.cell', function() {
-            let $cell = $(this);
-            let cell = $cell.prop('cell');
+            var $cell = $(this);
+            var cell = $cell.prop('cell');
 
             if (cell.letter == null) {
                 page.send('move', {cell: cell});
             }
         });
 
-        let my_username;
-        let me;
+        var my_username;
+        var me;
 
         const draw_board = function() {
-            let $grid = page.$("#grid");
-            let $grid_fragment = $(document.createDocumentFragment());
+            var $grid = page.$("#grid");
+            var $grid_fragment = $(document.createDocumentFragment());
 
-            let current_row = null;
-            let $grid_row = null;
+            var current_row = null;
+            var $grid_row = null;
 
             game.board.forEach(function(cell) {
                 if (cell.row != current_row) {
@@ -46,10 +46,10 @@ module.exports = function(options) {
                     $grid_fragment.append($grid_row);
                 }
 
-                let $cell = $('<div class="cell"/>').attr({row: cell.row, col: cell.col}).prop('cell', cell);
+                var $cell = $('<div class="cell"/>').attr({row: cell.row, col: cell.col}).prop('cell', cell);
 
                 if (cell.letter != null) {
-                    let $letter = $('<div class="letter">' + cell.letter + '</div>');
+                    var $letter = $('<div class="letter">' + cell.letter + '</div>');
                     $letter.addClass(cell.letter);
                     $cell.append($letter);
                 }
@@ -62,10 +62,10 @@ module.exports = function(options) {
         };
 
         const draw_payers = function() {
-            let $players = $(document.createDocumentFragment());
+            var $players = $(document.createDocumentFragment());
 
             game.players.forEach(function(p) {
-                let $player = $('<div class="user"/>').text(p.name);
+                var $player = $('<div class="user"/>').text(p.name);
                 $players.append($player);
             });
 
@@ -76,10 +76,10 @@ module.exports = function(options) {
             if (game.current_turn == my_username) {
                 page.$("#status").addClass('go_already').text("It's your turn!");
 
-                let $grid = page.$("#grid");
+                var $grid = page.$("#grid");
 
                 game.board.forEach(function(cell) {
-                    let $cell = get_cell(cell.col, cell.row);
+                    var $cell = get_cell(cell.col, cell.row);
 
                     if (cell.letter == null) {
                         $cell.addClass('allowed');
@@ -131,7 +131,7 @@ module.exports = function(options) {
         });
 
         page.listen('move', function(data) {
-            let $cell = get_cell(data.cell.col, data.cell.row);
+            var $cell = get_cell(data.cell.col, data.cell.row);
             $cell.prop('cell').letter = data.cell.letter;
 
             draw_board();
@@ -142,24 +142,24 @@ module.exports = function(options) {
         });
 
         page.listen('system', function(data) {
-            let $chat = $('<div class="message_wrapper"/>');
-            let $message = $('<div class="message">' + data.message + '</div>');
+            var $chat = $('<div class="message_wrapper"/>');
+            var $message = $('<div class="message">' + data.message + '</div>');
             $message.css({color: 'green'});
             $chat.append($message);
 
-            let $messages = page.$("#messages");
+            var $messages = page.$("#messages");
             $messages.append($chat);
 
             $messages.scrollTop($messages[0].scrollHeight);
         });
 
         page.listen('chat', function(data) {
-            let $chat = $('<div class="message_wrapper"/>');
-            let $user = $('<div class="username">' + data.username + ': </div>');
-            let $message = $('<div class="message">' + data.message + '</div>');
+            var $chat = $('<div class="message_wrapper"/>');
+            var $user = $('<div class="username">' + data.username + ': </div>');
+            var $message = $('<div class="message">' + data.message + '</div>');
             $chat.append($user, $message);
 
-            let $messages = page.$("#messages");
+            var $messages = page.$("#messages");
             $messages.append($chat);
 
             $messages.scrollTop($messages[0].scrollHeight);
@@ -167,7 +167,7 @@ module.exports = function(options) {
 
         page.$("#composer").on('keypress', function(e) {
             if (e.which == 13) {
-                let message = $(this).val().trim();
+                var message = $(this).val().trim();
                 page.$("#composer").val('');
 
                 if (message.length > 0) {

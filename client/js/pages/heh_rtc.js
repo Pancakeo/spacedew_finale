@@ -14,7 +14,7 @@ module.exports = function(options) {
     };
 
     const client_id = app.toolio.generate_id();
-    let queued_descriptions = [];
+    var queued_descriptions = [];
 
     const send = function(sub_type, data) {
         data = $.extend({
@@ -26,25 +26,25 @@ module.exports = function(options) {
 
     send('set_client_id', {client_id: client_id});
 
-    let peer;
+    var peer;
 
-    let peer_o_matic = function() {
+    var peer_o_matic = function() {
         peer = new RTCPeerConnection(config);
         app.rtc_peer = peer;
 
         if (options.host) {
             // UDP:
-            // let data_channel = peer.createDataChannel("woboy", {ordered: false, maxRetransmits: 0});
-            let data_channel = peer.createDataChannel("woboy", {});
+            // var data_channel = peer.createDataChannel("woboy", {ordered: false, maxRetransmits: 0});
+            var data_channel = peer.createDataChannel("woboy", {});
 
-            peer.oniceconnectionstatechange = event => {
+            peer.oniceconnectionstatechange = function(event) {
                 console.log('Ice state change', event);
 
                 if (event.target.iceConnectionState == "failed") {
                     console.log('woboy, failed');
 
                     if (queued_descriptions.length > 0) {
-                        let desc = queued_descriptions.shift();
+                        var desc = queued_descriptions.shift();
                         console.log('trying', desc);
                         peer.setRemoteDescription(new RTCSessionDescription(desc));
                     }
@@ -52,7 +52,7 @@ module.exports = function(options) {
             };
 
 
-            peer.ondatachannel = (event) => {
+            peer.ondatachannel = function(event) {
                 app.append_system('Er...', event);
             };
 
@@ -81,10 +81,10 @@ module.exports = function(options) {
             };
 
             peer.createOffer()
-                .then(offer => peer.setLocalDescription(offer))
+                .then(function(offer){peer.setLocalDescription(offer)})
         }
         else {
-            peer.ondatachannel = (event) => {
+            peer.ondatachannel = function(event) {
                 app.append_system('Woooboy!');
 
                 event.channel.onopen = function() {
@@ -104,7 +104,7 @@ module.exports = function(options) {
             };
         }
 
-        peer.onicecandidate = (ice) => {
+        peer.onicecandidate = function(ice) {
             if (ice.candidate) {
                 console.log('send add_ice', ice);
                 send('add_ice', {candidate: ice.candidate.toJSON(), description: peer.localDescription.toJSON()});
@@ -132,7 +132,7 @@ module.exports = function(options) {
 
         if (!options.host) {
             peer.createAnswer()
-                .then(answer => peer.setLocalDescription(answer));
+                .then(function(answer) {peer.setLocalDescription(answer)});
 
         }
 
