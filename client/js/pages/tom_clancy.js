@@ -223,7 +223,23 @@ module.exports = function(options) {
             },
             change_password: function() {
                 require('./change_password')();
-            }
+            },
+			got_a_light: function() {
+				$(this).toggleClass('active');
+                var active = $(this).hasClass('active');
+
+				if (active) {
+					localStorage.lights_out = true;
+					page.$("#chatterbox").addClass('lights_out');
+					page.$("#users").addClass('lights_out');
+
+				}
+				else {
+					delete localStorage.lights_out;
+					page.$("#chatterbox").removeClass('lights_out');
+					page.$("#users").removeClass('lights_out');
+				}
+			}
         };
 
         // Turn on Notifications if already set.
@@ -235,6 +251,11 @@ module.exports = function(options) {
                 }
             });
         }
+
+		if (localStorage.lights_out) {
+			page.$container.addClass('lights_out');
+			page.$("#button_jar [menu_item='got_a_light']").addClass('active');
+		}
 
         page.$container.on('click', '[menu_item]', function() {
             var menu_item = $(this).attr('menu_item');
