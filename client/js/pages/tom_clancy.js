@@ -230,14 +230,12 @@ module.exports = function(options) {
 
 				if (active) {
 					localStorage.lights_out = true;
-					page.$("#chatterbox").addClass('lights_out');
-					page.$("#users").addClass('lights_out');
+					page.$container.addClass('lights_out');
 
 				}
 				else {
 					delete localStorage.lights_out;
-					page.$("#chatterbox").removeClass('lights_out');
-					page.$("#users").removeClass('lights_out');
+					page.$container.removeClass('lights_out');
 				}
 			}
         };
