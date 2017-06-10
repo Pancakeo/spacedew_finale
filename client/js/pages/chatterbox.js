@@ -9,11 +9,11 @@ module.exports = function($parent, options) {
 
         app.event_bus.on('window.resize', function() {
             page.$("#chat_rooms .chat_thing").each(function() {
-                scroll_chat($(this));
+                scroll_thing($(this));
             });
         });
 
-        var scroll_chat = function($chat) {
+        var scroll_thing = function($chat) {
             if (app.settings.scroll_lock == true) {
                 return;
             }
@@ -22,7 +22,7 @@ module.exports = function($parent, options) {
                 $chat.scrollTop($chat[0].scrollHeight);
             }
         };
-        app.scroll_chat = scroll_chat;
+        app.scroll_chat = scroll_thing;
 
         var get_links_from_message = function(message) {
             var lines = message.split('<br/>');
@@ -103,7 +103,7 @@ module.exports = function($parent, options) {
             let do_append = function(room_id) {
                 var $chat = page.$("div[room_id='" + room_id + "']");
                 $chat.append($blargh);
-                scroll_chat($chat);
+                scroll_thing($chat);
             };
 
             if (append_options.room_id == null) {
@@ -140,7 +140,7 @@ module.exports = function($parent, options) {
                 }
 
                 $chat.append($message);
-                scroll_chat($chat);
+                scroll_thing($chat);
             };
 
             if (append_options.room_id == null) {
@@ -202,7 +202,7 @@ module.exports = function($parent, options) {
                 if ($link_box != null) {
                     $link_box.find('img, iframe').each(function() {
                         $(this).on('load', function() {
-                            scroll_chat($chat);
+                            scroll_thing($chat);
                         });
                     });
 
@@ -211,7 +211,7 @@ module.exports = function($parent, options) {
 
                         var scroll_of_doom = function() {
                             $video[0].removeEventListener('canplay', scroll_of_doom);
-                            scroll_chat($chat);
+                            scroll_thing($chat);
                         };
 
                         $video[0].addEventListener('canplay', scroll_of_doom);
@@ -220,7 +220,7 @@ module.exports = function($parent, options) {
                     $message.after($link_box);
                 }
 
-                scroll_chat($chat);
+                scroll_thing($chat);
             };
 
             if (data.room_id == null) {
@@ -381,6 +381,7 @@ module.exports = function($parent, options) {
                 });
 
                 append_custom($blargh, {room_id: room.id});
+                scroll_thing($blargh);
             }
 
             app.render_users_list();
@@ -467,7 +468,7 @@ module.exports = function($parent, options) {
                 image: function() {
                     var $elm = $('<img/>').attr('src', blob_url);
                     $elm.on('load', function() {
-                        scroll_chat($elm.closest('.chat_thing'));
+                        scroll_thing($elm.closest('.chat_thing'));
                     });
 
                     $blob_wrapper.append($elm);
@@ -479,7 +480,7 @@ module.exports = function($parent, options) {
 
                     $elm[0].addEventListener('loadedmetadata', function scroll_of_doom() {
                         this.removeEventListener('loadedmetadata', scroll_of_doom);
-                        scroll_chat($elm.closest('.chat_thing'));
+                        scroll_thing($elm.closest('.chat_thing'));
                     });
 
                     $blob_wrapper.append($elm);
@@ -490,7 +491,7 @@ module.exports = function($parent, options) {
                     $elm.append($src);
 
                     $elm.on('load', function() {
-                        scroll_chat($elm.closest('.chat_thing'));
+                        scroll_thing($elm.closest('.chat_thing'));
                     });
 
                     $blob_wrapper.append($elm);
