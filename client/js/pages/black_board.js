@@ -568,6 +568,10 @@ module.exports = function() {
             page.alert("Shortcuts", cuts.join('<br/>'));
         });
 
+        page.$("#load").on('click', function() {
+            page.$("#load_thing").click();
+        });
+
         page.$("#save").on('click', function() {
             page.$("#black_board_canvas")[0].toBlob(function(blob) {
                 if (page.blob_url) {
