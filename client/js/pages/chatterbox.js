@@ -515,7 +515,7 @@ module.exports = function($parent, options) {
             append_custom($blob_wrapper, {room_id: meta.room_id});
         };
 
-        append_system("We're expanding your quick chat options.", {color: 'black', room_id: lobby.id});
+        append_system("I like it spooky.", {color: 'black', room_id: lobby.id});
 
         app.append_system = function(message, append_options) {
             var room_id = app.get_active_room(true);
