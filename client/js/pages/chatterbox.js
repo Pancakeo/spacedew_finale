@@ -439,6 +439,7 @@ module.exports = function($parent, options) {
                 });
 
                 append_custom($blargh, {room_id: lobby.id});
+                scroll_thing($blargh);
             }
         });
 
@@ -538,6 +539,7 @@ module.exports = function($parent, options) {
             });
 
             append_custom($blargh, {room_id: lobby.id});
+            scroll_thing($blargh);
         }
 
         var instance_id = app.toolio.generate_id();
