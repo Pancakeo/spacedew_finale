@@ -527,7 +527,6 @@ module.exports = function($parent, options) {
             append_system(message, append_options);
         };
 
-        console.log(lobby);
         if (lobby.recent_messages.length > 0) {
             var $blargh = $('<div class="blargh recent_messages"/>');
             $blargh.append('<div class="header">Recent Messages <span class="close">x</span></div>');
