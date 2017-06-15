@@ -68,7 +68,10 @@ exports.create_room = function(room_name, room_id) {
     };
 
 
-    room.bob_ross = require('../whew/bob_ross')(room);
+    let bob_ross = require('../whew/bob_ross')(room);
+    Object.defineProperty(room, 'bob_ross', {
+        value: bob_ross
+    });
 
     rooms[room_id] = room;
     return room;
