@@ -64,6 +64,10 @@ exports.create_room = function(room_name, room_id) {
                     app.leave_room(username, room.id);
                 }
             }
+
+            if (room != lobby_room && room.users.length == 0) {
+                let result = delete rooms[room.id];
+            }
         }
     };
 

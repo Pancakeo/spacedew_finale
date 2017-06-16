@@ -142,7 +142,7 @@ exports.handle_message = function handle_message(session, message) {
             }
 
             message += " " + data.username + "'s warning level has been increased to " + current_warning + '%.';
-            sessionator.broadcast('chatterbox', 'system', {message: message, color: 'darkblue'}, {room_id: room_id});
+            sessionator.broadcast('chatterbox', 'system', {message: message, color: 'red'}, {room_id: room_id});
 
             if (current_warning >= WARNING_MAX) {
                 evil_session.is_silenced = true;
