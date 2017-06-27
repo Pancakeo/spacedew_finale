@@ -53,8 +53,6 @@ module.exports = function($target) {
                 data = page.user_list_data;
             }
 
-            console.log(data)
-
             var $users = page.$("#users_list").empty();
             var users = data.users_and_rooms.users;
 
