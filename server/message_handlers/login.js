@@ -26,6 +26,7 @@ exports.handle_message = function handle_message(session, message) {
         session.profile.user_settings = user.user_settings;
         session.profile.rocket_league_rank = user.rl_max_rank;
         session.profile.steam_id = user.steam_id;
+        session.profile.status = user.status;
 
         var auth_key = crypto.randomBytes(16).toString('hex');
         var user_id = user.user_id;
