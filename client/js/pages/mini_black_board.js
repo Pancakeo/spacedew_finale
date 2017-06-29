@@ -1,5 +1,5 @@
 module.exports = function($target, room, $room_box) {
-    var canvas_handler = require('../../../shared/canvas_handler');
+    var canvas_handler = require('../canvas/canvas_handler');
 
     get_page('mini_black_board', function(page) {
         $target.append(page.$container);

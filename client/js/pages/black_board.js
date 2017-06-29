@@ -1,12 +1,17 @@
 module.exports = function() {
     "use strict";
-    var canvas_handler = require('../../../shared/canvas_handler');
+    var canvas_handler = require('../canvas/canvas_handler');
 
     var helpers = {
         rgb2hex: function(rgb) {
+
             rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
             function hex(x) {
                 return ("0" + parseInt(x).toString(16)).slice(-2);
+            }
+
+            if (!Array.isArray(rgb)) {
+                return '#000000';
             }
 
             return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);

@@ -451,7 +451,7 @@ module.exports = function(options) {
 
             }, 100);
 
-            app.black_board = window.open('index.html?wup=black_board', '_blank', 'width=1300,height=830');
+            app.black_board = window.open('index.html?wup=black_board', '_blank', 'width=1400,height=830');
             app.popups.push(app.black_board);
             app.black_board.room_id = app.get_active_room(true);
         };
