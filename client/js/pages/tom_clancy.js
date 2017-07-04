@@ -230,11 +230,13 @@ module.exports = function(options) {
 
 				if (active) {
 					localStorage.lights_out = true;
+                    $('html').addClass('lights_out');
 					page.$container.addClass('lights_out');
 
 				}
 				else {
 					delete localStorage.lights_out;
+                    $('html').removeClass('lights_out');
 					page.$container.removeClass('lights_out');
 				}
 			}
@@ -251,6 +253,7 @@ module.exports = function(options) {
         }
 
 		if (localStorage.lights_out) {
+            $('html').addClass('lights_out');
 			page.$container.addClass('lights_out');
 			page.$("#button_jar [menu_item='got_a_light']").addClass('active');
 		}
