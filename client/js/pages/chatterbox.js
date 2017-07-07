@@ -239,7 +239,7 @@ module.exports = function($parent, options) {
         });
 
         page.peepy('users.has_gone_to_a_better_place', function(event) {
-            append_system(event.username + " went to the clearing at the end of the path.", {class_name: 'sad', room_id: app.get_lobby(true)})
+            append_system(event.username + " went to the clearing at the end of the path. Diablo's minions are mildly frustrated.", {class_name: 'sad', room_id: app.get_lobby(true)})
         });
 
         event_bus.on('blargher.send', function(params) {
