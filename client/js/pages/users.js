@@ -112,6 +112,9 @@ module.exports = function($target) {
                 $user.prop('user', user);
                 $user.attr('title', user.username);
 
+                var $status = $('<div class="status">' + (user.status || 'Ni!') + '</div>');
+                $user.append($status);
+
                 if (user.idle) {
                     $user.addClass('idle');
                 }
@@ -152,6 +155,18 @@ module.exports = function($target) {
                     return {
                         callback: function(key, options) {
                             switch (key) {
+                                case 'set_status':
+                                    page.prompt("Set Status", "What are you humans even doing?", "", function(status) {
+                                        if (status) {
+                                            status = status.trim();
+                                            
+                                            // Maybe do that.
+                                            if (status.length > 0) {
+                                                page.send('set_status', {status: status});
+                                            }
+                                        }
+                                    });
+                                    break;
                                 case 'warn':
                                     page.send('warn', {username: username});
                                     break;
@@ -222,6 +237,7 @@ module.exports = function($target) {
 
                         },
                         items: {
+                            set_status: {name: "Set Status...", icon: "fa-bathtub"},
                             warn: {name: "Warn " + username, icon: "fa-exclamation-triangle"},
                             super_warn: {name: "REALLY warn " + username, icon: "fa-bomb"},
                             view_rl_page: {

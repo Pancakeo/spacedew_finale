@@ -64,7 +64,7 @@ exports.get_max_rank = function(profile_id, callback) {
         if (!error && response.statusCode == 200) {
             var $ = cheerio.load(body);
 
-            var $table = $("#season-4 .card-table").first();
+            var $table = $("#season-5 .card-table").first();
             var $heh = $table.find('img');
             var max_rank = 0;
             var found_rank = false;

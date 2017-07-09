@@ -64,11 +64,18 @@ exports.create_room = function(room_name, room_id) {
                     app.leave_room(username, room.id);
                 }
             }
+
+            if (room != lobby_room && room.users.length == 0) {
+                let result = delete rooms[room.id];
+            }
         }
     };
 
 
-    room.bob_ross = require('../whew/bob_ross')(room);
+    let bob_ross = require('../whew/bob_ross')(room);
+    Object.defineProperty(room, 'bob_ross', {
+        value: bob_ross
+    });
 
     rooms[room_id] = room;
     return room;

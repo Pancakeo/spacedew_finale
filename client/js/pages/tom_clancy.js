@@ -223,7 +223,23 @@ module.exports = function(options) {
             },
             change_password: function() {
                 require('./change_password')();
-            }
+            },
+			got_a_light: function() {
+				$(this).toggleClass('active');
+                var active = $(this).hasClass('active');
+
+				if (active) {
+					localStorage.lights_out = true;
+                    $('html').addClass('lights_out');
+					page.$container.addClass('lights_out');
+
+				}
+				else {
+					delete localStorage.lights_out;
+                    $('html').removeClass('lights_out');
+					page.$container.removeClass('lights_out');
+				}
+			}
         };
 
         // Turn on Notifications if already set.
@@ -235,6 +251,12 @@ module.exports = function(options) {
                 }
             });
         }
+
+		if (localStorage.lights_out) {
+            $('html').addClass('lights_out');
+			page.$container.addClass('lights_out');
+			page.$("#button_jar [menu_item='got_a_light']").addClass('active');
+		}
 
         page.$container.on('click', '[menu_item]', function() {
             var menu_item = $(this).attr('menu_item');
@@ -432,7 +454,7 @@ module.exports = function(options) {
 
             }, 100);
 
-            app.black_board = window.open('index.html?wup=black_board', '_blank', 'width=1300,height=830');
+            app.black_board = window.open('index.html?wup=black_board', '_blank', 'width=1400,height=830');
             app.popups.push(app.black_board);
             app.black_board.room_id = app.get_active_room(true);
         };

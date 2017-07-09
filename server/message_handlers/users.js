@@ -3,6 +3,7 @@ var event_bus = require(app.shared_root + '/event_bus');
 var sessionator = require('../managers/sessionator');
 var wiseau = require('../managers/wiseau');
 var wuptil = require('../util/wuptil');
+var mango = require('../managers/mango');
 
 var warning_levels = {};
 var WARNING_MAX = 100;
@@ -71,6 +72,21 @@ exports.handle_message = function handle_message(session, message) {
 
             session.idle = data.idle;
             send_users_list();
+        },
+        set_status: function() {
+            var user_id = session.profile.user_id;
+            
+            mango.get().then(function(db) {
+                var users = db.collection('users');
+
+                if (typeof(data.status) == "string" && data.status.length <= 144) {
+                    users.updateOne({user_id: user_id}, {$set: {status: data.status}}).then(function() {
+                        session.profile.status = data.status;
+                        send_users_list();
+                        db.close();
+                    });
+                }
+            });
         },
         leave_room: function() {
             var room = wiseau.get_room(data.room_id);
@@ -142,7 +158,7 @@ exports.handle_message = function handle_message(session, message) {
             }
 
             message += " " + data.username + "'s warning level has been increased to " + current_warning + '%.';
-            sessionator.broadcast('chatterbox', 'system', {message: message, color: 'darkblue'}, {room_id: room_id});
+            sessionator.broadcast('chatterbox', 'system', {message: message, color: 'red'}, {room_id: room_id});
 
             if (current_warning >= WARNING_MAX) {
                 evil_session.is_silenced = true;

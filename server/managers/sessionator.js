@@ -215,7 +215,8 @@ exports.connect = function(connection_id, ws) {
                 steam_id: s.profile.steam_id,
                 ping: s.ping,
                 rocket_league_rank: s.profile.rocket_league_rank,
-                client_id: s.profile.client_id
+                client_id: s.profile.client_id,
+                status: s.profile.status
             };
 
             if (s.idle == true && s.idle_start) {

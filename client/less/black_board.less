@@ -7,10 +7,19 @@
 
   [menu_item] {
     cursor: pointer;
+    margin-top: 10px;
   }
 
   #controls {
-    height: 60px;
+    padding-left: 15px;
+    margin-top: 10px;
+    background: #333;
+    height: 100%;
+    left: 0;
+    top: 0;
+    z-index: 100;
+    width: 76px;
+    position: absolute;
   }
 
   .active {
@@ -34,7 +43,7 @@
       width: 16px;
     }
 
-    #shortcuts, #save {
+    #shortcuts, #save, #load {
       color: blue;
       font-size: 12px;
       text-decoration: underline;
@@ -42,6 +51,11 @@
       top: 5px;
       right: 25px;
       cursor: pointer;
+    }
+
+    #load {
+      color: blue;
+      right: 130px;
     }
 
     #save {

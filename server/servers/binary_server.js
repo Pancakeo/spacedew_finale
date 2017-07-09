@@ -31,17 +31,23 @@ wss.on('connection', function(binary_ws) {
     }, 7500);
 
     binary_ws.on('message', function(message) {
-        if (message instanceof Buffer) {
-            if (session) {
-                message_router.handle(session, message);
+        try {
+            if (message instanceof Buffer) {
+                if (session) {
+                    message_router.handle(session, message);
+                }
+            }
+            else {
+                var parsed_message = JSON.parse(message);
+                if (parsed_message.type == 'link_binary') {
+                    session = sessionator.link_binary(parsed_message.connection_id, binary_ws);
+                }
             }
         }
-        else {
-            var parsed_message = JSON.parse(message);
-            if (parsed_message.type == 'link_binary') {
-                session = sessionator.link_binary(parsed_message.connection_id, binary_ws);
-            }
+        catch (e) {
+            console.error('Damn shame', e);
         }
+
     });
 
     binary_ws.on('close', function(message) {
