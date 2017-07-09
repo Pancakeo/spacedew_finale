@@ -1,6 +1,7 @@
 node_modules
 dist
 dist.test
+build
 shared/shared_config_override.js
 
 .nyc_output
