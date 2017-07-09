@@ -56,19 +56,22 @@ import login from "../pages/login";
     app.ws = require('../app/wupsocket'); // for Lustmord
 
     // Dialog stuff.
-    // $.widget("yehrye.dialog", $.ui.dialog, {
-    //     close: function() {
-    //         var _this = this;
-    //         setTimeout(function() {
-    //             _this.uiDialog.remove();
-    //         }, 0);
-    //         this._superApply(arguments);
-    //     }
-    // });
+    $.widget("yehrye.dialog", $.ui.dialog, {
+        close: function() {
+            var _this = this;
+            setTimeout(function() {
+                _this.uiDialog.remove();
+            }, 0);
+            this._superApply(arguments);
+        }
+    });
 
     var shared_config = require('../../../shared/shared_config'); // TODO - consider copying shared/* to a more relative folder.
-
-    var protocol = shared_config.use_ssl ? 'wss' : 'ws';
+    var protocol = 'ws';
+    if (window.location.protocol == 'https') {
+        protocol = 'wss';
+    }
+    
     var server_settings = {
         server: protocol + '://localhost:' + shared_config.chat_port,
         binary_server: protocol + '://localhost:' + shared_config.binary_port
@@ -94,7 +97,6 @@ import login from "../pages/login";
 
         default:
             login();
-            // require('../pages/login')();
             break;
     }
 

@@ -85,10 +85,7 @@ module.exports = function () {
     get_page('black_board', function (page) {
         $('body').append(page.$container);
 
-        page.select_color = new jscolor(page.$('#select_color')[0], {
-            width: 350,
-            height: 250
-        });
+        new jscolor(page.$('#select_color')[0]);
 
         page.$('#brush_width_slider').slider({
             orientation: 'vertical',
@@ -143,7 +140,8 @@ module.exports = function () {
             var menu_item = $(this).attr('menu_item');
             switch (menu_item) {
                 case 'select_color':
-                    page.select_color.show();
+                    page.$('#select_color')[0].jscolor.show();
+                    // page.select_color.show();
                     break;
 
                 case 'brush_size':
@@ -184,8 +182,10 @@ module.exports = function () {
         //     });
         // });
 
-        page.$("#black_board_canvas").on('mouseleave', function (e) {
-            ui.left_mouse_button_down = false;
+        page.$("#overlay_canvas").on('mouseleave', function (e) {
+            ui.hold_up = setTimeout(function() {
+                ui.left_mouse_button_down = false;
+            }, 500);
         });
 
         setInterval(function () {

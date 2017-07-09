@@ -12,7 +12,7 @@ const compress = require('compression');
 express_app.use(express.static(web_root));
 express_app.use(compress());
 
-if (app.config.use_ssl) {
+if (process.env.NODE_ENV && process.env.NODE_ENV.trim() == 'production') {
     var https = require('https');
     var ssl_cert_folder = app.config.ssl_cert_folder;
     let https_port = app.config.https_port;

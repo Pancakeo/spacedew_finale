@@ -9,7 +9,11 @@ if (!app.config.server_domain) {
     throw "server_url must be set in conf/server_config.json";
 }
 
-let protocol = app.config.use_ssl ? 'https' : 'http';
+let protocol = 'http';
+if (process.env.NODE_ENV && process.env.NODE_ENV.trim() == 'production') {
+    protocol = 'https';
+}
+
 protocol += '://';
 
 var relyingParty = new openid.RelyingParty(
