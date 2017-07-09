@@ -68,7 +68,7 @@ import login from "../pages/login";
 
     var shared_config = require('../../../shared/shared_config'); // TODO - consider copying shared/* to a more relative folder.
     var protocol = 'ws';
-    if (window.location.protocol == 'https') {
+    if (window.location.protocol == 'https:') {
         protocol = 'wss';
     }
     
