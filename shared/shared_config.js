@@ -1,9 +1,9 @@
 // These things should be synced between the server and client!
 
-let shared_config = {
+var shared_config = {
     chat_port: 2001,
     binary_port: 2112,
-    use_ssl: true
+    use_ssl: false
 };
 
 // Put things that you want to set locally, but don't want to check-in remotely, in:
@@ -13,10 +13,10 @@ let shared_config = {
 //     use_ssl: false
 // };
 
-let override_stuff = {};
+var override_stuff = {};
 
 try {
-    override_stuff = require('./shared_config_override');
+    // override_stuff = require('./shared_config_override');
 }
 catch (e) {
     // No overide.

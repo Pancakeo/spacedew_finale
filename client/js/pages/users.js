@@ -1,6 +1,8 @@
 module.exports = function($target) {
     var displayed_users_once = false; // for mobile
     var default_emus = require('../app/default_emus');
+    require('jquery-contextmenu');
+    require('../../node_modules/jquery-contextmenu/dist/jquery.contextMenu.css')
 
     get_page('users', function(page) {
         $target.replaceWith(page.$container);
@@ -118,16 +120,13 @@ module.exports = function($target) {
                     $user.addClass('idle');
                 }
 
-                var $star = $('<div class="woah_star"><img/></div>');
+                var $star = $('<div class="woah_star rl_rank"><div/></div>');
 
                 if (user.rocket_league_rank != null) {
-                    $star.find('img').attr('src', 'images/rl_ranks/s4-' + user.rocket_league_rank + '.png');
-                }
-                else if (user.username.toLowerCase().startsWith('canister')) {
-                    $star.find('img').attr('src', 'images/rl_ranks/canister.png');
+                    $star.find('div').addClass('rank_' + user.rocket_league_rank)
                 }
                 else {
-                    $star.find('img').css({visibility: 'hidden'});
+                    $star.find('div').addClass('radish')
                 }
 
                 $user.prepend($star);
@@ -182,7 +181,7 @@ module.exports = function($target) {
                                     page.prompt("New Room", "With name", "cowsmoke", function(room_name) {
                                         if (room_name) {
                                             room_name = room_name.trim();
-                                            let invite_user;
+                                            var invite_user;
 
                                             if (user.username != app.profile.username) {
                                                 invite_user = user.username;
@@ -200,17 +199,18 @@ module.exports = function($target) {
                                     page.prompt("Game Name", "Game Name", "cowsmoke", function(val) {
                                         if (val && val.trim().length > 0) {
 
-                                            let invite_user = null;
+                                            var invite_user = null;
                                             if (username != app.profile.username) {
                                                 invite_user = username;
                                             }
 
-                                            let usernames = [];
+                                            var usernames = [];
                                             if (page.user_list_data) {
-                                                usernames = page.user_list_data.users_and_rooms.users.filter(u => u.username != app.profile.username).map(u => u.username);
+                                                // usernames = page.user_list_data.users_and_rooms.users.filter(u => u.username != app.profile.username).map(u => u.username);
+                                                usernames = []; // TODO
                                             }
-                                            let instance_id = app.toolio.generate_id();
-                                            let popup = window.open('index.html?wup=yownet', '_blank', 'width=1300,height=830,left=200,top=100');
+                                            var instance_id = app.toolio.generate_id();
+                                            var popup = window.open('index.html?wup=yownet', '_blank', 'width=1300,height=830,left=200,top=100');
                                             popup.woboy = {
                                                 game_name: val,
                                                 invite_user: invite_user,
@@ -269,26 +269,27 @@ module.exports = function($target) {
             app.render_users_list(data);
         });
 
-        $(document).idle({
-            onIdle: function() {
-                page.send('idle', {idle: true});
-            },
-            onActive: function() {
-                page.send('idle', {idle: false});
-            },
-            idle: 60000 * 5, // 5 minutes
-            recurIdleCall: true
-        });
+        // $(document).idle({
+        //     onIdle: function() {
+        //         page.send('idle', {idle: true});
+        //     },
+        //     onActive: function() {
+        //         page.send('idle', {idle: false});
+        //     },
+        //     idle: 60000 * 5, // 5 minutes
+        //     recurIdleCall: true
+        // });
 
 
         app.event_bus.on('users_pane_loaded', function() {
             if (localStorage.fast_crab) {
-                let usernames = [];
+                var usernames = [];
                 if (page.user_list_data) {
-                    usernames = page.user_list_data.users_and_rooms.users.filter(u => u.username != app.profile.username).map(u => u.username);
+                    // usernames = page.user_list_data.users_and_rooms.users.filter(u => u.username != app.profile.username).map(u => u.username);
+                    usernames = []; // TODO
                 }
-                let instance_id = app.toolio.generate_id();
-                let popup = window.open('index.html?wup=yownet', '_blank', 'width=1300,height=830,left=200,top=100');
+                var instance_id = app.toolio.generate_id();
+                var popup = window.open('index.html?wup=yownet', '_blank', 'width=1300,height=830,left=200,top=100');
                 popup.woboy = {
                     game_name: "Fast Crab",
                     instance_id: instance_id,
@@ -318,11 +319,11 @@ module.exports = function($target) {
         });
 
         page.$("#invite").button().on('click.invite', function() {
-            let $users = $('<table><tbody></tbody></table>');
-            let $user = $('<tr><td id="username"></td><td><button>Invite?</button></td></tr>');
+            var $users = $('<table><tbody></tbody></table>');
+            var $user = $('<tr><td id="username"></td><td><button>Invite?</button></td></tr>');
 
             $users.on('click', 'button', function() {
-                let username = $(this).prop('username');
+                var username = $(this).prop('username');
                 $(this).button('disable');
 
                 page.send('invite_to_room', {username: username, room_id: app.get_active_room(true)}, {page_name: 'chatterbox'});

@@ -1,5 +1,14 @@
-module.exports = (function() {
+import login from "../pages/login";
+
+(function() {
+    require('../../less/_everything.less');
+    require('../../node_modules/jquery-ui-bundle/jquery-ui.css')
+    
+    var $ = require('jquery');
+    window.$ = $;
+    require('jquery-ui-bundle');
     var toolio = require('../app/toolio');
+    require("font-awesome-webpack");
 
     var search = window.location.search;
     var matches = search.split('&');
@@ -47,19 +56,19 @@ module.exports = (function() {
     app.ws = require('../app/wupsocket'); // for Lustmord
 
     // Dialog stuff.
-    $.widget("yehrye.dialog", $.ui.dialog, {
-        close: function() {
-            var _this = this;
-            setTimeout(function() {
-                _this.uiDialog.remove();
-            }, 0);
-            this._superApply(arguments);
-        }
-    });
+    // $.widget("yehrye.dialog", $.ui.dialog, {
+    //     close: function() {
+    //         var _this = this;
+    //         setTimeout(function() {
+    //             _this.uiDialog.remove();
+    //         }, 0);
+    //         this._superApply(arguments);
+    //     }
+    // });
 
     var shared_config = require('../../../shared/shared_config'); // TODO - consider copying shared/* to a more relative folder.
 
-    let protocol = shared_config.use_ssl ? 'wss' : 'ws';
+    var protocol = shared_config.use_ssl ? 'wss' : 'ws';
     var server_settings = {
         server: protocol + '://localhost:' + shared_config.chat_port,
         binary_server: protocol + '://localhost:' + shared_config.binary_port
@@ -84,7 +93,8 @@ module.exports = (function() {
             break;
 
         default:
-            require('../pages/login')();
+            login();
+            // require('../pages/login')();
             break;
     }
 
@@ -104,4 +114,4 @@ module.exports = (function() {
         }
     });
 
-}());
+})();

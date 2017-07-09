@@ -1,6 +1,6 @@
 module.exports = function(options) {
-    let ws = require('../app/wupsocket');
-    let event_bus = app.event_bus;
+    var ws = require('../app/wupsocket');
+    var event_bus = app.event_bus;
 
     get_page('yownet', {popup: true}, function(page) {
         $('body').append(page.$container);
@@ -38,7 +38,7 @@ module.exports = function(options) {
         page.listen('start_game', function(data) {
             page.$container.empty();
 
-            let handlers = {
+            var handlers = {
                 tick_tack: function() {
                     require('./tick_tack')({room_id: page.room_id});
                 },
@@ -62,7 +62,7 @@ module.exports = function(options) {
             $message.css({color: 'green'});
             $chat.append($message);
 
-            let $messages = page.$("#messages");
+            var $messages = page.$("#messages");
             $messages.append($chat);
 
             $messages.scrollTop($messages[0].scrollHeight);
@@ -74,15 +74,15 @@ module.exports = function(options) {
             var $message = $('<div class="message">' + data.message + '</div>');
             $chat.append($user, $message);
 
-            let $messages = page.$("#messages");
+            var $messages = page.$("#messages");
             $messages.append($chat);
 
             $messages.scrollTop($messages[0].scrollHeight);
         });
 
         page.listen('add_bot', function(data) {
-            let $tbody = page.$("#players tbody");
-            let $player_row = page.get_template('player_row');
+            var $tbody = page.$("#players tbody");
+            var $player_row = page.get_template('player_row');
             $player_row.attr('bot_id', data.id);
             $player_row.find('#player_name').val(data.name);
             $player_row.find('#is_observer').attr('disabled', true);
@@ -95,8 +95,8 @@ module.exports = function(options) {
         });
 
         page.listen('add_player', function(data) {
-            let $tbody = page.$("#players tbody");
-            let $player_row = page.get_template('player_row');
+            var $tbody = page.$("#players tbody");
+            var $player_row = page.get_template('player_row');
             // $player_row.attr('bot_id', data.id);
             $player_row.find('#player_name').val(data.name);
             $tbody.append($player_row);
@@ -116,9 +116,9 @@ module.exports = function(options) {
             page.room_id = page.game.room_id;
             page.set_ws_room_id(); // update the wupsocket's knowledge of this popup.
 
-            let $tbody = page.$("#players tbody");
+            var $tbody = page.$("#players tbody");
             page.game.players.forEach(function(p) {
-                let $player_row = page.get_template('player_row');
+                var $player_row = page.get_template('player_row');
                 $player_row.find('#player_name').val(p.name);
                 $player_row.find('#is_observer').prop('checked', p.observer);
                 $tbody.append($player_row);
@@ -134,11 +134,11 @@ module.exports = function(options) {
         });
 
         page.$("#invite_to_game").button().on('click', function() {
-            let $users = $('<table><tbody></tbody></table>');
-            let $user = $('<tr><td id="username"></td><td><button>Invite?</button></td></tr>');
+            var $users = $('<table><tbody></tbody></table>');
+            var $user = $('<tr><td id="username"></td><td><button>Invite?</button></td></tr>');
 
             $users.on('click', 'button', function() {
-                let username = $(this).prop('username');
+                var username = $(this).prop('username');
                 $(this).button('disable');
 
                 page.send('sorry_jimmy', {username: username, room_id: page.room_id});
@@ -187,7 +187,7 @@ module.exports = function(options) {
 
         page.$("#composer").on('keypress', function(e) {
             if (e.which == 13) {
-                let message = $(this).val().trim();
+                var message = $(this).val().trim();
                 page.$("#composer").val('');
 
                 if (message.length > 0) {

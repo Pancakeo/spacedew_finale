@@ -2,6 +2,9 @@ module.exports = (function() {
     "use strict";
     var toolio = {};
 
+    const $ = require('jquery')
+    require('jquery-ui-bundle');
+
     toolio.alert = function(title, message) {
         $('<div/>').text(message).dialog({
             title: title,
