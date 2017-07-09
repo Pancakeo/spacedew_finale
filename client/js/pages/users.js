@@ -2,6 +2,7 @@ module.exports = function($target) {
     var displayed_users_once = false; // for mobile
     var default_emus = require('../app/default_emus');
     require('jquery-contextmenu');
+    require('../../node_modules/jquery-contextmenu/dist/jquery.contextMenu.css')
 
     get_page('users', function(page) {
         $target.replaceWith(page.$container);
@@ -119,16 +120,13 @@ module.exports = function($target) {
                     $user.addClass('idle');
                 }
 
-                var $star = $('<div class="woah_star"><img/></div>');
+                var $star = $('<div class="woah_star rl_rank"><div/></div>');
 
                 if (user.rocket_league_rank != null) {
-                    $star.find('img').attr('src', 'images/rl_ranks/s4-' + user.rocket_league_rank + '.png');
-                }
-                else if (user.username.toLowerCase().startsWith('canister')) {
-                    $star.find('img').attr('src', 'images/rl_ranks/canister.png');
+                    $star.find('div').addClass('rank_' + user.rocket_league_rank)
                 }
                 else {
-                    $star.find('img').css({visibility: 'hidden'});
+                    $star.find('div').addClass('radish')
                 }
 
                 $user.prepend($star);

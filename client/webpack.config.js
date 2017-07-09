@@ -1,11 +1,15 @@
-const { resolve } = require('path');
+const {
+  resolve
+} = require('path');
+
+const Clean = require('clean-webpack-plugin');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 module.exports = {
-  context: resolve(__dirname, 'client'),
+  // context: resolve(__dirname, 'client'),
 
   entry: [
     'react-hot-loader/patch',
@@ -47,20 +51,45 @@ module.exports = {
   },
 
   module: {
-      rules: [
-        { test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "url-loader?limit=10000&mimetype=application/font-woff" },
-        { test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "file-loader" },
-        {
-            test: /\.less$/,
-            use: ExtractTextPlugin.extract({
-              fallback: 'style-loader',
-              use: ['css-loader', 
-              {loader: 'less-loader', options: {noIeCompat: true}}]
-            })
-        }
-      ]
+    rules: [{
+        test: /\.jsx/,
+        loader: 'babel-loader'
+      }, {
+        test: /\.(png|jpg|gif)$/,
+        use: [{
+          loader: 'url-loader',
+          options: {
+            limit: 8192
+          }
+        }]
+      },
+      {
+        test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+        loader: "url-loader?limit=10000&mimetype=application/font-woff"
+      },
+      {
+        test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+        loader: "file-loader"
+      },
+      {
+        test: /\.(less|css)$/,
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: ['css-loader',
+            {
+              loader: 'less-loader',
+              options: {
+                noIeCompat: true
+              }
+            }
+          ]
+        })
+      }
+    ]
   },
   plugins: [
+    new Clean(['dist']),
+
     new webpack.DefinePlugin({
       'process.env': {
         // This has effect on the react lib size
@@ -74,9 +103,14 @@ module.exports = {
     new webpack.NamedModulesPlugin(),
     // prints more readable module names in the browser console on HMR updates
 
-    new CopyWebpackPlugin([
-        {from: './html', to: 'html'},
-        {from: './js/public', to: 'js/public'}
+    new CopyWebpackPlugin([{
+        from: './html',
+        to: 'html'
+      },
+      {
+        from: './js/public',
+        to: 'js/public'
+      }
     ]),
 
     new ExtractTextPlugin("wup.css"),

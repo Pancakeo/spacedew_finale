@@ -1,5 +1,8 @@
-module.exports = (function() {
+import login from "../pages/login";
+
+(function() {
     require('../../less/_everything.less');
+    require('../../node_modules/jquery-ui-bundle/jquery-ui.css')
     
     var $ = require('jquery');
     window.$ = $;
@@ -90,7 +93,8 @@ module.exports = (function() {
             break;
 
         default:
-            require('../pages/login')();
+            login();
+            // require('../pages/login')();
             break;
     }
 
@@ -110,4 +114,4 @@ module.exports = (function() {
         }
     });
 
-}());
+})();

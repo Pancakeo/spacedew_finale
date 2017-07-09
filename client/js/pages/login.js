@@ -1,20 +1,25 @@
-module.exports = function() {
+import * as heh from "../components/woboy.jsx";
+
+export default function () {
     var event_bus = app.event_bus;
     var ws = require('../app/wupsocket');
     var $ = require('jquery');
     const jQuery = $;
     require('jquery-ui-bundle');
 
-    get_page('login', function(page) {
+    get_page('login', function (page) {
         var $parent = $('body');
         $parent.append(page.$container);
 
         page.$('button').prop('disabled', true);
-        page.$("#status").text('Connecting...').css({visibility: 'visible'});
+        page.$("#status").text('Connecting...').css({
+            visibility: 'visible'
+        });
 
         ws.connect();
+        heh.heh();
 
-        event_bus.on('ws.connect', function() {
+        event_bus.on('ws.connect', function () {
             if (!app.logged_in) {
                 page.$("#status").text('Connected!');
                 page.$('button').prop('disabled', false);
@@ -23,13 +28,16 @@ module.exports = function() {
                     if (localStorage.auth_key != null) {
                         page.$("#status").text('Logging in (auth_key)...');
                         page.$('button').prop('disabled', true);
-                        page.send('login_with_auth_key', {username: localStorage.username, auth_key: localStorage.auth_key});
+                        page.send('login_with_auth_key', {
+                            username: localStorage.username,
+                            auth_key: localStorage.auth_key
+                        });
                     }
                 }
             }
         });
 
-        event_bus.on('ws.disconnect', function() {
+        event_bus.on('ws.disconnect', function () {
             if (app.disconnected || app.logged_in) {
                 return;
             }
@@ -40,11 +48,11 @@ module.exports = function() {
                 title: "Oh shit",
                 modal: true,
                 buttons: {
-                    'Ok': function() {
+                    'Ok': function () {
                         $(this).dialog('close');
                     }
                 },
-                close: function() {
+                close: function () {
                     app.disconnected = false;
                     app.force_logout = true;
                     window.location = '/';
@@ -53,14 +61,13 @@ module.exports = function() {
             });
         });
 
-        page.listen('login', function(data) {
+        page.listen('login', function (data) {
 
             if (data.success !== true) {
                 if (data.auto_login !== true) {
                     page.alert('Uh oh', "Well that didn't work. Reason: " + data.reason);
                     page.$("#status").text('Whoops, try again.');
-                }
-                else {
+                } else {
                     page.$("#status").text('Auto-login failed.');
                 }
 
@@ -71,10 +78,10 @@ module.exports = function() {
             if (data.password_change_required) {
                 require('./change_password')({
                     banner: "We informations password SHA-1 insecure. Please ship password in provided packaging, and fedes, California.",
-                    on_success: function() {
+                    on_success: function () {
                         page.alert("Password changed", "Password changed. Please refresh and try logging in now.");
                     },
-                    on_cancel: function() {
+                    on_cancel: function () {
                         window.location = '/';
                     }
                 });
@@ -93,7 +100,7 @@ module.exports = function() {
             require('../pages/tom_clancy')(clancy_stuff);
         });
 
-        var do_login = function() {
+        var do_login = function () {
             page.$('button').prop('disabled', true);
 
             var params = {
@@ -110,7 +117,7 @@ module.exports = function() {
             page.send('login', params);
         };
 
-        page.$('#username, #password').on('keypress', function(e) {
+        page.$('#username, #password').on('keypress', function (e) {
             if (page.$('#login').prop('disabled') !== true) {
                 if (e.keyCode === 13) {
                     do_login();
@@ -118,11 +125,11 @@ module.exports = function() {
             }
         });
 
-        page.$('#login_now').on('click', function() {
+        page.$('#login_now').on('click', function () {
             do_login();
         });
 
-        page.$("#sign_up").on('click', function() {
+        page.$("#sign_up").on('click', function () {
             page.$container.hide();
             require('./create_account')();
         });

@@ -1,6 +1,7 @@
 module.exports = function () {
     "use strict";
     var canvas_handler = require('../canvas/canvas_handler');
+    var jscolor = require('../whew/jscolor').default;
 
     var helpers = {
         rgb2hex: function (rgb) {
