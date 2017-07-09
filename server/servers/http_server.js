@@ -6,7 +6,7 @@ const express_app = express();
 const fs = require('fs');
 
 const path = require('path');
-const web_root = path.join(__dirname, '../..', 'build');
+const web_root = path.join(__dirname, '../..', 'client/dist');
 const compress = require('compression');
 
 express_app.use(express.static(web_root));

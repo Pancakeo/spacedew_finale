@@ -100,7 +100,7 @@ module.exports = function () {
             slide: function (event, ui) {
                 board.style.stroke_width = ui.value;
 
-                let scale = ui.value / 100;
+                var scale = ui.value / 100;
                 page.$("#controls [menu_item='brush_size'] svg").css({
                     transform: "scale(" + scale + ")"
                 });
@@ -131,7 +131,7 @@ module.exports = function () {
         var ch = canvas_handler(ctx);
 
         var perform_drawing_action = function (type, data) {
-            let message = $.extend({}, data, {
+            var message = $.extend({}, data, {
                 action: 'draw',
                 type: type
             });

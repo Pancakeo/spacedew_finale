@@ -36,8 +36,9 @@ module.exports = {
     // necessary for HMR to know where to load the hot update chunks
   },
 
+  // TODO - configure environments
   // devtool: 'inline-source-map',
-  devtool: 'source-map',
+  // devtool: 'source-map',
 
   devServer: {
     hot: true,
