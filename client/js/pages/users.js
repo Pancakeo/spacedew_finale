@@ -4,6 +4,8 @@ module.exports = function($target) {
     require('jquery-contextmenu');
     require('../../node_modules/jquery-contextmenu/dist/jquery.contextMenu.css')
 
+    var idleJs = require('idle-js');
+
     get_page('users', function(page) {
         $target.replaceWith(page.$container);
 
@@ -269,17 +271,19 @@ module.exports = function($target) {
             app.render_users_list(data);
         });
 
-        // $(document).idle({
-        //     onIdle: function() {
-        //         page.send('idle', {idle: true});
-        //     },
-        //     onActive: function() {
-        //         page.send('idle', {idle: false});
-        //     },
-        //     idle: 60000 * 5, // 5 minutes
-        //     recurIdleCall: true
-        // });
+        var idle = new idleJs({
+            idle: 60 * 1000 * 5, // idle time in ms 
+            events: ['mousemove', 'keydown', 'mousedown', 'touchstart'], // events that will trigger the idle resetter 
+            onIdle: function () {
+                page.send('idle', {idle: true});
+            }, // callback function to be executed after idle time 
+            onActive: function () {
+                page.send('idle', {idle: false});
+            }, // callback function to be executed after back form idleness 
 
+            keepTracking: true, // set it to false of you want to track only once 
+            startAtIdle: false // set it to true if you want to start in the idle state 
+        }).start();
 
         app.event_bus.on('users_pane_loaded', function() {
             if (localStorage.fast_crab) {

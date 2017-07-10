@@ -29,6 +29,7 @@
   "dependencies": {
     "coloreact": "^0.2.0",
     "font-awesome": "^4.7.0",
+    "idle-js": "^0.1.0",
     "jquery": "^3.2.1",
     "jquery-contextmenu": "^2.4.5",
     "jquery-ui-bundle": "^1.12.1",
