@@ -14,10 +14,10 @@ module.exports = function(options) {
     const room_id = options.room_id;
 
     var lizard = new Image();
-    lizard.src = 'images/game/player.png';
+    lizard.src = 'public/game/player.png';
 
     var evil = new Image();
-    evil.src = 'images/game/evil.png';
+    evil.src = 'public/game/evil.png';
 
     // TODO tweak these values and stuff.
     var player = {

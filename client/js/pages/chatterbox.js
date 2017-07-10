@@ -78,12 +78,12 @@ module.exports = function($parent, options) {
                 // Do the favicon thing.
                 if (localStorage.local_dev == null) {
                     if (app.new_message_alert !== true) {
-                        $('#favicon').attr('href', '/images/favicon-alert.png');
+                        $('link[rel="shortcut icon"]').attr('href', '/public/favicon-alert.png');
                         app.new_message_alert = true;
 
                         $(window).one('focus', function() {
                             app.new_message_alert = false;
-                            $('#favicon').attr('href', '/images/favicon-normal.png');
+                            $('link[rel="shortcut icon"]').attr('href', '/public/favicon-normal.png');
                         });
                     }
                 }

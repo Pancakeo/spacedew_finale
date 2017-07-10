@@ -642,7 +642,7 @@ module.exports = function(options) {
         };
 
         if (localStorage.is_local_dev != null) {
-            $('#favicon').attr('href', '/images/whew2.jpg');
+            $('#favicon').attr('href', '/public/whew2.jpg');
         }
 
         page.$("#slash_users").on('click', function() {

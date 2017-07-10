@@ -110,17 +110,19 @@ let devConfig = {
       {
         from: './js/public',
         to: 'js/public'
+      },
+      {
+        from: './public',
+        to: 'public'
       }
     ]),
 
     new ExtractTextPlugin("wup.css"),
 
     new HtmlWebpackPlugin({
-      title: "Spacedew Finale",
+      title: "SpaceReactWebpackConfigLoaderEnterpriseModule",
       hash: true,
-      favicon: './images/favicon-normal.png'
-      // template: 'client/index.html',
-      // hash: true
+      favicon: './public/favicon-normal.png'
     })
   ]
 };
@@ -189,15 +191,19 @@ let prodConfig = {
       {
         from: './js/public',
         to: 'js/public'
+      },
+      {
+        from: './public',
+        to: 'public'
       }
     ]),
 
     new ExtractTextPlugin("wup.css"),
 
     new HtmlWebpackPlugin({
-      title: "Spacedew Finale",
+      title: "SpaceReactWebpackConfigLoaderEnterpriseModule",
       hash: true,
-      favicon: './images/favicon-normal.png'
+      favicon: './public/favicon-normal.png'
     })
   ]
 };
