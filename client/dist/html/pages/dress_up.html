@@ -1,0 +1,109 @@
+<div>
+    <div id="dress_up">
+
+        <div id="dress_tabs">
+            <ul>
+                <li><a href="#chat_style">Chatting</a></li>
+                <li><a href="#user_list_style">User List</a></li>
+                <li><a href="#holy_cows">Holy cow!</a></li>
+                <li><a href="#steamed_nachos">Steamed Nachos</a></li>
+            </ul>
+
+            <div id="chat_style">
+                <div>
+                    <label for="username_color">Username</label>
+                    <input id="username_color" type="color"/>
+                </div>
+
+                <div>
+                    <label for="fg_color">Foreground</label>
+                    <input id="fg_color" type="color"/>
+                </div>
+
+                <div>
+                    <label for="bg_color">Background</label>
+                    <input id="bg_color" type="color"/>
+                </div>
+
+                <div>
+                    <label for="font_family">Font</label>
+                    <select id="font_family"></select>
+                </div>
+
+                <div>
+                    <label for="font_size">Size</label>
+                    <select id="font_size"></select>
+                </div>
+
+                <div id="example_container">
+                    <label>Example</label>
+                    <div id="example_wrapper">
+                        <span id="example_username"></span>
+                        <span id="example_message">Hey everybody!</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="user_list_style">
+                <div>
+                    <label for="fg_color">Color</label>
+                    <input id="fg_color" type="color"/>
+                </div>
+
+                <div>
+                    <label for="bg_color">Background</label>
+                    <input id="bg_color" type="color"/>
+                </div>
+
+                <div>
+                    <label for="font_family">Font</label>
+                    <select id="font_family"></select>
+                </div>
+
+                <div>
+                    <label for="font_size">Size</label>
+                    <select id="font_size"></select>
+                </div>
+
+                <div id="example_container">
+                    <label>Example</label>
+                    <div id="ul_example"></div>
+                </div>
+            </div>
+
+            <div id="holy_cows">
+                <table id="emu_things" class="wupfindtable">
+                    <thead>
+                    <tr>
+                        <th>Numpad</th>
+                        <th>Emote</th>
+                        <th>Team?</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr template="emu_row" class="emu_row">
+                        <td style="text-align: center;">
+                            <div id="key_code">Woah</div>
+                        </td>
+                        <td>
+                            <select></select>
+                            <i class="fa fa-wrench" aria-hidden="true" menu_item="make_your_own"></i>
+                        </td>
+                        <td>
+                            <input id="team_play" type="checkbox"/>
+                        </td>
+                    </tr>
+                    </tbody>
+
+                </table>
+            </div>
+
+            <div id="steamed_nachos">
+                Steam ID: <input readonly="readonly" id="steam_id" style="background: #DDD"/>
+                <button id="clear_steam_id">Clear</button>
+                <button id="set_steam_id">Set</button>
+            </div>
+        </div>
+    </div>
+</div>

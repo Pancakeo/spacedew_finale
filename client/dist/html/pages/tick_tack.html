@@ -1,0 +1,35 @@
+<div>
+    <div id="tick_tack">
+        <div class="heading">Noughts and Crosses</div>
+
+        <div class="flexer">
+            <div id="left_pane">
+                <div id="grid"></div>
+            </div>
+
+            <div id="right_pane">
+                <div id="move_history"></div>
+                <canvas id="whiteboard"></canvas>
+            </div>
+        </div>
+
+        <div id="you_are" style="margin-top: 5px; margin-bottom: 5px;">You're: <span id="my_letter"></span></div>
+        <div id="status">Waiting is...</div>
+
+        <div id="other_stuff">
+            <div class="flexer">
+                <div id="messages"></div>
+                <div id="players"></div>
+            </div>
+
+            <input id="composer"/>
+        </div>
+
+        <div template="tile_select" class="tick_tack_tile_select">
+            <div style="display: flex;">
+                <div class="letter">X</div>
+                <div class="letter">O</div>
+            </div>
+        </div>
+    </div>
+</div>
