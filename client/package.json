@@ -12,7 +12,7 @@
     "dev": "npm run build && webpack-dev-server",
     "devo": "webpack-dev-server",
     "docs": "echo heh",
-    "prod": "set NODE_ENV=production&& npm run clean && webpack -p",
+    "prod": "cross-env NODE_ENV=production webpack -p",
     "test": "jest",
     "watch": "webpack --watch"
   },
@@ -46,6 +46,7 @@
     "babel-preset-react": "^6.24.1",
     "clean-webpack-plugin": "^0.1.16",
     "copy-webpack-plugin": "^4.0.1",
+    "cross-env": "^5.0.1",
     "css-loader": "^0.28.1",
     "extract-text-webpack-plugin": "^2.1.0",
     "file-loader": "^0.11.1",

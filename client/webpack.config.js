@@ -137,6 +137,8 @@ let prodConfig = {
     path: resolve(__dirname, 'dist')
   },
 
+  // devtool: 'nosources-source-map',
+
   module: {
     rules: [{
         test: /\.jsx/,
