@@ -151,7 +151,7 @@ module.exports = (function() {
                     meta.file_info.username = meta.username;
                     app.handle_binary(wupsocket.binary_transfers[meta.transfer_id].data, meta.file_info);
                     delete wupsocket.binary_transfers[meta.transfer_id];
-                    event_bus.emit('ws.transfer_compvare', {transfer_id: meta.transfer_id});
+                    event_bus.emit('ws.transfer_complete', {transfer_id: meta.transfer_id});
                 }
                 else {
                     var stored_size;
