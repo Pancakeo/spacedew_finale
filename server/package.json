@@ -2,7 +2,7 @@
   "name": "server",
   "version": "1.0.0",
   "description": "",
-  "main": "dewd.js",
+  "main": "app.js",
   "dependencies": {
     "bluebird": "^3.4.0",
     "cheerio": "^0.22.0",
@@ -17,10 +17,13 @@
     "request": "latest",
     "ws": "2.3.1"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "nodemon": "^1.11.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node dewd.js"
+    "start": "node app.js",
+    "dev": "node node_modules/nodemon/bin/nodemon.js app.js"
   },
   "author": "",
   "license": "ISC"
