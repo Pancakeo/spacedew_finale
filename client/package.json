@@ -37,7 +37,8 @@
     "pako": "^1.0.5",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
-    "react-hot-loader": "^3.0.0-beta.7"
+    "react-hot-loader": "^3.0.0-beta.7",
+    "react-simple-colorpicker": "^1.4.1"
   },
   "devDependencies": {
     "babel-core": "^6.24.1",

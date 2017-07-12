@@ -1,5 +1,3 @@
-import * as heh from "../components/woboy.jsx";
-
 export default function () {
     var event_bus = app.event_bus;
     var ws = require('../app/wupsocket');
@@ -17,7 +15,6 @@ export default function () {
         });
 
         ws.connect();
-        heh.heh();
 
         event_bus.on('ws.connect', function () {
             if (!app.logged_in) {

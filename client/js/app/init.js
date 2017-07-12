@@ -1,20 +1,23 @@
 import login from "../pages/login";
+import blackBoard from '../pages/black_board.jsx';
 
-(function() {
-    require('../../less/_everything.less');
-    require('../../node_modules/jquery-ui-bundle/jquery-ui.css')
-    
-    var $ = require('jquery');
+import '../../less/_everything.less';
+import '../../node_modules/jquery-ui-bundle/jquery-ui.css';
+import 'font-awesome-webpack';
+
+import * as $ from 'jquery';
+import 'jquery-ui-bundle';
+import toolio from '../app/toolio';
+import event_bus from '../../../shared/event_bus';
+
+(function () {
     window.$ = $;
-    require('jquery-ui-bundle');
-    var toolio = require('../app/toolio');
-    require("font-awesome-webpack");
 
     var search = window.location.search;
     var matches = search.split('&');
     var query_params = {};
 
-    matches.forEach(function(match) {
+    matches.forEach(function (match) {
         if (match.indexOf('?') == 0) {
             match = match.slice(1);
         }
@@ -33,8 +36,8 @@ import login from "../pages/login";
     var is_iphone = user_agent.indexOf("iphone") > -1;
 
     window.app = {
-        event_bus: require('../../../shared/event_bus'),
-        toolio: require('../app/toolio'),
+        event_bus: event_bus,
+        toolio: toolio,
         domain: domain,
         settings: {},
         profile: {},
@@ -42,10 +45,12 @@ import login from "../pages/login";
         window_listeners: {},
         popups: [],
         is_mobile: is_android || is_iphone,
-        world: {user_settings: {}} // Users and shit.
+        world: {
+            user_settings: {}
+        } // Users and shit.
     };
 
-    app.register_window_listener = function(listener_name, listener) {
+    app.register_window_listener = function (listener_name, listener) {
         if (!Array.isArray(app.window_listeners[listener_name])) {
             app.window_listeners[listener_name] = [];
         }
@@ -57,9 +62,9 @@ import login from "../pages/login";
 
     // Dialog stuff.
     $.widget("yehrye.dialog", $.ui.dialog, {
-        close: function() {
+        close: function () {
             var _this = this;
-            setTimeout(function() {
+            setTimeout(function () {
                 _this.uiDialog.remove();
             }, 0);
             this._superApply(arguments);
@@ -71,7 +76,7 @@ import login from "../pages/login";
     if (window.location.protocol == 'https:') {
         protocol = 'wss';
     }
-    
+
     var server_settings = {
         server: protocol + '://localhost:' + shared_config.chat_port,
         binary_server: protocol + '://localhost:' + shared_config.binary_port
@@ -88,7 +93,7 @@ import login from "../pages/login";
 
     switch (query_params.wup) {
         case 'black_board':
-            require('../pages/black_board')();
+            blackBoard();
             break;
 
         case 'yownet':
@@ -100,17 +105,17 @@ import login from "../pages/login";
             break;
     }
 
-    $(window).on('beforeunload', function() {
-        app.popups.forEach(function(p) {
+    $(window).on('beforeunload', function () {
+        app.popups.forEach(function (p) {
             if (p && p.closed != true) {
                 p.close();
             }
         });
     });
 
-    window.addEventListener('message', function(e) {
+    window.addEventListener('message', function (e) {
         if (Array.isArray(app.window_listeners[e.data.listener_name])) {
-            app.window_listeners[e.data.listener_name].forEach(function(listener) {
+            app.window_listeners[e.data.listener_name].forEach(function (listener) {
                 listener(e.data);
             });
         }

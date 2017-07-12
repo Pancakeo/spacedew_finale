@@ -36,8 +36,8 @@ let devConfig = {
     // necessary for HMR to know where to load the hot update chunks
   },
 
-  devtool: 'inline-source-map',
-  // devtool: 'source-map',
+  // devtool: 'inline-source-map',
+  devtool: 'source-map',
 
   devServer: {
     hot: true,
@@ -53,7 +53,10 @@ let devConfig = {
   module: {
     rules: [{
         test: /\.jsx/,
-        loader: 'babel-loader'
+        loader: 'babel-loader',
+        exclude: [
+          resolve(__dirname, "node_modules")
+        ],
       }, {
         test: /\.(png|jpg|gif)$/,
         use: [{

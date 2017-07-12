@@ -1,7 +1,13 @@
-module.exports = function () {
+import React from 'react';
+import ReactDOM from 'react-dom';
+import {
+    Wup
+} from '../app/components/colorpick.jsx';
+
+import canvas_handler from '../canvas/canvas_handler';
+
+export default function () {
     "use strict";
-    var canvas_handler = require('../canvas/canvas_handler');
-    var jscolor = require('../whew/jscolor').default;
 
     var helpers = {
         rgb2hex: function (rgb) {
@@ -85,7 +91,23 @@ module.exports = function () {
     get_page('black_board', function (page) {
         $('body').append(page.$container);
 
-        new jscolor(page.$('#select_color')[0]);
+        // I know.
+        var props = {
+            onChange: function (color) {
+                var rgba = color.replace(/^rgba?\(|\s+|\)$/g, '').split(',');
+
+                var justRGB = 'rgb(' + rgba[0] + ',' + rgba[1] + ',' + rgba[2] + ')';
+                let hexColor = helpers.rgb2hex(justRGB);
+                board.style.fg_color = hexColor;
+                board.style.alpha = rgba[3];
+
+                page.$("#controls").find("[menu_item='select_color'], [menu_item='brush_size'] svg").css({
+                    fill: color
+                });
+            }
+        }
+
+        ReactDOM.render(<Wup {...props} />, page.$("#select_color")[0]);
 
         page.$('#brush_width_slider').slider({
             orientation: 'vertical',
@@ -102,18 +124,6 @@ module.exports = function () {
                     transform: "scale(" + scale + ")"
                 });
             }
-        });
-
-        page.$("#select_color").on('change', function () {
-            page.$("#controls").find("[menu_item='select_color'], [menu_item='brush_size'] svg").css({
-                fill: this.value
-            });
-
-            board.style.fg_color = '#' + this.value;
-        });
-
-        page.$("#brush_width_slider").on('change', function () {
-
         });
 
         var $wait_dialog = $('<div>Syncing...</div>').dialog({
@@ -136,12 +146,14 @@ module.exports = function () {
             send_message(message);
         };
 
-        page.$("#controls").on('click', '[menu_item]', function () {
+        page.$("#controls").on('click', '[menu_item]', function (e) {
             var menu_item = $(this).attr('menu_item');
             switch (menu_item) {
                 case 'select_color':
-                    page.$('#select_color')[0].jscolor.show();
-                    // page.select_color.show();
+                    page.$("#select_color").dialog({
+                        title: "Select Color"
+                    });
+
                     break;
 
                 case 'brush_size':
@@ -183,7 +195,7 @@ module.exports = function () {
         // });
 
         page.$("#overlay_canvas").on('mouseleave', function (e) {
-            ui.hold_up = setTimeout(function() {
+            ui.hold_up = setTimeout(function () {
                 ui.left_mouse_button_down = false;
             }, 500);
         });
@@ -540,17 +552,17 @@ module.exports = function () {
                         page.$("#rect_tool").click();
                         break;
 
-                        // 'c'
+                    // 'c'
                     case 67:
                         page.$("[menu_item='eye_drop']").click();
                         break;
 
-                        // Escape
+                    // Escape
                     case 27:
                         stop_tools();
                         break;
 
-                        // 's' - save (if Ctrl)
+                    // 's' - save (if Ctrl)
                     case 83:
                         if (e.ctrlKey) {
                             page.$("#save").click();
@@ -558,7 +570,7 @@ module.exports = function () {
                         }
                         break;
 
-                        // 't' = text
+                    // 't' = text
                     case 84:
                         page.$("[menu_item='fonty']").click();
                         return false;
@@ -572,7 +584,7 @@ module.exports = function () {
                     case 27:
                         stop_tools();
                         break;
-                        // 'f' = fill
+                    // 'f' = fill
                     case 70:
                         var data = {
                             color: board.style.fg_color,
@@ -583,7 +595,7 @@ module.exports = function () {
                         perform_drawing_action('colorful_clear', data);
                         stop_tools();
                         break;
-                        // delete = erase
+                    // delete = erase
                     case 46:
                         var data = $.extend({
                             color: board.style.bg_color
