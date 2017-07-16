@@ -1,5 +1,6 @@
-// TODO - go through regular login path
-module.exports = function() {
+import '../../less/crabble.less';
+
+export default function() {
     var ws = require('../app/wupsocket');
     var event_bus = require('../../../shared/event_bus');
 

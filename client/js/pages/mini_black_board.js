@@ -1,4 +1,6 @@
-module.exports = function($target, room, $room_box) {
+import '../../less/mini_black_board.less';
+
+export default function($target, room, $room_box) {
     var canvas_handler = require('../canvas/canvas_handler');
 
     get_page('mini_black_board', function(page) {

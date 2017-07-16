@@ -1,4 +1,6 @@
-module.exports = function(options) {
+import '../../less/change_password.less';
+
+export default function(options) {
     options = $.extend({
         banner: null,
         on_success: function() {

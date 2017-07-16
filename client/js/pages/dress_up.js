@@ -1,4 +1,6 @@
-module.exports = function() {
+import '../../less/dress_up.less';
+
+export default function() {
 
     var toolio = require('../app/toolio');
     var ws = require('../app/wupsocket');

@@ -1,7 +1,12 @@
 import login from "../pages/login";
-import blackBoard from '../pages/black_board.jsx';
+import yownet from "../pages/yownet";
+import blackBoard from './components/black_board.jsx';
 
-import '../../less/_everything.less';
+// import '../../less/_everything.less';
+import '../../less/global.less';
+import '../../less/z_android.less';
+
+
 import '../../node_modules/jquery-ui-bundle/jquery-ui.css';
 import 'font-awesome-webpack';
 
@@ -97,7 +102,7 @@ import event_bus from '../../../shared/event_bus';
             break;
 
         case 'yownet':
-            require('../pages/yownet')();
+            yownet();
             break;
 
         default:

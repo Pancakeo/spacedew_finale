@@ -1,4 +1,6 @@
-module.exports = function(options) {
+import '../../less/spacedew.less';
+
+export default function(options) {
     options = $.extend({
         room_id: null
     }, options);
@@ -76,7 +78,7 @@ module.exports = function(options) {
             if (Date.now() - player.weapon.last_fire >= player.weapon.cooldown) {
                 player.weapon.last_fire = Date.now();
 
-                var bulvar = {origin: {x: player.x + 16, y: player.y + 16}, speed: player.weapon.speed, radius: player.weapon.radius, created_at: Date.now()};
+                var bullet = {origin: {x: player.x + 16, y: player.y + 16}, speed: player.weapon.speed, radius: player.weapon.radius, created_at: Date.now()};
 
                 var diff_x = bullet.origin.x - player.mouse.x;
                 var diff_y = bullet.origin.y - player.mouse.y;

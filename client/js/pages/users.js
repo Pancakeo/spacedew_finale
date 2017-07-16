@@ -1,10 +1,12 @@
-module.exports = function($target) {
-    var displayed_users_once = false; // for mobile
-    var default_emus = require('../app/default_emus');
-    require('jquery-contextmenu');
-    require('../../node_modules/jquery-contextmenu/dist/jquery.contextMenu.css')
+import '../../less/users.less';
+import '../../node_modules/jquery-contextmenu/dist/jquery.contextMenu.css';
 
-    var idleJs = require('idle-js');
+import 'jquery-contextmenu';
+import idleJs from 'idle-js';
+import default_emus from '../app/default_emus';
+
+export default function($target) {
+    var displayed_users_once = false; // for mobile
 
     get_page('users', function(page) {
         $target.replaceWith(page.$container);

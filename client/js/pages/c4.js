@@ -1,4 +1,6 @@
-module.exports = function(options) {
+import '../../less/c4.less';
+
+export default function(options) {
     options = $.extend({
         room_id: null
     }, options);

@@ -1,10 +1,12 @@
+import './black_board.less';
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {
     Wup
-} from '../app/components/colorpick.jsx';
+} from './colorpick.jsx';
 
-import canvas_handler from '../canvas/canvas_handler';
+import canvas_handler from '../../canvas/canvas_handler';
 
 export default function () {
     "use strict";

@@ -1,4 +1,6 @@
-module.exports = function() {
+import '../../less/create_account.less';
+
+export default function() {
     var event_bus = app.event_bus;
     var ws = require('../app/wupsocket');
 

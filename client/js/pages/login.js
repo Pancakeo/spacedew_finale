@@ -1,9 +1,13 @@
+import "../../less/login.less";
+import * as $ from 'jquery';
+import "jquery-ui-bundle";
+
+import tom_clancy from './tom_clancy';
+import create_account from './create_account';
+
 export default function () {
     var event_bus = app.event_bus;
-    var ws = require('../app/wupsocket');
-    var $ = require('jquery');
-    const jQuery = $;
-    require('jquery-ui-bundle');
+    const ws = require('../app/wupsocket');
 
     get_page('login', function (page) {
         var $parent = $('body');
@@ -94,7 +98,7 @@ export default function () {
 
             app.emu_list = data.emu_list || [];
             app.profile.username = data.username;
-            require('../pages/tom_clancy')(clancy_stuff);
+            tom_clancy(clancy_stuff);
         });
 
         var do_login = function () {
@@ -128,7 +132,7 @@ export default function () {
 
         page.$("#sign_up").on('click', function () {
             page.$container.hide();
-            require('./create_account')();
+            create_account();
         });
 
         page.$("#username").val(localStorage.username);

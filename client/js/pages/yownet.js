@@ -1,4 +1,11 @@
-module.exports = function(options) {
+import '../../less/yownet.less';
+
+import c4 from './c4';
+import crabble from './crabble';
+import spacedew from './spacedew';
+import tick_tack from './tick_tack';
+
+export default function(options) {
     var ws = require('../app/wupsocket');
     var event_bus = app.event_bus;
 
@@ -40,16 +47,16 @@ module.exports = function(options) {
 
             var handlers = {
                 tick_tack: function() {
-                    require('./tick_tack')({room_id: page.room_id});
+                    tick_tack({room_id: page.room_id});
                 },
                 c4: function() {
-                    require('./c4')({room_id: page.room_id});
+                    c4(({room_id: page.room_id}));
                 },
                 crabble: function() {
-                    require('./crabble')({room_id: page.room_id});
+                    crabble({room_id: page.room_id});
                 },
                 spacedew: function() {
-                    require('./spacedew')({room_id: page.room_id});
+                    spacedew({room_id: page.room_id});
                 }
             };
 

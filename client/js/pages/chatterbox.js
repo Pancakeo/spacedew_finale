@@ -1,4 +1,6 @@
-module.exports = function($parent, options) {
+import "../../less/chatterbox.less";
+
+export default function($parent, options) {
     const moment = require('moment');
     
     get_page('chatterbox', function(page) {

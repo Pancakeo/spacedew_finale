@@ -1,11 +1,13 @@
-module.exports = function(initial_text) {
+import '../../less/blargher.less';
+
+export default function(initial_text) {
 
     get_page('blargher', function(page) {
 
         var $dialog = page.$container.dialog({
             title: 'Blargher',
             width: 1200,
-            height: 800,
+            height: Math.min(800, $(window).height() - 50),
             resizeable: true,
             modal: true,
             open: function() {

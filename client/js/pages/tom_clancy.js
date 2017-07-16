@@ -1,4 +1,12 @@
-module.exports = function(options) {
+import "../../less/tom_clancy.less";
+import chatterbox from "./chatterbox";
+import users from "./users";
+import change_password from "./change_password";
+import blargher from "./blargher";
+import dress_up from "./dress_up";
+import mini_black_board from "./mini_black_board";
+
+export default function(options) {
 
     get_page('tom_clancy', function(page) {
         $('div').not('#tom_clancy').remove();
@@ -16,8 +24,8 @@ module.exports = function(options) {
 
         do_resize();
 
-        var chatterbox = require('./chatterbox')(page.$('#left_pane'), options);
-        require('./users')(page.$('#users_placeholder'));
+        chatterbox(page.$("#left_pane"), options);
+        users(page.$('#users_placeholder'));
 
         var last_emote_ts = null;
         var shown_flood = false;
@@ -94,7 +102,7 @@ module.exports = function(options) {
 
             var multi_line_text = event.originalEvent.clipboardData.getData("text");
             if (multi_line_text.indexOf('\n') > 0) {
-                require('./blargher')(multi_line_text);
+                blargher(multi_line_text);
                 return false;
             }
 
@@ -207,10 +215,10 @@ module.exports = function(options) {
                 app.settings.scroll_lock = $(this).hasClass('active');
             },
             dress_up: function() {
-                require('./dress_up')();
+                dress_up();
             },
             blargher: function() {
-                require('./blargher')();
+                blargher();
             },
             browse: function() {
                 page.$("#browse_file_thing").click();
@@ -222,7 +230,7 @@ module.exports = function(options) {
                 page.$("#right_pane").toggleClass('no_user_pane');
             },
             change_password: function() {
-                require('./change_password')();
+                change_password();
             },
 			got_a_light: function() {
 				$(this).toggleClass('active');
@@ -411,7 +419,7 @@ module.exports = function(options) {
             var $room_box = $('<div class="chat_thing" room_id="' + room.id + '"></div>');
             $room_box.prop('room', room);
 
-            require('./mini_black_board')(page.$('#mini_black_board_placeholder'), room, $room_box);
+            mini_black_board(page.$('#mini_black_board_placeholder'), room, $room_box);
 
             $room_box.on('click', '.blargh .close', function() {
                 $(this).closest('.blargh').remove();

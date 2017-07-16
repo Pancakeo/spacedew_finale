@@ -1,4 +1,6 @@
-module.exports = function(options) {
+import '../../less/tick_tack.less';
+
+export default function(options) {
     options = $.extend({
         room_id: null
     }, options);
