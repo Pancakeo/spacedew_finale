@@ -14,12 +14,15 @@ exports.handle_message = function handle_message(session, message) {
     var sub_type = message.sub_type;
     var data = message.data;
 
+    if (!data) {
+        return;
+    }
+
     var lowercase_username = data.username && data.username.toLowerCase();
 
-    var do_login = function(user, options) {
+    var do_login = function (user, options) {
         options = Object.assign({
-            reconnect: false,
-            password_change_required: false
+            reconnect: false
         }, options);
 
         session.login(data.username, user.user_id);
@@ -45,14 +48,12 @@ exports.handle_message = function handle_message(session, message) {
         }
 
         session.send(page_key, message_key, {
-                success: true,
-                username: data.username,
-                auth_key: auth_key,
-                lobby: wiseau.get_lobby(),
-                emu_list: emu_list,
-                password_change_required: options.password_change_required
-            }
-        );
+            success: true,
+            username: data.username,
+            auth_key: auth_key,
+            lobby: wiseau.get_lobby(),
+            emu_list: emu_list
+        });
 
         var user_settings = {};
         var sessions = sessionator.get_sessions();
@@ -68,9 +69,15 @@ exports.handle_message = function handle_message(session, message) {
             user_settings: user_settings
         });
 
-        mango.get().then(function(db) {
+        mango.get().then(function (db) {
             var users = db.collection('users');
-            users.updateOne({user_id: user.user_id}, {$set: {auth_key: auth_key}}).then(function() {
+            users.updateOne({
+                user_id: user.user_id
+            }, {
+                $set: {
+                    auth_key: auth_key
+                }
+            }).then(function () {
                 db.close();
             });
         });
@@ -79,99 +86,124 @@ exports.handle_message = function handle_message(session, message) {
     };
 
     var handle = {
-        reconnect: function() {
-            mango.get().then(function(db) {
+        reconnect: function () {
+            mango.get().then(function (db) {
                 var users = db.collection('users');
 
-                users.findOne({auth_key: data.auth_key, username: lowercase_username}).then(function(user) {
+                users.findOne({
+                    auth_key: data.auth_key,
+                    username: lowercase_username
+                }).then(function (user) {
                     db.close();
 
                     if (user == null) {
-                        session.send('chatterbox', 'reconnect', {success: false, reason: "Fuck you"});
-                    }
-                    else {
-                        do_login(user, {reconnect: true});
+                        session.send('chatterbox', 'reconnect', {
+                            success: false,
+                            reason: "Fuck you"
+                        });
+                    } else {
+                        do_login(user, {
+                            reconnect: true
+                        });
                     }
                 });
 
             });
         },
-        login: function() {
-            mango.get().then(function(db) {
+        login: function () {
+            mango.get().then(function (db) {
                 var users = db.collection('users');
-                users.findOne({username: lowercase_username}).then(function(user) {
+                users.findOne({
+                    username: lowercase_username
+                }).then(function (user) {
                     db.close();
 
                     if (user == null) {
-                        session.send('login', 'login', {success: false, reason: "Fuck you (bad login)."});
+                        session.send('login', 'login', {
+                            success: false,
+                            reason: "Fuck you (bad login)."
+                        });
                         return;
                     }
 
                     let password_hasher = crepto.get_hashed_password;
-                    let password_change_required = false;
-                    if (user.last_password_change_date == null) {
-                        password_hasher = crepto.get_legacy_hashed_password;
-                        password_change_required = true;
-                    }
 
-                    password_hasher(user, data.password).then(function(result) {
+                    password_hasher(user, data.password).then(function (result) {
                         if (user.password == result.hashed_password) {
-                            do_login(user, {password_change_required: password_change_required});
-                        }
-                        else {
-                            session.send('login', 'login', {success: false, reason: "Fuck you (bad login)."});
+                            do_login(user, {});
+                        } else {
+                            session.send('login', 'login', {
+                                success: false,
+                                reason: "Fuck you (bad login)."
+                            });
                         }
                     });
                 });
             });
         },
-        login_with_auth_key: function() {
-            mango.get().then(function(db) {
+        login_with_auth_key: function () {
+            mango.get().then(function (db) {
                 var users = db.collection('users');
-                users.findOne(
-                    {
-                        auth_key: data.auth_key,
-                        username: lowercase_username
-                    }).then(function(user) {
-                        db.close();
+                users.findOne({
+                    auth_key: data.auth_key,
+                    username: lowercase_username
+                }).then(function (user) {
+                    db.close();
 
-                        if (user == null) {
-                            session.send('login', 'login', {success: false, reason: "Fuck you", auto_login: true});
-                            return;
-                        }
-
-                        do_login(user);
+                    if (user == null) {
+                        session.send('login', 'login', {
+                            success: false,
+                            reason: "Fuck you",
+                            auto_login: true
+                        });
+                        return;
                     }
-                );
+
+                    do_login(user);
+                });
             });
         },
-        create_account: function() {
+        create_account: function () {
             if (data.username.length < 3 || data.password.length < 4) {
-                session.send('login', 'create_account', {success: false, reason: "Username is 3-16 characters, password 4-64 characters."});
+                session.send('login', 'create_account', {
+                    success: false,
+                    reason: "Username is 3-16 characters, password 4-64 characters."
+                });
                 return;
             }
 
             if (data.username.length > 16 || data.password.length > 64) {
-                session.send('login', 'create_account', {success: false, reason: "Username is 3-16 characters, password 4-64 characters."});
+                session.send('login', 'create_account', {
+                    success: false,
+                    reason: "Username is 3-16 characters, password 4-64 characters."
+                });
                 return;
             }
 
             var alpha_numeric_regex = /^[A-Za-z0-9_]+$/;
 
             if (alpha_numeric_regex.test(data.username) !== true || alpha_numeric_regex.test(data.password) !== true) {
-                session.send('login', 'create_account', {success: false, reason: "Username and password must be alphanumeric."});
+                session.send('login', 'create_account', {
+                    success: false,
+                    reason: "Username and password must be alphanumeric."
+                });
                 return;
             }
 
-            mango.get().then(function(db) {
+            mango.get().then(function (db) {
                 var users = db.collection('users');
-                users.findOne({username: lowercase_username}).then(function(user) {
+                users.findOne({
+                    username: lowercase_username
+                }).then(function (user) {
                     if (user != null) {
-                        session.send('login', 'create_account', {success: false, reason: "Username already exists!"});
+                        session.send('login', 'create_account', {
+                            success: false,
+                            reason: "Username already exists!"
+                        });
                         return;
                     }
 
-                    crepto.hash_password(data.password).then(function(result) {
+                    crepto.hash_password(data.password).then(function (result) {
                         var new_user = {
                             username: lowercase_username,
                             user_id: uuid.v4(),
@@ -181,15 +213,23 @@ exports.handle_message = function handle_message(session, message) {
                             last_password_change_date: new Date()
                         };
 
-                        users.insertOne(new_user).then(function(result) {
+                        users.insertOne(new_user).then(function (result) {
                             db.close();
-                            session.send('login', 'create_account', {success: true});
-                        }).catch(function(err) {
-                            session.send('login', 'create_account', {success: false, reason: "Internal error."});
+                            session.send('login', 'create_account', {
+                                success: true
+                            });
+                        }).catch(function (err) {
+                            session.send('login', 'create_account', {
+                                success: false,
+                                reason: "Internal error."
+                            });
                         });
-                    }, function(err) {
+                    }, function (err) {
                         console.log(err);
-                        session.send('login', 'create_account', {success: false, reason: "Internal error."});
+                        session.send('login', 'create_account', {
+                            success: false,
+                            reason: "Internal error."
+                        });
                     });
                 });
             });

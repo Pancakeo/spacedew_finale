@@ -33,12 +33,6 @@ exports.handle_message = function handle_message(session, message) {
 
                 users.findOne({user_id: session.profile.user_id}).then(function(user) {
                     let password_hasher = crepto.get_hashed_password;
-                    let password_change_required = false;
-
-                    if (user.last_password_change_date == null) {
-                        password_hasher = crepto.get_legacy_hashed_password;
-                        password_change_required = true;
-                    }
 
                     password_hasher(user, data.current_pw).then(function(result) {
                         users.findOne({user_id: session.profile.user_id, password: result.hashed_password}).then(function(user_fishing) {

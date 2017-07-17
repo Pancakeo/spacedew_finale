@@ -23,7 +23,7 @@ let devConfig = {
     // bundle the client for hot reloading
     // only- means to only hot reload for successful updates
 
-    './js/app/init.js'
+    './js/app/init.jsx'
     // the entry point of our app
   ],
   output: {
@@ -93,13 +93,6 @@ let devConfig = {
   plugins: [
     new Clean(['dist']),
 
-    new webpack.DefinePlugin({
-      'process.env': {
-        // This has effect on the react lib size
-        'NODE_ENV': JSON.stringify('production'),
-      }
-    }),
-
     new webpack.HotModuleReplacementPlugin(),
     // enable HMR globally
 
@@ -133,7 +126,7 @@ let devConfig = {
 let prodConfig = {
   entry: [
     // the entry point of our app
-    './js/app/init.js'
+    './js/app/init.jsx'
   ],
   output: {
     filename: 'spacedew_finale.js',

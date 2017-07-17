@@ -1,4 +1,4 @@
-module.exports = (function() {
+module.exports = (function () {
     "use strict";
     const pako = require('pako');
     const toolio = app.toolio;
@@ -27,7 +27,7 @@ module.exports = (function() {
     prime_socket.postMessage({});
 
     var ws_handlers = {
-        connection: function(message) {
+        connection: function (message) {
             switch (message.sub_type) {
                 case 'heartbeat':
                     wupsocket.send('connection', 'heartbeat', message.data);
@@ -38,7 +38,7 @@ module.exports = (function() {
 
                     // Thinking here is that if the client sends a message on a regular interval, it'll trigger a disconnect faster.
                     clearInterval(wupsocket.pong);
-                    wupsocket.pong = setInterval(function() {
+                    wupsocket.pong = setInterval(function () {
                         wupsocket.send('connection', 'pong', {});
                     }, 7500);
 
@@ -59,7 +59,7 @@ module.exports = (function() {
 
     };
 
-    prime_socket.addEventListener('message', function(e) {
+    prime_socket.addEventListener('message', function (e) {
         var params = e.data.params;
 
         switch (e.data.action) {
@@ -80,7 +80,9 @@ module.exports = (function() {
                 break;
 
             case 'binary_reconnect_attempt':
-                app.append_system("Attempting to reconnect binary...", {color: 'green'});
+                app.append_system("Attempting to reconnect binary...", {
+                    color: 'green'
+                });
                 break;
 
             case 'disconnect':
@@ -93,7 +95,7 @@ module.exports = (function() {
 
             case 'message':
                 var message = params.message;
-                if (typeof(ws_handlers[message.type]) == "function") {
+                if (typeof (ws_handlers[message.type]) == "function") {
                     ws_handlers[message.type](message);
                 }
 
@@ -101,9 +103,11 @@ module.exports = (function() {
                     event_bus.emit(message.type + '.' + message.sub_type, message.data);
                 }
 
-                wupsocket.popups.forEach(function(p) {
+                wupsocket.popups.forEach(function (p) {
                     if (p.room_id == message.data.room_id || p.instance_id == message.data.instance_id) {
-                        var popup_message = $.extend(message, {listener_name: 'ws.' + message.type});
+                        var popup_message = $.extend(message, {
+                            listener_name: 'ws.' + message.type
+                        });
                         p.popup.postMessage(popup_message, app.domain);
                     }
                 });
@@ -114,7 +118,9 @@ module.exports = (function() {
                 var meta = params.meta;
 
                 if (meta.type == 'blackboard') {
-                    var inflated_response = pako.inflate(params.buffer, {to: 'string'});
+                    var inflated_response = pako.inflate(params.buffer, {
+                        to: 'string'
+                    });
                     var response_as_json = JSON.parse(inflated_response);
                     var useful_response = {
                         bg_color: meta.bg_color,
@@ -128,21 +134,20 @@ module.exports = (function() {
 
                 // I'm sure it's fine.
                 if (meta.debut === true && wupsocket.binary_transfers[meta.transfer_id] == null) {
-                    wupsocket.binary_transfers[meta.transfer_id] = {data: []};
-                }
-                else if (wupsocket.binary_transfers[meta.transfer_id] == null) {
+                    wupsocket.binary_transfers[meta.transfer_id] = {
+                        data: []
+                    };
+                } else if (wupsocket.binary_transfers[meta.transfer_id] == null) {
                     console.debug("Ignoring partial transfer " + meta.transfer_id);
                     return;
                 }
 
                 if (meta.no_data !== true) {
                     wupsocket.binary_transfers[meta.transfer_id].data.push(params.buffer);
-                }
-                else {
+                } else {
                     if (wupsocket.binary_transfers[meta.transfer_id].chunk == null) {
                         wupsocket.binary_transfers[meta.transfer_id].chunk = 0;
-                    }
-                    else {
+                    } else {
                         wupsocket.binary_transfers[meta.transfer_id].chunk++;
                     }
                 }
@@ -151,23 +156,26 @@ module.exports = (function() {
                     meta.file_info.username = meta.username;
                     app.handle_binary(wupsocket.binary_transfers[meta.transfer_id].data, meta.file_info);
                     delete wupsocket.binary_transfers[meta.transfer_id];
-                    event_bus.emit('ws.transfer_complete', {transfer_id: meta.transfer_id});
-                }
-                else {
+                    event_bus.emit('ws.transfer_complete', {
+                        transfer_id: meta.transfer_id
+                    });
+                } else {
                     var stored_size;
 
                     if (meta.no_data == true) {
                         var cur_chunk = wupsocket.binary_transfers[meta.transfer_id] && wupsocket.binary_transfers[meta.transfer_id].chunk;
                         cur_chunk = cur_chunk || 0;
                         stored_size = cur_chunk * chunk_size;
-                    }
-                    else {
-                        stored_size = wupsocket.binary_transfers[meta.transfer_id].data.reduce(function(prev, chunk) {
+                    } else {
+                        stored_size = wupsocket.binary_transfers[meta.transfer_id].data.reduce(function (prev, chunk) {
                             return prev + chunk.byteLength;
                         }, 0);
                     }
 
-                    event_bus.emit('ws.transfer_update', {transfer_id: meta.transfer_id, stored_size: stored_size});
+                    event_bus.emit('ws.transfer_update', {
+                        transfer_id: meta.transfer_id,
+                        stored_size: stored_size
+                    });
                 }
 
                 break;
@@ -182,9 +190,11 @@ module.exports = (function() {
     });
 
 
-    wupsocket.send_binary = function(blob, meta) {
+    wupsocket.send_binary = function (blob, meta) {
         if (!binary_connected) {
-            app.append_system('Unable to send: Binary not connected.', {color: 'red'});
+            app.append_system('Unable to send: Binary not connected.', {
+                color: 'red'
+            });
         }
         var transfer_id = meta.transfer_id;
 
@@ -195,7 +205,7 @@ module.exports = (function() {
             }
         });
 
-        var send_chunk = function(buffer, meta, start) {
+        var send_chunk = function (buffer, meta, start) {
             var transfer_info = {
                 compvare: false,
                 transfer_id: transfer_id,
@@ -218,8 +228,7 @@ module.exports = (function() {
                         meta: transfer_info
                     }
                 }, [chunk]);
-            }
-            else {
+            } else {
                 var chunk = buffer.slice(start, start + chunk_size);
                 prime_socket.postMessage({
                     action: 'send_binary',
@@ -229,17 +238,19 @@ module.exports = (function() {
                     }
                 }, [chunk]);
 
-                setTimeout(function() {
+                setTimeout(function () {
                     send_chunk(buffer, meta, start + chunk_size);
                 }, 0);
             }
         };
 
-        wupsocket.binary_transfers[transfer_id] = {data: [blob]};
+        wupsocket.binary_transfers[transfer_id] = {
+            data: [blob]
+        };
         send_chunk(blob, meta, 0);
     };
 
-    wupsocket.send = function(type, sub_type, data) {
+    wupsocket.send = function (type, sub_type, data) {
         if (ws_connected === false) {
             console.error("Wupsocket is not connected");
             event_bus.emit('ws.error');
@@ -260,23 +271,31 @@ module.exports = (function() {
         });
     };
 
-    wupsocket.is_connected = function() {
+    Object.defineProperty(wupsocket, 'connected', {
+        get: function() {
+            return ws_connected
+        }
+    });
+
+    wupsocket.is_connected = function () {
         return ws_connected;
     };
 
-    wupsocket.close = function() {
+    wupsocket.close = function () {
         manually_closed = true;
-        prime_socket.postMessage({action: 'disconnect'});
+        prime_socket.postMessage({
+            action: 'disconnect'
+        });
     };
 
-    app.register_window_listener('ws.send', function(data) {
+    app.register_window_listener('ws.send', function (data) {
         wupsocket.send(data.type, data.sub_type, data.message);
     });
 
-    app.register_window_listener('ws.set_room_id', function(data) {
+    app.register_window_listener('ws.set_room_id', function (data) {
         var page_name = data.page_name;
 
-        wupsocket.popups.forEach(function(p) {
+        wupsocket.popups.forEach(function (p) {
             if (p.instance_id == data.instance_id) {
                 p.room_id = data.room_id;
             }
@@ -284,13 +303,13 @@ module.exports = (function() {
     });
 
     wupsocket.popups = [];
-    wupsocket.register_popup = function(registration) {
+    wupsocket.register_popup = function (registration) {
         var page_key = registration.page_key;
         wupsocket.popups.push(registration);
         app.popups.push(registration.popup);
     };
 
-    wupsocket.reconnect = function() {
+    wupsocket.reconnect = function () {
         wupsocket.reconnecting = true;
 
         if (Date.now() - wupsocket.last_reconnect_attempt >= 5000) {
@@ -302,18 +321,19 @@ module.exports = (function() {
                     server_ip: app.settings.server
                 }
             });
-        }
-        else {
+        } else {
             var diff = 5000 - (Date.now() - wupsocket.last_reconnect_attempt);
-            setTimeout(function() {
+            setTimeout(function () {
                 wupsocket.reconnect();
             }, diff)
         }
 
     };
 
-    wupsocket.connect = function() {
-        prime_socket.postMessage({action: 'disconnect'});
+    wupsocket.connect = function () {
+        prime_socket.postMessage({
+            action: 'disconnect'
+        });
 
         prime_socket.postMessage({
             action: 'connect',

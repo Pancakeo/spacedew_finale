@@ -1,11 +1,8 @@
-import login from "../pages/login";
 import yownet from "../pages/yownet";
 import blackBoard from './components/black_board.jsx';
 
-// import '../../less/_everything.less';
 import '../../less/global.less';
 import '../../less/z_android.less';
-
 
 import '../../node_modules/jquery-ui-bundle/jquery-ui.css';
 import 'font-awesome-webpack';
@@ -14,6 +11,14 @@ import * as $ from 'jquery';
 import 'jquery-ui-bundle';
 import toolio from '../app/toolio';
 import event_bus from '../../../shared/event_bus';
+
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+import {
+    LoginComponent
+} from "../pages/login.jsx";
+
 
 (function () {
     window.$ = $;
@@ -96,6 +101,8 @@ import event_bus from '../../../shared/event_bus';
     $.extend(app.settings, server_settings);
     window.get_page = require('../app/page');
 
+    $('body').append('<div id="app"></div>');
+
     switch (query_params.wup) {
         case 'black_board':
             blackBoard();
@@ -106,7 +113,8 @@ import event_bus from '../../../shared/event_bus';
             break;
 
         default:
-            login();
+            // ReactDOM.render(<LoginComponent />, document.querySelector('#app'));
+            ReactDOM.render(<LoginComponent />, $("#app")[0]);
             break;
     }
 

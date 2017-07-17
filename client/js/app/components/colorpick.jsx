@@ -11,12 +11,12 @@ export class Wup extends React.Component {
       color: this.props.initialColor
     }
 
-    this.handleChange = this.handleChange.bind(this);
+    // this.handleChange = this.handleChange.bind(this);
   }
 
   render() {
     return (
-      <ColorPicker color={this.state.color} onChange={this.handleChange} opacitySlider />
+      <ColorPicker color={this.state.color} onChange={(e) => this.handleChange(e)} opacitySlider />
     );
   }
 
