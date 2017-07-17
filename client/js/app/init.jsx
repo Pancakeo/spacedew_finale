@@ -2,7 +2,6 @@ import yownet from "../pages/yownet";
 import blackBoard from './components/black_board.jsx';
 
 import '../../less/global.less';
-import '../../less/z_android.less';
 
 import '../../node_modules/jquery-ui-bundle/jquery-ui.css';
 import 'font-awesome-webpack';
