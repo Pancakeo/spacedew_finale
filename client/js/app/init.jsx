@@ -45,6 +45,9 @@ import {
     var is_iphone = user_agent.indexOf("iphone") > -1;
 
     window.app = {
+		new_message_alert: false,
+		original_title: document.title,
+		unread_messages: 0,
         event_bus: event_bus,
         toolio: toolio,
         domain: domain,
