@@ -93,7 +93,7 @@ export default function ($parent, options) {
 							$('link[rel="shortcut icon"]').attr('href', '/public/favicon-normal.png');
 							clearInterval(app.check_for_focus);
 						}
-					});
+					}, 100);
 				}
 			}
 
