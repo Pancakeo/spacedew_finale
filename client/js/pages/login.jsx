@@ -64,7 +64,7 @@ export class LoginComponent extends React.Component {
 					}
 				},
 				close: function () {
-					$(this).destroy();
+					$(this).dialog('destroy');
 				}
 			});
 		});
