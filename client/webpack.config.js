@@ -116,7 +116,7 @@ let devConfig = {
     new ExtractTextPlugin("wup.css"),
 
     new HtmlWebpackPlugin({
-      title: "Bourbon Rye (Dev)",
+      title: "Bourbon 'N' Rye (Dev)",
       hash: true,
       favicon: './public/favicon-normal.png'
     })
@@ -199,7 +199,7 @@ let prodConfig = {
     new ExtractTextPlugin("wup.css"),
 
     new HtmlWebpackPlugin({
-      title: "Bourbon Rye",
+      title: "Bourbon 'N' Rye",
       hash: true,
       favicon: './public/favicon-normal.png'
     })
