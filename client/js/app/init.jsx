@@ -118,6 +118,7 @@ import {
     }
 
     $(window).on('beforeunload', function () {
+	    window.open('https://www.yehrye.com/public/wup.mp3', '_blank');
         app.popups.forEach(function (p) {
             if (p && p.closed != true) {
                 p.close();
