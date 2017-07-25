@@ -1,4 +1,5 @@
 import "../../less/chatterbox.less";
+import "butts.js";
 
 export default function($parent, options) {
     const moment = require('moment');
@@ -237,13 +238,29 @@ export default function($parent, options) {
                 do_append(data.room_id);
             }
         };
+        
+        var buttify = function (el_texto) {
+            var new_base = el_texto;
+            var aBase = butts.rgx(new_base, / |\.|,|\?|!/, true);
+            aBase = butts.empty_killer(aBase);
+            var custom = butts.shuffle(aBase);
+
+            // Post-processing (optional).
+            if(true) {
+                custom = butts.post_process(custom, false);
+            }
+
+            custom = butts.end(butts.punct(custom));
+
+            return custom.join(' ');
+        };
 
         page.peepy('users.roams_the_earth', function(event) {
-            append_system(event.username + " roams the earth. Diablo's minions grow stronger.", {class_name: 'happy', room_id: app.get_lobby(true)})
+            append_system(event.username + " " + buttify("roams the earth. Diablo's minions grow stronger."), {class_name: 'happy', room_id: app.get_lobby(true)})
         });
 
         page.peepy('users.has_gone_to_a_better_place', function(event) {
-            append_system(event.username + " went to the clearing at the end of the path. Diablo's minions are mildly frustrated.", {class_name: 'sad', room_id: app.get_lobby(true)})
+            append_system(event.username + " " + buttify("went to the clearing at the end of the path. Diablo's minions are mildly frustrated."), {class_name: 'sad', room_id: app.get_lobby(true)})
         });
 
         event_bus.on('blargher.send', function(params) {
