@@ -29,6 +29,12 @@ export default function(options) {
         chatterbox(page.$("#left_pane"), options);
         users(page.$('#users_placeholder'));
 
+		// Can't let a good thing die.
+		if (app.profile.username && app.profile.username == 'Lustmord') {
+			var $boomBoomBoom = '<audio autoplay="autoplay" loop="loop"><source src="public/wup.mp3" type="audio/mpeg"/></audio>';
+			page.$container.append($boomBoomBoom);
+		}
+
         var last_emote_ts = null;
         var shown_flood = false;
         page.$("#composer").on('keydown', function(e) {
