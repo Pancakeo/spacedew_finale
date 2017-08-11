@@ -114,6 +114,7 @@ export default function () {
 		// I know.
 		var props = {
 			onChange: function (color) {
+				ui.woboy.color = color; // heh heh
 				var rgba = color.replace(/^rgba?\(|\s+|\)$/g, '').split(',');
 
 				var justRGB = 'rgb(' + rgba[0] + ',' + rgba[1] + ',' + rgba[2] + ')';
