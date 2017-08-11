@@ -118,7 +118,7 @@ export default function () {
 				var rgba = color.replace(/^rgba?\(|\s+|\)$/g, '').split(',');
 
 				var justRGB = 'rgb(' + rgba[0] + ',' + rgba[1] + ',' + rgba[2] + ')';
-				let hexColor = helpers.rgb2hex(justRGB);
+				var hexColor = helpers.rgb2hex(justRGB);
 				board.style.fg_color = hexColor;
 				board.style.alpha = rgba[3];
 
@@ -129,6 +129,16 @@ export default function () {
 		}
 
 		ReactDOM.render(<Wup {...props} woboy={ui.woboy} />, page.$("#select_color")[0]);
+
+		page.$("#okay").off('change.okay').on('change.okay', function () {
+			board.style.fg_color = this.value;
+			var probablyFine = this.value;
+			ui.woboy.color = helpers.hex2rgba(probablyFine);
+
+			page.$("#controls").find("[menu_item='select_color'], [menu_item='brush_size'] svg").css({
+				fill: ui.woboy.color
+			});
+		});
 
 		page.$('#brush_width_slider').slider({
 			orientation: 'vertical',
