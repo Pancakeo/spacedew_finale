@@ -4,25 +4,38 @@ import ColorPicker from 'react-simple-colorpicker';
 import '../../../less/colorpicker.less';
 
 export class Wup extends React.Component {
-  constructor(props) {
-    super(props);
+	constructor(props) {
+		super(props);
 
-    this.state = {
-      color: this.props.initialColor
-    }
+		this.state = {
+			color: this.props.initialColor
+		}
+	}
 
-    // this.handleChange = this.handleChange.bind(this);
-  }
+	componentDidMount() {
+		clearInterval(this.hacko);
 
-  render() {
-    return (
-      <ColorPicker color={this.state.color} onChange={(e) => this.handleChange(e)} opacitySlider />
-    );
-  }
+		this.hacko = setInterval(function () {
 
-  handleChange(color) {
-    //console.log(color); // color is rgb(a) string
-    this.setState({ color: color });
-    this.props.onChange(color);
-  }
+			if (this.props.woboy.color != this.state.color) {
+				this.setState({ color: this.props.woboy.color });
+			}
+		}.bind(this), 100);
+	}
+
+	componentWillUnmount() {
+		clearInterval(this.hacko);
+	}
+
+	render() {
+		return (
+			<ColorPicker color={this.state.color} onChange={(e) => this.handleChange(e)} opacitySlider />
+		);
+	}
+
+	handleChange(color) {
+		//console.log(color); // color is rgb(a) string
+		this.setState({ color: color });
+		this.props.onChange(color);
+	}
 }

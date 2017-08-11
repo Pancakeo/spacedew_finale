@@ -27,6 +27,20 @@ export default function () {
 			return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
 		},
 
+		// Whew.
+		hex2rgba: function (hex) {
+			var c;
+			if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
+				c = hex.substring(1).split('');
+				if (c.length == 3) {
+					c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+				}
+				c = '0x' + c.join('');
+				return 'rgba(' + [(c >> 16) & 255, (c >> 8) & 255, c & 255].join(',') + ',1)';
+			}
+			throw new Error('Bad Hex');
+		},
+
 		invertColor: function (hexTripletColor) {
 			var color = hexTripletColor;
 			color = color.substring(1); // remove #
@@ -54,7 +68,11 @@ export default function () {
 		pinned_x: null,
 		pinned_y: null,
 		hold_up: null,
-		my_username: null
+		my_username: null,
+
+		woboy: {
+			color: null
+		}
 	};
 
 	var board = {
@@ -109,7 +127,7 @@ export default function () {
 			}
 		}
 
-		ReactDOM.render(<Wup {...props} />, page.$("#select_color")[0]);
+		ReactDOM.render(<Wup {...props} woboy={ui.woboy} />, page.$("#select_color")[0]);
 
 		page.$('#brush_width_slider').slider({
 			orientation: 'vertical',
@@ -230,6 +248,7 @@ export default function () {
 					var rgb = 'rgb(' + pixel.data[0] + ',' + pixel.data[1] + ',' + pixel.data[2] + ')';
 
 					var probablyFine = helpers.rgb2hex(rgb);
+					ui.woboy.color = helpers.hex2rgba(probablyFine);
 
 					page.$("#controls").find("[menu_item='select_color'], [menu_item='brush_size'] svg").css({
 						fill: probablyFine
