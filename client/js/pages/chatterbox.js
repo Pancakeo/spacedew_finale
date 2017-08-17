@@ -383,9 +383,9 @@ export default function ($parent, options) {
 				
 		}
 		
-var buttsFactory = new ButtsFactory();
-var butts;
-butts = buttsFactory.newButts(10, 5);
+		var buttsFactory = new ButtsFactory();
+		var butts;
+		butts = buttsFactory.newButts(10, 5);
 		
 		page.peepy('users.roams_the_earth', function (event) {
 			append_system(event.username + butts.butter(" roams the earth. Diablo's minions grow stronger."), { class_name: 'happy', room_id: app.get_lobby(true) })
