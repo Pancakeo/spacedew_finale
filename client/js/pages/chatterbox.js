@@ -244,132 +244,148 @@ export default function ($parent, options) {
 			}
 		};
 
-		
-		
-        var butts = {
-			butt_freq: 75,
-			jumble_freq: 5,
-			butt_time: function(){
-				if(Math.floor(Math.random() * this.butt_freq) == 0){
-					return true;
+		function ButtsFactory() {
+			this.newButts = function (buttFrequency, jumbleFrequency){
+				var butts = {};
+				butts.buttFrequency = buttFrequency;
+				butts.jumbleFrequency = jumbleFrequency;
+				butts.buttArray = [];
+				
+				butts.init = function(initArray){
+					butts.buttArray = initArray.slice(0);
 				}
-			},
-			buttify: function(word){ 
-				var result = word;
-				if(this.butt_time()){
-					if(Math.floor(Math.random() * 2) == 0){
-						result = "butt";
-					} else {
-						result = "butts";
+				
+				butts.buttTime = function(){
+					if(Math.floor(Math.random() * butts.buttFrequency) == 0){
+						return true;
 					}
 				}
-				if(school){
-					result = cap(result);
+				
+				butts.buttify = function (word){ 
+					var result = word;
+					if(this.buttTime()){
+						if(Math.floor(Math.random() * 2) == 0){
+							result = "butt";
+						} else {
+							result = "butts";
+						}
+					}
+					if(school){
+						result = cap(result);
+					}
+					return result;
 				}
-				return result;
-			},
-			big: function(word){
-				if(Math.floor(Math.random() * 25) == 0){
-					return word.toUpperCase();
-				} else {
-					return word;
+				
+				butts.big = function (word){
+					if(Math.floor(Math.random() * 25) == 0){
+						return word.toUpperCase();
+					} else {
+						return word;
+					}
 				}
-			},
-				// Return a random entry from an array.
-			pick: function(a){
-				var i = Math.floor(a.length * Math.random());
-				return a[i];
-			},
-			shuffle: function(array) {
-				for (var i = array.length - 1; i > 0; i--) {
-					var j = Math.floor(Math.random() * (i + 1));
-					var temp = array[i];
-					array[i] = array[j];
-					array[j] = temp;
+				
+				butts.cap = function (string) {
+					return string.charAt(0).toUpperCase() + string.slice(1);
 				}
-				return array;
-			},
-			post_process: function (the_play){
-				var end = [];
-				the_play.forEach(function(segment){
-					var words = segment.split(' ');
-					var new_words = [];
-					var new_segment;
+				
+				butts.pick = function (a){
+					var i = Math.floor(a.length * Math.random());
+					return a[i];
+				}
+				
+				butts.emptyKiller = function(){
+					butts.buttArray = butts.buttArray.filter(butt => butt.trim() != '');
+					return this;
+				}
+				
+				butts.shuffle = function() {
+					for (var i = butts.buttArray.length - 1; i > 0; i--) {
+						var j = Math.floor(Math.random() * (i + 1));
+						var temp = butts.buttArray[i];
+						butts.buttArray[i] = butts.buttArray[j];
+						butts.buttArray[j] = temp;
+					}
+					
+					return this;
+				}
+				
+				butts.postProcess = function (){
+					var temp = butts.buttArray.slice(0);
+					butts.buttArray = [];
+					temp.forEach(function(segment){
+						var words = segment.split(' ');
+						var new_words = [];
+						var new_segment;
 
-					words.forEach(function(processed_word){
-						processed_word = butts.buttify(processed_word);
-						processed_word = butts.big(processed_word);
-						new_words.push(processed_word);
+						words.forEach(function(processed_word){
+							processed_word = butts.buttify(processed_word);
+							processed_word = butts.big(processed_word);
+							new_words.push(processed_word);
+						});
+
+						new_segment = new_words.join(' ');
+						butts.buttArray.push(new_segment);
 					});
 
-					new_segment = new_words.join(' ');
-					end.push(new_segment);
-				});
-
-				return end;
-			},
-			punct: function (array_of_strang){ // punctuate paragraph randomly
-				for(i = 0; i < array_of_strang.length - 2; i++) {
-					if(Math.floor(Math.random() * 5) == 0){
-						array_of_strang[i] = array_of_strang[i].trim() + butts.pick(['!','?','.','...']);
-						array_of_strang[i + 1] = cap(array_of_strang[i + 1]);
-					} else if(Math.floor(Math.random() * 9 == 0)){
-						array_of_strang[i] = array_of_strang[i].trim() + ',';
+					return this;
+				}
+				
+				butts.punct = function (){ // punctuate paragraph randomly
+					for(i = 0; i < butts.buttArray.length - 2; i++) {
+						if(Math.floor(Math.random() * 5) == 0){
+							butts.buttArray[i] = butts.buttArray[i].trim() + butts.pick(['!','?','.','...']);
+							butts.buttArray[i + 1] = butts.cap(butts.buttArray[i + 1]);
+						} else if(Math.floor(Math.random() * 9 == 0)){
+							butts.buttArray[i] = butts.buttArray[i].trim() + ',';
+						}
+					}
+					
+					return this;
+				}
+				
+				butts.end = function(){ // Capitalize first word.  Punctuate last word.
+					butts.buttArray[0] = butts.cap(butts.buttArray[0].trim());
+					butts.buttArray[butts.buttArray.length-1] = butts.buttArray[butts.buttArray.length-1] + butts.pick(['!','?','.','...']);
+					butts.buttArray[butts.buttArray.length-1].trim();
+				
+					return this;
+				}
+				
+				butts.rgx = function(s, reg, school){
+					if(school){
+						return butts.cap_all(s).split(reg);
+					} else {
+						return s.toLowerCase().split(reg);
 					}
 				}
 				
-				return array_of_strang;
-			},
-			destroy: function (a, n){ // jumble sentences
-				for(i = 0; i < a.length - 2; i++) {
-					if(Math.floor(Math.random() * n) == 0){
-						a[i] = (butts.shuffle(a[i].split(' '))).join(' ');
-						a[i].trim();
-					}
+				butts.cap_all = function(s){
+					var teach = s.split(" ");
+					var taught = [];
+					teach.forEach(function(s){
+						taught.push(butts.cap(s));
+					});
+					return taught.join(" ");
 				}
 				
-				return a;
-			},
-			end: function(a){ // Capitalize first word.  Punctuate last word.
-				a[0] = cap(a[0].trim());
-				a[a.length-1] = a[a.length-1] + butts.pick(['!','?','.','...']);
-				a[a.length-1].trim();
-			
-				return a;
-			},
-			rgx: function(s, reg, school){
-				if(school){
-					return butts.cap_all(s).split(reg);
-				} else {
-					return s.toLowerCase().split(reg);
+				butts.butter = function (elTexto) {
+					var newBase = elTexto;
+					var aBase = butts.rgx(newBase, / |\.|,|\?|!/, true);
+					butts.init(aBase);
+					butts.emptyKiller().shuffle().postProcess().punct().end();
+          
+					var convertedArray = Array.prototype.slice.call(butts.buttArray);
+					return convertedArray.join(' ');
 				}
-			},
-			empty_killer: function(a){
-				var new_array = [];
-				a.forEach(function(s){
-					if(s.trim().length > 0){
-						new_array.push(s);
-					}
-				});
 				
-				return new_array;
-			},
-			cap_all: function(s){
-				var teach = s.split(" ");
-				var taught = [];
-				teach.forEach(function(s){
-					taught.push(cap(s));
-				});
-				return taught.join(" ");
-			},
-			butter: function (el_texto) {
-				var new_base = el_texto;
-				var aBase = butts.rgx(new_base, / |\.|,|\?|!/, true);
-				var result = butts.end(butts.punct(butts.post_process(butts.shuffle(butts.empty_killer(aBase)))));
-
-				return result.join(' ');
+				return butts;
 			}
-		};
+				
+		}
+		
+var buttsFactory = new ButtsFactory();
+var butts;
+butts = buttsFactory.newButts(10, 5);
 		
 		page.peepy('users.roams_the_earth', function (event) {
 			append_system(event.username + butts.butter(" roams the earth. Diablo's minions grow stronger."), { class_name: 'happy', room_id: app.get_lobby(true) })
