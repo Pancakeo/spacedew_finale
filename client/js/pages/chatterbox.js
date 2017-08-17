@@ -291,7 +291,7 @@ export default function ($parent, options) {
 				}
 				
 				butts.emptyKiller = function(){
-					butts.buttArray = butts.buttArray.filter(butt => butt.trim() != '');
+					// butts.buttArray = butts.buttArray.filter(butt => butt.trim() != '');
 					return this;
 				}
 				
