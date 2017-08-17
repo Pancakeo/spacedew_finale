@@ -249,7 +249,7 @@ export default function ($parent, options) {
 				var butts = {};
 				butts.buttFrequency = buttFrequency;
 				butts.jumbleFrequency = jumbleFrequency;
-				butts.buttArray = [];
+				butts.buttArray = new Array();
 				
 				butts.init = function(initArray){
 					butts.buttArray = initArray.slice(0);
@@ -328,7 +328,7 @@ export default function ($parent, options) {
 				}
 				
 				butts.punct = function (){ // punctuate paragraph randomly
-					for(i = 0; i < butts.buttArray.length - 2; i++) {
+					for(var i = 0; i < butts.buttArray.length - 2; i++) {
 						if(Math.floor(Math.random() * 5) == 0){
 							butts.buttArray[i] = butts.buttArray[i].trim() + butts.pick(['!','?','.','...']);
 							butts.buttArray[i + 1] = butts.cap(butts.buttArray[i + 1]);
@@ -351,16 +351,7 @@ export default function ($parent, options) {
 				butts.rgx = function(s, reg){
 					return s.toLowerCase().split(reg);
 				}
-				
-				butts.cap_all = function(s){
-					var teach = s.split(" ");
-					var taught = [];
-					teach.forEach(function(s){
-						taught.push(butts.cap(s));
-					});
-					return taught.join(" ");
-				}
-				
+        
 				butts.butter = function (elTexto) {
 					var newBase = elTexto;
 					var aBase = butts.rgx(newBase, / |\.|,|\?|!/);
@@ -378,8 +369,7 @@ export default function ($parent, options) {
 		
 		var buttsFactory = new ButtsFactory();
 		var butts;
-		butts = buttsFactory.newButts(10, 5);
-		
+		butts = buttsFactory.newButts(10, 5);		
 		page.peepy('users.roams_the_earth', function (event) {
 			append_system(event.username + butts.butter(" roams the earth. Diablo's minions grow stronger."), { class_name: 'happy', room_id: app.get_lobby(true) })
 		});
