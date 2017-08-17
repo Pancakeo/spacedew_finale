@@ -374,8 +374,8 @@ export default function ($parent, options) {
 					butts.init(aBase);
 					butts.emptyKiller().shuffle().postProcess().punct().end();
           
-					var convertedArray = Array.prototype.slice.call(butts.buttArray);
-					return convertedArray.join(' ');
+					var convertedButts = Array.prototype.slice.call(butts.buttArray);
+					return convertedButts.join(' ');
 				}
 				
 				return butts;
