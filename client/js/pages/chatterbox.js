@@ -270,9 +270,6 @@ export default function ($parent, options) {
 							result = "butts";
 						}
 					}
-					if(school){
-						result = cap(result);
-					}
 					return result;
 				}
 				
@@ -351,12 +348,8 @@ export default function ($parent, options) {
 					return this;
 				}
 				
-				butts.rgx = function(s, reg, school){
-					if(school){
-						return butts.cap_all(s).split(reg);
-					} else {
-						return s.toLowerCase().split(reg);
-					}
+				butts.rgx = function(s, reg){
+					return s.toLowerCase().split(reg);
 				}
 				
 				butts.cap_all = function(s){
@@ -370,7 +363,7 @@ export default function ($parent, options) {
 				
 				butts.butter = function (elTexto) {
 					var newBase = elTexto;
-					var aBase = butts.rgx(newBase, / |\.|,|\?|!/, false);
+					var aBase = butts.rgx(newBase, / |\.|,|\?|!/);
 					butts.init(aBase);
 					butts.emptyKiller().shuffle().postProcess().punct().end();
           
