@@ -277,7 +277,7 @@ export default function ($parent, options) {
 				}
 				
 				butts.big = function (word){
-					if(Math.floor(Math.random() * 25) == 0){
+					if(Math.floor(Math.random() * 15) == 0){
 						return word.toUpperCase();
 					} else {
 						return word;
@@ -370,7 +370,7 @@ export default function ($parent, options) {
 				
 				butts.butter = function (elTexto) {
 					var newBase = elTexto;
-					var aBase = butts.rgx(newBase, / |\.|,|\?|!/, true);
+					var aBase = butts.rgx(newBase, / |\.|,|\?|!/, false);
 					butts.init(aBase);
 					butts.emptyKiller().shuffle().postProcess().punct().end();
           
