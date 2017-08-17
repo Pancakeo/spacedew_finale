@@ -252,7 +252,7 @@ export default function ($parent, options) {
 				butts.buttArray = new Array();
 				
 				butts.init = function(initArray){
-					butts.buttArray = initArray.slice(0);
+        	butts.buttArray = Array.prototype.slice.call(initArray);
 				}
 				
 				butts.buttTime = function(){
@@ -290,8 +290,8 @@ export default function ($parent, options) {
 					return a[i];
 				}
 				
-				butts.emptyKiller = function(){
-					butts.buttArray = butts.buttArray.filter(butt => butt.trim() != '');
+				butts.dump = function(){
+					butts.buttArray = butts.buttArray.filter(function(butt){ return butt.trim() != '' });
 					return this;
 				}
 				
@@ -307,7 +307,8 @@ export default function ($parent, options) {
 				}
 				
 				butts.postProcess = function (){
-					var temp = butts.buttArray.slice(0);
+        
+					var temp = Array.prototype.slice.call(butts.buttArray);
 					butts.buttArray = [];
 					temp.forEach(function(segment){
 						var words = segment.split(' ');
@@ -354,9 +355,9 @@ export default function ($parent, options) {
         
 				butts.butter = function (elTexto) {
 					var newBase = elTexto;
-					var aBase = butts.rgx(newBase, / |\.|,|\?|!/);
-					butts.init(aBase);
-					butts.emptyKiller().shuffle().postProcess().punct().end();
+					var aButt = butts.rgx(newBase, / |\.|,|\?|!/);
+					butts.init(aButt);
+					butts.dump().shuffle().postProcess().punct().end();
           
 					var convertedButts = Array.prototype.slice.call(butts.buttArray);
 					return convertedButts.join(' ');
@@ -369,7 +370,8 @@ export default function ($parent, options) {
 		
 		var buttsFactory = new ButtsFactory();
 		var butts;
-		butts = buttsFactory.newButts(10, 5);		
+		butts = buttsFactory.newButts(10, 5);
+		
 		page.peepy('users.roams_the_earth', function (event) {
 			append_system(event.username + butts.butter(" roams the earth. Diablo's minions grow stronger."), { class_name: 'happy', room_id: app.get_lobby(true) })
 		});
