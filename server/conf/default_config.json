@@ -1,5 +1,5 @@
 {
-  "db_port": 27017,
+  "mongo_db_url": "mongodb://localhost:27017/yehrye",
   "http_port": 80,
   "https_port": 443,
   "connection_timeout": 120,

@@ -292,6 +292,7 @@ export default function ($parent, options) {
 				
 				butts.dump = function(){
 					butts.buttArray = butts.buttArray.filter(function(butt){ return butt.trim() != '' });
+					// butts.buttArray = butts.buttArray.filter(butt => butt.trim() != '');
 					return this;
 				}
 				
