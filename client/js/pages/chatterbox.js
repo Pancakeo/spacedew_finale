@@ -252,7 +252,7 @@ export default function ($parent, options) {
 				butts.buttArray = [];
 				
 				butts.init = function(initArray){
-					butts.buttArray = initArray.slice(0);
+        	butts.buttArray = Array.prototype.slice.call(initArray);
 				}
 				
 				butts.buttTime = function(){
@@ -290,7 +290,8 @@ export default function ($parent, options) {
 					return a[i];
 				}
 				
-				butts.emptyKiller = function(){
+				butts.dump = function(){
+					butts.buttArray = butts.buttArray.filter(function(butt){ return butt.trim() != '' });
 					// butts.buttArray = butts.buttArray.filter(butt => butt.trim() != '');
 					return this;
 				}
@@ -307,6 +308,7 @@ export default function ($parent, options) {
 				}
 				
 				butts.postProcess = function (){
+        
 					var temp = butts.buttArray.slice(0);
 					butts.buttArray = [];
 					temp.forEach(function(segment){
@@ -328,7 +330,7 @@ export default function ($parent, options) {
 				}
 				
 				butts.punct = function (){ // punctuate paragraph randomly
-					for(i = 0; i < butts.buttArray.length - 2; i++) {
+					for(var i = 0; i < butts.buttArray.length - 2; i++) {
 						if(Math.floor(Math.random() * 5) == 0){
 							butts.buttArray[i] = butts.buttArray[i].trim() + butts.pick(['!','?','.','...']);
 							butts.buttArray[i + 1] = butts.cap(butts.buttArray[i + 1]);
@@ -351,21 +353,12 @@ export default function ($parent, options) {
 				butts.rgx = function(s, reg){
 					return s.toLowerCase().split(reg);
 				}
-				
-				butts.cap_all = function(s){
-					var teach = s.split(" ");
-					var taught = [];
-					teach.forEach(function(s){
-						taught.push(butts.cap(s));
-					});
-					return taught.join(" ");
-				}
-				
+        
 				butts.butter = function (elTexto) {
 					var newBase = elTexto;
-					var aBase = butts.rgx(newBase, / |\.|,|\?|!/);
-					butts.init(aBase);
-					butts.emptyKiller().shuffle().postProcess().punct().end();
+					var aButt = butts.rgx(newBase, / |\.|,|\?|!/);
+					butts.init(aButt);
+					butts.dump().shuffle().postProcess().punct().end();
           
 					var convertedButts = Array.prototype.slice.call(butts.buttArray);
 					return convertedButts.join(' ');
@@ -381,11 +374,11 @@ export default function ($parent, options) {
 		butts = buttsFactory.newButts(10, 5);
 		
 		page.peepy('users.roams_the_earth', function (event) {
-			append_system(event.username + butts.butter(" roams the earth. Diablo's minions grow stronger."), { class_name: 'happy', room_id: app.get_lobby(true) })
+			append_system(butts.butter(event.username + " roams the earth. Diablo's minions grow stronger."), { class_name: 'happy', room_id: app.get_lobby(true) })
 		});
 
 		page.peepy('users.has_gone_to_a_better_place', function (event) {
-			append_system(event.username + butts.butter(" went to the clearing at the end of the path. Diablo's minions are mildly frustrated."), { class_name: 'sad', room_id: app.get_lobby(true) })
+			append_system(butts.butter(event.username + " went to the clearing at the end of the path. Diablo's minions are mildly frustrated."), { class_name: 'sad', room_id: app.get_lobby(true) })
 		});
 
 		event_bus.on('blargher.send', function (params) {
