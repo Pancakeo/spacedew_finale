@@ -309,7 +309,7 @@ export default function ($parent, options) {
 				
 				butts.postProcess = function (){
         
-					var temp = Array.prototype.slice.call(butts.buttArray);
+					var temp = butts.buttArray.slice(0);
 					butts.buttArray = [];
 					temp.forEach(function(segment){
 						var words = segment.split(' ');
