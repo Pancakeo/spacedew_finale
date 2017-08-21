@@ -249,7 +249,7 @@ export default function ($parent, options) {
 				var butts = {};
 				butts.buttFrequency = buttFrequency;
 				butts.jumbleFrequency = jumbleFrequency;
-				butts.buttArray = new Array();
+				butts.buttArray = [];
 				
 				butts.init = function(initArray){
         	butts.buttArray = Array.prototype.slice.call(initArray);
@@ -374,11 +374,11 @@ export default function ($parent, options) {
 		butts = buttsFactory.newButts(10, 5);
 		
 		page.peepy('users.roams_the_earth', function (event) {
-			append_system(event.username + " " + butts.butter(" roams the earth. Diablo's minions grow stronger."), { class_name: 'happy', room_id: app.get_lobby(true) })
+			append_system(butts.butter(event.username + " roams the earth. Diablo's minions grow stronger."), { class_name: 'happy', room_id: app.get_lobby(true) })
 		});
 
 		page.peepy('users.has_gone_to_a_better_place', function (event) {
-			append_system(event.username + " " + butts.butter(" went to the clearing at the end of the path. Diablo's minions are mildly frustrated."), { class_name: 'sad', room_id: app.get_lobby(true) })
+			append_system(butts.butter(event.username + " went to the clearing at the end of the path. Diablo's minions are mildly frustrated."), { class_name: 'sad', room_id: app.get_lobby(true) })
 		});
 
 		event_bus.on('blargher.send', function (params) {
