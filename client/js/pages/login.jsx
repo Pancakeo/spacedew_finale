@@ -32,7 +32,7 @@ export class LoginComponent extends React.Component {
 					status: "Connected!"
 				});
 
-				if (!document.hidden || localStorage.is_local_dev) {
+				if (!document.hidden || localStorage.is_local_dev || sessionStorage.consenting_adult) {
 					if (localStorage.auth_key != null) {
 						this.setState({
 							status: 'Logging in (Auth Key)...',
@@ -87,6 +87,9 @@ export class LoginComponent extends React.Component {
 				
 				return;
 			}
+
+			// It worked! Store a session thing.
+			sessionStorage.consenting_adult = 'probably';
 
 			localStorage.auth_key = data.auth_key;
 			localStorage.username = data.username;
