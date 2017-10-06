@@ -1,5 +1,4 @@
 import "../../less/login.less";
-import * as $ from 'jquery';
 import "jquery-ui-bundle";
 
 import tom_clancy from './tom_clancy';

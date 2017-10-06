@@ -3,11 +3,6 @@ import blackBoard from './components/black_board.jsx';
 
 import '../../less/global.less';
 
-import '../../node_modules/jquery-ui-bundle/jquery-ui.css';
-import 'font-awesome-webpack';
-
-import * as $ from 'jquery';
-import 'jquery-ui-bundle';
 import toolio from '../app/toolio';
 import event_bus from '../../../shared/event_bus';
 
@@ -19,9 +14,9 @@ import {
 } from "../pages/login.jsx";
 
 
-(function () {
-    window.$ = $;
+import '../../node_modules/jquery-ui-bundle/jquery-ui.css';
 
+(function () {
     var search = window.location.search;
     var matches = search.split('&');
     var query_params = {};

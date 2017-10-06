@@ -1,6 +1,5 @@
 module.exports = function() {
-    const $ = require('jquery');
-
+	
     var page_name, options, callback;
     if (arguments.length === 3) {
         page_name = arguments[0];

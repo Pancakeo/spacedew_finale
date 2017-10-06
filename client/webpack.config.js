@@ -8,24 +8,19 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
-let devConfig = {
-	// context: resolve(__dirname, 'client'),
+const commonConfig = {
 
-	entry: [
-		'react-hot-loader/patch',
-		// activate HMR for React
-
-		'webpack-dev-server/client?http://localhost:8080',
-		// bundle the client for webpack-dev-server
-		// and connect to the provided endpoint
-
-		'webpack/hot/only-dev-server',
-		// bundle the client for hot reloading
-		// only- means to only hot reload for successful updates
-
-		'./js/app/init.jsx'
-		// the entry point of our app
-	],
+	entry: {
+		app: './js/app/init.jsx',
+		vendor: [
+			'jquery', 'jquery-ui-bundle', 'jquery-contextmenu',
+			'font-awesome-webpack',
+			'idle-js',
+			'react', 'react-dom', 'react-simple-colorpicker',
+			'moment',
+			'pako'
+		]
+	},
 	output: {
 		filename: 'spacedew_finale.js',
 		// the output bundle
@@ -99,88 +94,16 @@ let devConfig = {
 		new webpack.NamedModulesPlugin(),
 		// prints more readable module names in the browser console on HMR updates
 
-		new CopyWebpackPlugin([{
-				from: './html',
-				to: 'html'
-			},
-			{
-				from: './js/public',
-				to: 'js/public'
-			},
-			{
-				from: './public',
-				to: 'public'
-			}
-		]),
+		new webpack.optimize.CommonsChunkPlugin({
+			name: 'vendor',
+			filename: 'vendor-[hash].js',
+			minChunks: Infinity
+		}),
 
-		new ExtractTextPlugin("wup.css"),
-
-		new HtmlWebpackPlugin({
-			template: 'index_template.ejs',
-			title: "Reckless Abandon (Dev)",
-			hash: true,
-			favicon: './public/favicon-normal.png'
-		})
-	]
-};
-
-let prodConfig = {
-	entry: [
-		// the entry point of our app
-		'./js/app/init.jsx'
-	],
-	output: {
-		filename: 'spacedew_finale.js',
-		path: resolve(__dirname, 'dist')
-	},
-
-	// devtool: 'nosources-source-map',
-
-	module: {
-		rules: [{
-				test: /\.jsx/,
-				loader: 'babel-loader'
-			}, {
-				test: /\.(png|jpg|gif)$/,
-				use: [{
-					loader: 'url-loader',
-					options: {
-						limit: 8192
-					}
-				}]
-			},
-			{
-				test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-				loader: "url-loader?limit=10000&mimetype=application/font-woff"
-			},
-			{
-				test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-				loader: "file-loader"
-			},
-			{
-				test: /\.(less|css)$/,
-				use: ExtractTextPlugin.extract({
-					fallback: 'style-loader',
-					use: ['css-loader',
-						{
-							loader: 'less-loader',
-							options: {
-								noIeCompat: true
-							}
-						}
-					]
-				})
-			}
-		]
-	},
-	plugins: [
-		new Clean(['dist']),
-
-		new webpack.DefinePlugin({
-			'process.env': {
-				// This has effect on the react lib size
-				'NODE_ENV': JSON.stringify('production'),
-			}
+		new webpack.ProvidePlugin({
+			$: "jquery",
+			jQuery: "jquery",
+			"window.jQuery": "jquery"
 		}),
 
 		new CopyWebpackPlugin([{
@@ -198,15 +121,38 @@ let prodConfig = {
 		]),
 
 		new ExtractTextPlugin("wup.css"),
-
-		new HtmlWebpackPlugin({
-			template: 'index_template.ejs',
-			title: "Reckless Abandon",
-			hash: true,
-			favicon: './public/favicon-normal.png'
-		})
 	]
-};
+}
+
+const devConfig = Object.assign({}, commonConfig);
+
+const devHtmlPlugin = new HtmlWebpackPlugin({
+	template: 'index_template.ejs',
+	title: "Reckless Abandon (Dev)",
+	hash: true,
+	favicon: './public/favicon-normal.png'
+});
+
+devConfig.plugins.push(devHtmlPlugin);
+
+const prodConfig = Object.assign({}, commonConfig);
+
+const prodHtmlPlugin = new HtmlWebpackPlugin({
+	template: 'index_template.ejs',
+	title: "Reckless Abandon",
+	hash: true,
+	favicon: './public/favicon-normal.png'
+});
+
+const setProductionEnv = new webpack.DefinePlugin({
+	'process.env': {
+		// This has effect on the react lib size
+		'NODE_ENV': JSON.stringify('production'),
+	}
+});
+
+prodConfig.plugins.unshift(setProductionEnv);
+prodConfig.plugins.push(prodHtmlPlugin);
 
 if (process.env.NODE_ENV && process.env.NODE_ENV.trim() == 'production') {
 	console.log("Using prod config.");
