@@ -7,6 +7,7 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 
 const commonConfig = {
 
@@ -144,6 +145,19 @@ const prodHtmlPlugin = new HtmlWebpackPlugin({
 	favicon: './public/favicon-normal.png'
 });
 
+const prodUglifyJsPlugin = new UglifyJSPlugin({
+	uglifyOptions: {
+		ecma: 8,
+		output: {
+			comments: false,
+			beautify: false,
+		},
+		mangle: false,
+		compress: false,
+		warnings: true
+	}
+});
+
 const setProductionEnv = new webpack.DefinePlugin({
 	'process.env': {
 		// This has effect on the react lib size
@@ -153,8 +167,9 @@ const setProductionEnv = new webpack.DefinePlugin({
 
 prodConfig.plugins.unshift(setProductionEnv);
 prodConfig.plugins.push(prodHtmlPlugin);
+prodConfig.plugins.unshift(prodUglifyJsPlugin);
 
-if (process.env.NODE_ENV && process.env.NODE_ENV.trim() == 'production') {
+if (process.env.NODE_ENV && process.env.NODE_ENV.trim() == 'webpack_prod_build') {
 	console.log("Using prod config.");
 	module.exports = prodConfig;
 } else {
