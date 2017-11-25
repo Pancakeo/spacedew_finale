@@ -645,10 +645,7 @@ export default function ($parent, options) {
 				scroll_thing($blargh);
 			}
 
-			if (app.idleTracker) {
-				app.idleTracker.idle = true;
-			}
-			
+			app.idleTracker && app.idleTracker.restart();
 		});
 
 		var lobby = options.lobby;
