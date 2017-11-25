@@ -48,14 +48,16 @@ export default function ($parent, options) {
 
 				if (message == '') {
 					message = parts.join(' ');
-				}
-				else {
+				} else {
 					message += '<br/>' + parts.join(' ');
 				}
 
 			});
 
-			return { message: message, maybe_something: maybe_something };
+			return {
+				message: message,
+				maybe_something: maybe_something
+			};
 		};
 
 		var show_notification = function (message, append_options) {
@@ -122,8 +124,7 @@ export default function ($parent, options) {
 					do_append(room_id);
 					$blargh = $blargh.clone(); // this doesn't entirely work for some $blarghs.
 				});
-			}
-			else {
+			} else {
 				do_append(append_options.room_id);
 			}
 
@@ -158,8 +159,7 @@ export default function ($parent, options) {
 					var room_id = $(this).attr('room_id');
 					do_append(room_id);
 				});
-			}
-			else {
+			} else {
 				do_append(append_options.room_id);
 			}
 		};
@@ -201,11 +201,20 @@ export default function ($parent, options) {
 					username_thing = '[TEAM] ' + data.username;
 				}
 
-				var $message = $('<div class="message"><span class="timestamp">[' + moment().format("h:mm:ss A") + ']</span><span class="username">' + username_thing + ': </span>'
-					+ '<span class="message_text">' + message + '</span></div>');
-				$message.css({ background: outfit.bg_color, color: outfit.fg_color, fontFamily: outfit.font_family, fontSize: outfit.font_size + 'px' });
-				$message.find('.username').css({ color: outfit.username_color });
-				$message.find('a').css({ color: outfit.fg_color });
+				var $message = $('<div class="message"><span class="timestamp">[' + moment().format("h:mm:ss A") + ']</span><span class="username">' + username_thing + ': </span>' +
+					'<span class="message_text">' + message + '</span></div>');
+				$message.css({
+					background: outfit.bg_color,
+					color: outfit.fg_color,
+					fontFamily: outfit.font_family,
+					fontSize: outfit.font_size + 'px'
+				});
+				$message.find('.username').css({
+					color: outfit.username_color
+				});
+				$message.find('a').css({
+					color: outfit.fg_color
+				});
 
 				$chat.append($message);
 
@@ -238,33 +247,32 @@ export default function ($parent, options) {
 					var room_id = $(this).attr('room_id');
 					do_append(room_id);
 				});
-			}
-			else {
+			} else {
 				do_append(data.room_id);
 			}
 		};
 
 		function ButtsFactory() {
-			this.newButts = function (buttFrequency, jumbleFrequency){
+			this.newButts = function (buttFrequency, jumbleFrequency) {
 				var butts = {};
 				butts.buttFrequency = buttFrequency;
 				butts.jumbleFrequency = jumbleFrequency;
 				butts.buttArray = [];
-				
-				butts.init = function(initArray){
+
+				butts.init = function (initArray) {
 					butts.buttArray = initArray.slice(0);
 				}
-				
-				butts.buttTime = function(){
-					if(Math.floor(Math.random() * butts.buttFrequency) == 0){
+
+				butts.buttTime = function () {
+					if (Math.floor(Math.random() * butts.buttFrequency) == 0) {
 						return true;
 					}
 				}
-				
-				butts.buttify = function (word){ 
+
+				butts.buttify = function (word) {
 					var result = word;
-					if(this.buttTime()){
-						if(Math.floor(Math.random() * 2) == 0){
+					if (this.buttTime()) {
+						if (Math.floor(Math.random() * 2) == 0) {
 							result = "butt";
 						} else {
 							result = "butts";
@@ -272,49 +280,49 @@ export default function ($parent, options) {
 					}
 					return result;
 				}
-				
-				butts.big = function (word){
-					if(Math.floor(Math.random() * 15) == 0){
+
+				butts.big = function (word) {
+					if (Math.floor(Math.random() * 15) == 0) {
 						return word.toUpperCase();
 					} else {
 						return word;
 					}
 				}
-				
+
 				butts.cap = function (string) {
 					return string.charAt(0).toUpperCase() + string.slice(1);
 				}
-				
-				butts.pick = function (a){
+
+				butts.pick = function (a) {
 					var i = Math.floor(a.length * Math.random());
 					return a[i];
 				}
-				
-				butts.emptyKiller = function(){
+
+				butts.emptyKiller = function () {
 					// butts.buttArray = butts.buttArray.filter(butt => butt.trim() != '');
 					return this;
 				}
-				
-				butts.shuffle = function() {
+
+				butts.shuffle = function () {
 					for (var i = butts.buttArray.length - 1; i > 0; i--) {
 						var j = Math.floor(Math.random() * (i + 1));
 						var temp = butts.buttArray[i];
 						butts.buttArray[i] = butts.buttArray[j];
 						butts.buttArray[j] = temp;
 					}
-					
+
 					return this;
 				}
-				
-				butts.postProcess = function (){
+
+				butts.postProcess = function () {
 					var temp = butts.buttArray.slice(0);
 					butts.buttArray = [];
-					temp.forEach(function(segment){
+					temp.forEach(function (segment) {
 						var words = segment.split(' ');
 						var new_words = [];
 						var new_segment;
 
-						words.forEach(function(processed_word){
+						words.forEach(function (processed_word) {
 							processed_word = butts.buttify(processed_word);
 							processed_word = butts.big(processed_word);
 							new_words.push(processed_word);
@@ -326,72 +334,81 @@ export default function ($parent, options) {
 
 					return this;
 				}
-				
-				butts.punct = function (){ // punctuate paragraph randomly
-					for(i = 0; i < butts.buttArray.length - 2; i++) {
-						if(Math.floor(Math.random() * 5) == 0){
-							butts.buttArray[i] = butts.buttArray[i].trim() + butts.pick(['!','?','.','...']);
+
+				butts.punct = function () { // punctuate paragraph randomly
+					for (i = 0; i < butts.buttArray.length - 2; i++) {
+						if (Math.floor(Math.random() * 5) == 0) {
+							butts.buttArray[i] = butts.buttArray[i].trim() + butts.pick(['!', '?', '.', '...']);
 							butts.buttArray[i + 1] = butts.cap(butts.buttArray[i + 1]);
-						} else if(Math.floor(Math.random() * 9 == 0)){
+						} else if (Math.floor(Math.random() * 9 == 0)) {
 							butts.buttArray[i] = butts.buttArray[i].trim() + ',';
 						}
 					}
-					
+
 					return this;
 				}
-				
-				butts.end = function(){ // Capitalize first word.  Punctuate last word.
+
+				butts.end = function () { // Capitalize first word.  Punctuate last word.
 					butts.buttArray[0] = butts.cap(butts.buttArray[0].trim());
-					butts.buttArray[butts.buttArray.length-1] = butts.buttArray[butts.buttArray.length-1] + butts.pick(['!','?','.','...']);
-					butts.buttArray[butts.buttArray.length-1].trim();
-				
+					butts.buttArray[butts.buttArray.length - 1] = butts.buttArray[butts.buttArray.length - 1] + butts.pick(['!', '?', '.', '...']);
+					butts.buttArray[butts.buttArray.length - 1].trim();
+
 					return this;
 				}
-				
-				butts.rgx = function(s, reg){
+
+				butts.rgx = function (s, reg) {
 					return s.toLowerCase().split(reg);
 				}
-				
-				butts.cap_all = function(s){
+
+				butts.cap_all = function (s) {
 					var teach = s.split(" ");
 					var taught = [];
-					teach.forEach(function(s){
+					teach.forEach(function (s) {
 						taught.push(butts.cap(s));
 					});
 					return taught.join(" ");
 				}
-				
+
 				butts.butter = function (elTexto) {
 					var newBase = elTexto;
 					var aBase = butts.rgx(newBase, / |\.|,|\?|!/);
 					butts.init(aBase);
 					butts.emptyKiller().shuffle().postProcess().punct().end();
-          
+
 					var convertedButts = Array.prototype.slice.call(butts.buttArray);
 					return convertedButts.join(' ');
 				}
-				
+
 				return butts;
 			}
-				
+
 		}
-		
+
 		var buttsFactory = new ButtsFactory();
 		var butts = buttsFactory.newButts(10, 5);
-		
+
 		page.peepy('users.roams_the_earth', function (event) {
 			// append_system(event.username + butts.butter(" roams the earth. Diablo's minions grow stronger."), { class_name: 'happy', room_id: app.get_lobby(true) })
-			append_system(event.username + " roams the earth. Diablo's minions grow stronger.", { class_name: 'happy', room_id: app.get_lobby(true) })
+			append_system(event.username + " roams the earth. Diablo's minions grow stronger.", {
+				class_name: 'happy',
+				room_id: app.get_lobby(true)
+			})
 		});
 
 		page.peepy('users.has_gone_to_a_better_place', function (event) {
 			// append_system(event.username + butts.butter(" went to the clearing at the end of the path. Diablo's minions are mildly frustrated."), { class_name: 'sad', room_id: app.get_lobby(true) })
-			append_system(event.username + " went to the clearing at the end of the path. Diablo's minions are mildly frustrated.", { class_name: 'sad', room_id: app.get_lobby(true) })
+			append_system(event.username + " went to the clearing at the end of the path. Diablo's minions are mildly frustrated.", {
+				class_name: 'sad',
+				room_id: app.get_lobby(true)
+			})
 		});
 
 		event_bus.on('blargher.send', function (params) {
 			var room_id = app.get_active_room(true);
-			page.send('blargh', { message: params.message, room_id: room_id });
+			page.send('blargh', {
+				message: params.message,
+				room_id: room_id
+			});
 		});
 
 		event_bus.on('tom_clancy.change_room_name', function (params) {
@@ -400,12 +417,21 @@ export default function ($parent, options) {
 
 		event_bus.on('ws.connect', function () {
 			var room_id = app.get_lobby(true);
-			append_system("Reconnected! Soothing lobster bisque...", { room_id: room_id, color: 'green' });
-			page.ws.send('login', 'reconnect', { auth_key: localStorage.auth_key, username: app.profile.username });
+			append_system("Reconnected! Soothing lobster bisque...", {
+				room_id: room_id,
+				color: 'green'
+			});
+			page.ws.send('login', 'reconnect', {
+				auth_key: localStorage.auth_key,
+				username: app.profile.username
+			});
 		});
 
 		event_bus.on('ws.binary_disconnect', function () {
-			app.append_system("Binary disconnected. Hopefully it comes back! (it doesn't)", { room_id: app.get_active_room(true), color: 'red' });
+			app.append_system("Binary disconnected. Hopefully it comes back! (it doesn't)", {
+				room_id: app.get_active_room(true),
+				color: 'red'
+			});
 		});
 
 		event_bus.on('ws.disconnect', function () {
@@ -419,9 +445,10 @@ export default function ($parent, options) {
 			if (!page.ws.reconnecting) {
 				var room_id = app.get_active_room(true);
 				var $blargh = $('<div class="reconnect_meter">Disconnected from server. Attempting to reconnect (attempt: <span id="reconnect_attempt">1</span>)</div>');
-				append_custom($blargh, { room_id: room_id });
-			}
-			else {
+				append_custom($blargh, {
+					room_id: room_id
+				});
+			} else {
 				var attempt = page.$(".reconnect_meter").last().find('#reconnect_attempt').text();
 				attempt = parseInt(attempt);
 				attempt++;
@@ -435,7 +462,9 @@ export default function ($parent, options) {
 		page.listen('blargh_grid', function (grid_data) {
 			var grid_width = grid_data.grid_width || 500;
 
-			var $blargh = $('<div class="blargh"/>').css({ width: grid_width });
+			var $blargh = $('<div class="blargh"/>').css({
+				width: grid_width
+			});
 			$blargh.append('<div class="header">' + grid_data.username + ' (' + grid_data.title + ') <span class="close">x</span></div>');
 			$blargh.append('<div class="body" style="padding: 0;"/>');
 			var $body = $blargh.find('.body');
@@ -465,7 +494,9 @@ export default function ($parent, options) {
 
 
 			$body.append($table);
-			append_custom($blargh, { room_id: grid_data.room_id });
+			append_custom($blargh, {
+				room_id: grid_data.room_id
+			});
 		});
 
 		page.listen('chat', function (data) {
@@ -473,12 +504,18 @@ export default function ($parent, options) {
 		});
 
 		page.listen('system', function (data) {
-			append_system(data.message, { class_name: 'sad', color: data.color, room_id: data.room_id })
+			append_system(data.message, {
+				class_name: 'sad',
+				color: data.color,
+				room_id: data.room_id
+			})
 		});
 
 		page.listen('boom_boom', function (data) {
 			page.toolio.confirm("Invitation", data.invited_by + " invited you to chat.<br/><br/><b>Room Name:</b> " + data.room_name, function () {
-				page.send('join_room', { room_id: data.room_id });
+				page.send('join_room', {
+					room_id: data.room_id
+				});
 			});
 		});
 
@@ -514,7 +551,9 @@ export default function ($parent, options) {
 		});
 
 		page.listen('join_room', function (room) {
-			app.add_room_tab(room, { focus: true });
+			app.add_room_tab(room, {
+				focus: true
+			});
 
 			if (room.recent_messages.length > 0) {
 				var $blargh = $('<div class="blargh recent_messages"/>');
@@ -527,7 +566,9 @@ export default function ($parent, options) {
 					$body.append('<div>[' + moment(mess.timestamp).format('hh:mm:ss A') + '] ' + message + '</div>');
 				});
 
-				append_custom($blargh, { room_id: room.id });
+				append_custom($blargh, {
+					room_id: room.id
+				});
 				scroll_thing($blargh);
 			}
 
@@ -541,11 +582,16 @@ export default function ($parent, options) {
 			var $body = $blargh.find('.body');
 			$body.text(data.message);
 
-			append_custom($blargh, { room_id: data.room_id });
+			append_custom($blargh, {
+				room_id: data.room_id
+			});
 		});
 
 		page.listen('change_room_name', function (data) {
-			append_system(data.blame + ' changed the room name to ' + data.new_name, { room_id: data.room_id, class_name: 'wup' });
+			append_system(data.blame + ' changed the room name to ' + data.new_name, {
+				room_id: data.room_id,
+				class_name: 'wup'
+			});
 			app.rename_room_tab(data.room_id, data.new_name);
 		});
 
@@ -557,7 +603,9 @@ export default function ($parent, options) {
 			var $progress = $('<progress value="0" max="100"/>');
 			$wrapper.append(message);
 			$wrapper.append($progress);
-			append_custom($wrapper, { room_id: data.room_id });
+			append_custom($wrapper, {
+				room_id: data.room_id
+			});
 		});
 
 		page.listen('reconnect', function (data) {
@@ -569,11 +617,17 @@ export default function ($parent, options) {
 			}
 
 			var room_id = app.get_lobby(true);
-			append_system("Logged in (again).", { room_id: room_id, color: 'green' });
+			append_system("Logged in (again).", {
+				room_id: room_id,
+				color: 'green'
+			});
 
 			localStorage.auth_key = data.auth_key;
 			lobby = data.lobby;
-			page.ws.send('users', 'sync', { room_id: app.get_active_room(true), mobile: app.is_mobile });
+			page.ws.send('users', 'sync', {
+				room_id: app.get_active_room(true),
+				mobile: app.is_mobile
+			});
 
 			if (lobby.recent_messages.length > 0) {
 				var $blargh = $('<div class="blargh recent_messages"/>');
@@ -585,18 +639,29 @@ export default function ($parent, options) {
 					$body.append('<div>[' + moment(mess.timestamp).format('hh:mm:ss A') + '] ' + mess.message + '</div>');
 				});
 
-				append_custom($blargh, { room_id: lobby.id });
+				append_custom($blargh, {
+					room_id: lobby.id
+				});
 				scroll_thing($blargh);
 			}
+
+			if (app.idleTracker) {
+				app.idleTracker.idle = true;
+			}
+			
 		});
 
 		var lobby = options.lobby;
-		app.add_room_tab(options.lobby, { focus: true });
+		app.add_room_tab(options.lobby, {
+			focus: true
+		});
 		app.ready = true;
 		app.logged_in = true;
 
 		app.handle_binary = function (binary_parts, meta) {
-			var blob = new Blob(binary_parts, { type: meta.type });
+			var blob = new Blob(binary_parts, {
+				type: meta.type
+			});
 			var blob_url = URL.createObjectURL(blob);
 
 			var $blob_wrapper = $('<div class="file_transfer"/>');
@@ -606,7 +671,10 @@ export default function ($parent, options) {
 			var $author = $('<span class="username"/>').text(meta.username);
 			var $file_name = $('<span class="file_name"/>').text(meta.name);
 			var $file_size = $('<span class="file_size"/>').text(page.toolio.nice_size(meta.size));
-			var $save = $('<a target="_blank" class="save">Save</a>').attr({ download: meta.name, href: blob_url });
+			var $save = $('<a target="_blank" class="save">Save</a>').attr({
+				download: meta.name,
+				href: blob_url
+			});
 			var $close = $('<span class="close">x</span>');
 
 			$header.append($author, ' has sent ', $file_name, ' (', $file_size, ')', $save, $close);
@@ -654,15 +722,19 @@ export default function ($parent, options) {
 
 			if (handlers[type]) {
 				handlers[type]();
-			}
-			else {
+			} else {
 				handlers.generic_file();
 			}
 
-			append_custom($blob_wrapper, { room_id: meta.room_id });
+			append_custom($blob_wrapper, {
+				room_id: meta.room_id
+			});
 		};
 
-		append_system("I like it spooky.", { class_name: 'welcoming', room_id: lobby.id });
+		append_system("I like it spooky.", {
+			class_name: 'welcoming',
+			room_id: lobby.id
+		});
 
 		app.append_system = function (message, append_options) {
 			var room_id = app.get_active_room(true);
@@ -685,7 +757,9 @@ export default function ($parent, options) {
 				$body.append('<div>[' + moment(mess.timestamp).format('hh:mm:ss A') + '] ' + message + '</div>');
 			});
 
-			append_custom($blargh, { room_id: lobby.id });
+			append_custom($blargh, {
+				room_id: lobby.id
+			});
 			scroll_thing($blargh);
 		}
 

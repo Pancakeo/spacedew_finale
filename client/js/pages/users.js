@@ -273,8 +273,9 @@ export default function($target) {
             app.render_users_list(data);
         });
 
-        var idle = new idleJs({
-            idle: 60 * 1000 * 5, // idle time in ms 
+        app.idleTracker = new idleJs({
+			// idle: 60 * 1000 * 5, // idle time in ms 
+			idle: 4000,
             events: ['mousemove', 'keydown', 'mousedown', 'touchstart'], // events that will trigger the idle resetter 
             onIdle: function () {
                 page.send('idle', {idle: true});
@@ -285,7 +286,9 @@ export default function($target) {
 
             keepTracking: true, // set it to false of you want to track only once 
             startAtIdle: true // set it to true if you want to start in the idle state 
-        }).start();
+		});
+		
+		app.idleTracker.start();
 
         app.event_bus.on('users_pane_loaded', function() {
             if (localStorage.fast_crab) {
