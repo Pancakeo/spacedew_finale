@@ -284,7 +284,7 @@ export default function($target) {
             }, // callback function to be executed after back form idleness 
 
             keepTracking: true, // set it to false of you want to track only once 
-            startAtIdle: false // set it to true if you want to start in the idle state 
+            startAtIdle: true // set it to true if you want to start in the idle state 
         }).start();
 
         app.event_bus.on('users_pane_loaded', function() {

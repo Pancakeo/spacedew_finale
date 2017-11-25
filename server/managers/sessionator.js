@@ -201,7 +201,7 @@ exports.connect = function(connection_id, ws) {
         logged_in: false,
         authenticated: false,
         profile: {},
-        idle: false,
+        idle: true,
         last_activity: Date.now(),
         queued_binary: [],
 
