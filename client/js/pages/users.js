@@ -302,13 +302,13 @@ export default function ($target) {
 				idleTime: 1000 * 60 * 5, // 5 minutes.
 				idle: true,
 				onIdle: function () {
-					console.log('idle');
+
 					page.send('idle', {
 						idle: true
 					});
 				},
 				onActive: function () {
-					console.log('active');
+
 					page.send('idle', {
 						idle: false
 					});
