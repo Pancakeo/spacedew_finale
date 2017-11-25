@@ -16,7 +16,6 @@ const commonConfig = {
 		vendor: [
 			'jquery', 'jquery-ui-bundle', 'jquery-contextmenu',
 			'font-awesome-webpack',
-			'idle-js',
 			'react', 'react-dom', 'react-simple-colorpicker',
 			'moment',
 			'pako'

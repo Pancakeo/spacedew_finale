@@ -2,7 +2,6 @@ import '../../less/users.less';
 import '../../node_modules/jquery-contextmenu/dist/jquery.contextMenu.css';
 
 import 'jquery-contextmenu';
-import idleJs from 'idle-js';
 import default_emus from '../app/default_emus';
 
 export default function ($target) {
@@ -295,25 +294,51 @@ export default function ($target) {
 			app.render_users_list(data);
 		});
 
-		app.idleTracker = new idleJs({
-			idle: 60 * 1000 * 5, // idle time in ms 
-			events: ['mousemove', 'keydown', 'mousedown', 'touchstart'], // events that will trigger the idle resetter 
-			onIdle: function () {
-				page.send('idle', {
-					idle: true
-				});
-			}, // callback function to be executed after idle time 
-			onActive: function () {
-				page.send('idle', {
-					idle: false
-				});
-			}, // callback function to be executed after back form idleness 
 
-			keepTracking: true, // set it to false of you want to track only once 
-			startAtIdle: true // set it to true if you want to start in the idle state 
-		});
+		var createIdleTracker = function () {
 
-		app.idleTracker.start();
+			const idleTracker = {
+				events: ['mousemove', 'keydown', 'mousedown', 'touchstart'],
+				idleTime: 1000 * 60 * 5, // 5 minutes.
+				idle: true,
+				onIdle: function () {
+					console.log('idle');
+					page.send('idle', {
+						idle: true
+					});
+				},
+				onActive: function () {
+					console.log('active');
+					page.send('idle', {
+						idle: false
+					});
+				},
+				reset: function(idleState) {
+					clearInterval(idleTracker.interval);
+					this.idle = idleState;
+
+					idleTracker.interval = setInterval(function () {
+						idleTracker.idle = true;
+						idleTracker.onIdle();
+					}, idleTracker.idleTime);
+				}
+			}
+
+			idleTracker.events.forEach(function (event) {
+
+				$(document).on(event, function () {
+					if (idleTracker.idle) {
+						idleTracker.onActive();
+						idleTracker.reset(false);
+					}
+				})
+			});
+
+			idleTracker.reset(true);
+			return idleTracker;
+		}
+
+		app.idleTracker = createIdleTracker();
 
 		app.event_bus.on('users_pane_loaded', function () {
 			if (localStorage.fast_crab) {
