@@ -3,6 +3,7 @@ import '../../node_modules/jquery-contextmenu/dist/jquery.contextMenu.css';
 
 import 'jquery-contextmenu';
 import default_emus from '../app/default_emus';
+import _ from 'lodash';
 
 export default function ($target) {
 	var displayed_users_once = false; // for mobile
@@ -313,7 +314,7 @@ export default function ($target) {
 						idle: false
 					});
 				},
-				reset: function(idleState) {
+				reset: function (idleState) {
 					clearInterval(idleTracker.interval);
 					this.idle = idleState;
 
@@ -324,13 +325,19 @@ export default function ($target) {
 				}
 			}
 
+			// Call once every second, max
+			var throttledReset = _.throttle(function () {
+				idleTracker.reset(false);
+			}, 1000);
+
 			idleTracker.events.forEach(function (event) {
 
 				$(document).on(event, function () {
 					if (idleTracker.idle) {
 						idleTracker.onActive();
-						idleTracker.reset(false);
 					}
+
+					throttledReset();
 				})
 			});
 

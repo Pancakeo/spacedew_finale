@@ -39,10 +39,10 @@ if (process.env.NODE_ENV && process.env.NODE_ENV.trim() == 'production') {
         console.log("Listening for HTTPS (secure) requests on port " + https_port);
     });
 
-    require('http').createServer((req, res) => {
-        res.writeHead(301, {location: 'https://www.' + app.config.server_domain});
-        res.end();
-    }).listen(app.config.http_port);
+    // require('http').createServer((req, res) => {
+    //     res.writeHead(301, {location: 'https://www.' + app.config.server_domain});
+    //     res.end();
+    // }).listen(app.config.http_port);
 }
 else {
     var http = require('http');
