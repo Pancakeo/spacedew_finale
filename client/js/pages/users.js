@@ -84,7 +84,7 @@ export default function ($target) {
 				var $user = $('<div class="user"><span class="username">' + display_name + '</span></div>');
 
 				if (user.idle == true) {
-					var duration = (user.idle_duration + (5000 * 60)) / 1000;
+					var duration = user.idle_duration / 1000;
 					var unit = "s";
 
 					if (duration >= 60) {
