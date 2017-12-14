@@ -128,9 +128,9 @@ const devConfig = Object.assign({}, commonConfig);
 
 const devHtmlPlugin = new HtmlWebpackPlugin({
 	template: 'index_template.ejs',
-	title: "Reckless Abandon (Dev)",
+	title: "Development Hell",
 	hash: true,
-	favicon: './public/favicon-normal.png'
+	favicon: './public/favicon-normal.ico'
 });
 
 devConfig.plugins.push(devHtmlPlugin);
@@ -139,9 +139,9 @@ const prodConfig = Object.assign({}, commonConfig);
 
 const prodHtmlPlugin = new HtmlWebpackPlugin({
 	template: 'index_template.ejs',
-	title: "Reckless Abandon",
+	title: "Dr. Hauliday",
 	hash: true,
-	favicon: './public/favicon-normal.png'
+	favicon: './public/favicon-normal.ico'
 });
 
 const prodUglifyJsPlugin = new UglifyJSPlugin({

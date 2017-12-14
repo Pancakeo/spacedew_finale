@@ -83,7 +83,7 @@ export default function ($parent, options) {
 				document.title = '(' + app.unread_messages + ') ' + app.original_title;
 
 				if (!app.new_message_alert) {
-					$('link[rel="shortcut icon"]').attr('href', '/public/favicon-alert.png');
+					$('link[rel="shortcut icon"]').attr('href', '/public/favicon-alert.ico');
 					app.new_message_alert = true;
 
 					clearInterval(app.check_for_focus);
@@ -92,7 +92,7 @@ export default function ($parent, options) {
 							app.new_message_alert = false;
 							app.unread_messages = 0;
 							document.title = app.original_title;
-							$('link[rel="shortcut icon"]').attr('href', '/public/favicon-normal.png');
+							$('link[rel="shortcut icon"]').attr('href', '/public/favicon-normal.ico');
 							clearInterval(app.check_for_focus);
 						}
 					}, 100);
